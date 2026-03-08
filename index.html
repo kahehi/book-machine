@@ -650,6 +650,14 @@
                 </div>
               </label>
               <label class="provider-option">
+                <input type="radio" name="img-provider" value="sd" id="imgprov-sd">
+                <div class="provider-card">
+                  <span class="provider-name">Stable Diffusion</span>
+                  <span class="provider-model">Stability AI</span>
+                  <span class="provider-desc" data-i18n="imgprov.sd.desc">Photorealistic images — requires Stability key</span>
+                </div>
+              </label>
+              <label class="provider-option" style="grid-column:1/-1">
                 <input type="radio" name="img-provider" value="none" id="imgprov-none">
                 <div class="provider-card">
                   <span class="provider-name" data-i18n="imgprov.none.title">None</span>
@@ -956,7 +964,7 @@
         'q.fast':'70 — Quick','q.balanced':'82 — Balanced','q.best':'95 — Best',
         'prov.anthropic.desc':'Best quality — requires an API key','prov.openai.desc':'Great results — requires an API key','prov.gemini.desc':'Google AI — requires an API key','prov.mistral.desc':'European AI — requires an API key',
         'prov.mock.title':'Try it (Offline)','prov.mock.desc':'No account needed — perfect for testing',
-        'f.imgprov.label':'Image AI','imgprov.dalle.desc':'High-quality AI images — requires OpenAI key','imgprov.none.title':'None','imgprov.none.desc':'No image generation',
+        'f.imgprov.label':'Image AI','imgprov.dalle.desc':'High-quality AI images — requires OpenAI key','imgprov.sd.desc':'Photorealistic images — requires Stability key','imgprov.none.title':'None','imgprov.none.desc':'No image generation',
         'f.imgkey.label':'Image API Key','f.imgkey.hint':'OpenAI key for DALL-E 3. Stored only in your browser.',
         'tone.auto':'Let the AI decide','tone.warm':'Warm & heartfelt','tone.funny':'Funny & playful','tone.epic':'Epic & dramatic','tone.calm':'Calm & reflective','tone.educational':'Clear & educational',
         'genre.auto':'Let the AI decide','genre.adventure':'Adventure','genre.romance':'Romance','genre.mystery':'Mystery','genre.fantasy':'Fantasy','genre.educational':'Educational','genre.biography':'Biography / True Story','genre.children':'Children\'s Story','genre.other':'Other',
@@ -1025,7 +1033,7 @@
         'q.fast':'70 — Schnell','q.balanced':'82 — Ausgewogen','q.best':'95 — Bestmöglich',
         'prov.anthropic.desc':'Beste Qualität — API-Schlüssel erforderlich','prov.openai.desc':'Tolle Ergebnisse — API-Schlüssel erforderlich','prov.gemini.desc':'Google KI — API-Schlüssel erforderlich','prov.mistral.desc':'Europäische KI — API-Schlüssel erforderlich',
         'prov.mock.title':'Ausprobieren (Offline)','prov.mock.desc':'Kein Konto nötig — perfekt zum Testen',
-        'f.imgprov.label':'Bild-KI','imgprov.dalle.desc':'Hochwertige KI-Bilder — OpenAI-Schlüssel erforderlich','imgprov.none.title':'Keine','imgprov.none.desc':'Ohne Bildgenerierung',
+        'f.imgprov.label':'Bild-KI','imgprov.dalle.desc':'Hochwertige KI-Bilder — OpenAI-Schlüssel erforderlich','imgprov.sd.desc':'Fotorealistische Bilder — Stability-Schlüssel erforderlich','imgprov.none.title':'Keine','imgprov.none.desc':'Ohne Bildgenerierung',
         'f.imgkey.label':'Bild-API-Schlüssel','f.imgkey.hint':'OpenAI-Schlüssel für DALL-E 3. Nur in deinem Browser gespeichert.',
         'tone.auto':'KI entscheiden lassen','tone.warm':'Warm & herzlich','tone.funny':'Lustig & verspielt','tone.epic':'Episch & dramatisch','tone.calm':'Ruhig & nachdenklich','tone.educational':'Klar & lehrreich',
         'genre.auto':'KI entscheiden lassen','genre.adventure':'Abenteuer','genre.romance':'Romantik','genre.mystery':'Krimi','genre.fantasy':'Fantasy','genre.educational':'Sachbuch','genre.biography':'Biografie / Wahre Geschichte','genre.children':'Kinderbuch','genre.other':'Sonstiges',
@@ -1094,7 +1102,7 @@
         'q.fast':'70 — Rapide','q.balanced':'82 — Équilibré','q.best':'95 — Optimal',
         'prov.anthropic.desc':'Meilleure qualité — clé API requise','prov.openai.desc':'Excellents résultats — clé API requise','prov.gemini.desc':'IA Google — clé API requise','prov.mistral.desc':'IA européenne — clé API requise',
         'prov.mock.title':'Essayer (Hors ligne)','prov.mock.desc':'Aucun compte nécessaire — idéal pour tester',
-        'f.imgprov.label':'IA Image','imgprov.dalle.desc':'Images IA haute qualité — clé OpenAI requise','imgprov.none.title':'Aucune','imgprov.none.desc':'Sans génération d\'images',
+        'f.imgprov.label':'IA Image','imgprov.dalle.desc':'Images IA haute qualité — clé OpenAI requise','imgprov.sd.desc':'Images photoréalistes — clé Stability requise','imgprov.none.title':'Aucune','imgprov.none.desc':'Sans génération d\'images',
         'f.imgkey.label':'Clé API Image','f.imgkey.hint':'Clé OpenAI pour DALL-E 3. Stockée uniquement dans votre navigateur.',
         'tone.auto':'Laisser l\'IA décider','tone.warm':'Chaleureux & sincère','tone.funny':'Drôle & enjoué','tone.epic':'Épique & dramatique','tone.calm':'Calme & contemplatif','tone.educational':'Clair & éducatif',
         'genre.auto':'Laisser l\'IA décider','genre.adventure':'Aventure','genre.romance':'Romance','genre.mystery':'Mystère','genre.fantasy':'Fantasy','genre.educational':'Éducatif','genre.biography':'Biographie / Histoire vraie','genre.children':'Livre pour enfants','genre.other':'Autre',
@@ -1163,7 +1171,7 @@
         'q.fast':'70 — Veloce','q.balanced':'82 — Bilanciato','q.best':'95 — Ottimale',
         'prov.anthropic.desc':'Migliore qualità — richiede una chiave API','prov.openai.desc':'Ottimi risultati — richiede una chiave API','prov.gemini.desc':'IA Google — richiede una chiave API','prov.mistral.desc':'IA europea — richiede una chiave API',
         'prov.mock.title':'Prova (Offline)','prov.mock.desc':'Nessun account necessario — perfetto per testare',
-        'f.imgprov.label':'IA Immagini','imgprov.dalle.desc':'Immagini AI di alta qualità — chiave OpenAI richiesta','imgprov.none.title':'Nessuna','imgprov.none.desc':'Senza generazione di immagini',
+        'f.imgprov.label':'IA Immagini','imgprov.dalle.desc':'Immagini AI di alta qualità — chiave OpenAI richiesta','imgprov.sd.desc':'Immagini fotorealistiche — chiave Stability richiesta','imgprov.none.title':'Nessuna','imgprov.none.desc':'Senza generazione di immagini',
         'f.imgkey.label':'Chiave API Immagini','f.imgkey.hint':'Chiave OpenAI per DALL-E 3. Salvata solo nel tuo browser.',
         'tone.auto':'Lascia decidere all\'IA','tone.warm':'Caldo & sincero','tone.funny':'Divertente & giocoso','tone.epic':'Epico & drammatico','tone.calm':'Calmo & riflessivo','tone.educational':'Chiaro & educativo',
         'genre.auto':'Lascia decidere all\'IA','genre.adventure':'Avventura','genre.romance':'Romanzo','genre.mystery':'Giallo','genre.fantasy':'Fantasy','genre.educational':'Educativo','genre.biography':'Biografia / Storia vera','genre.children':'Libro per bambini','genre.other':'Altro',
@@ -1815,6 +1823,34 @@ Return JSON in this exact format (raw JSON only, no markdown):
       return data.data?.[0]?.url||null;
     }
 
+    async function stabilityGenerate(prompt){
+      const form=new FormData();
+      form.append('prompt',prompt);
+      form.append('output_format','webp');
+      form.append('aspect_ratio','1:1');
+      const resp=await fetch('https://api.stability.ai/v2beta/stable-image/generate/core',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+wfCfg.imgApiKey,'Accept':'application/json'},
+        body:form
+      });
+      if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.errors?.[0]||e.message||'HTTP '+resp.status);}
+      const data=await resp.json();
+      if(data.image) return 'data:image/webp;base64,'+data.image;
+      return null;
+    }
+
+    // Unified image generator — returns {imageUrl, dataUrl} or null
+    async function generateCoverImage(prompt){
+      if(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey){
+        const url=await dalleGenerate(prompt);
+        if(url) return{imageUrl:url,dataUrl:await fetchAsDataUrl(url)};
+      } else if(wfCfg.imgProvider==='sd'&&wfCfg.imgApiKey){
+        const dataUrl=await stabilityGenerate(prompt);
+        if(dataUrl) return{imageUrl:dataUrl,dataUrl};
+      }
+      return null;
+    }
+
     async function fetchAsDataUrl(url){
       try{
         const resp=await fetch(url);
@@ -1829,7 +1865,7 @@ Return JSON in this exact format (raw JSON only, no markdown):
     async function generateCovers(){
       const container=document.getElementById('wf-cover-progress');
       container.innerHTML='';
-      const useDALLE=(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey);
+      const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
 
       for(let i=0;i<wfCovers.length;i++){
         const cov=wfCovers[i];
@@ -1849,12 +1885,12 @@ Return JSON in this exact format (raw JSON only, no markdown):
         let pct=0;
         const iv=setInterval(()=>{pct=Math.min(pct+1.2,88);bar.style.width=pct+'%';},150);
 
-        if(useDALLE){
+        if(useImgAI){
           try{
-            const url=await dalleGenerate(buildCoverPrompt(cov,book));
-            if(url){cov.imageUrl=url;cov.dataUrl=await fetchAsDataUrl(url);}
+            const result=await generateCoverImage(buildCoverPrompt(cov,book));
+            if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
           }catch(e){
-            console.error('[Cover] DALL-E Fehler für',cov.bookTitle,e.message||e);
+            console.error('[Cover] Fehler für',cov.bookTitle,e.message||e);
           }
         }
 
@@ -1922,11 +1958,12 @@ Return JSON in this exact format (raw JSON only, no markdown):
         // Disable action buttons while loading
         card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
         (async()=>{
-          if(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey){
+          const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
+          if(useImgAI){
             try{
               const book=wfBooks.find(b=>b.id===cov.bookId);
-              const url=await dalleGenerate(buildCoverPrompt(cov,book));
-              if(url){cov.imageUrl=url;cov.dataUrl=await fetchAsDataUrl(url);}
+              const result=await generateCoverImage(buildCoverPrompt(cov,book));
+              if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
             }catch(e){
               console.error('[Cover] Regen Fehler:',e.message||e);
             }
@@ -2204,8 +2241,8 @@ Return JSON in this exact format (raw JSON only, no markdown):
 
     // Image provider toggle → show/hide image API key field
     function updateImgKeyVisibility(){
-      const isDalle=document.querySelector('input[name="img-provider"]:checked')?.value==='dalle';
-      document.getElementById('img-api-key-group').style.display=isDalle?'':'none';
+      const val=document.querySelector('input[name="img-provider"]:checked')?.value;
+      document.getElementById('img-api-key-group').style.display=(val&&val!=='none')?'':'none';
     }
     document.querySelectorAll('input[name="img-provider"]').forEach(r=>r.addEventListener('change',updateImgKeyVisibility));
     updateImgKeyVisibility();
