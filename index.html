@@ -629,7 +629,7 @@
             </div>
           </div>
 
-          <div class="form-group reveal">
+          <div class="form-group reveal" id="api-key-group">
             <label class="form-label" for="api-key"><span data-i18n="f.apikey.label">API Key</span> <span class="req">required</span></label>
             <div class="api-key-wrap">
               <input type="password" class="form-input" id="api-key" placeholder="sk-..." autocomplete="off">
@@ -1426,17 +1426,16 @@
         setTimeout(()=>f.style.borderColor='',2000);
         return;
       }
+      const provider=document.querySelector('input[name="provider"]:checked').value;
       const apiKey=document.getElementById('api-key').value.trim();
-      if(!apiKey){
+      if(provider!=='mock'&&!apiKey){
         const f=document.getElementById('api-key');
         f.focus();f.style.borderColor='#c0392b';
         setTimeout(()=>f.style.borderColor='',2000);
         f.scrollIntoView({behavior:'smooth',block:'center'});
         return;
       }
-      localStorage.setItem('bm_api_key',apiKey);
-
-      const provider=document.querySelector('input[name="provider"]:checked').value;
+      if(apiKey) localStorage.setItem('bm_api_key',apiKey);
       const cnt=parseInt(bookCount.value);
       const genre=document.getElementById('genre').value;
       const age=document.getElementById('age').value;
@@ -2240,6 +2239,13 @@ Return JSON in this exact format (raw JSON only, no markdown):
     if(savedImgKey) document.getElementById('img-api-key').value=savedImgKey;
 
     // Image provider toggle → show/hide image API key field
+    function updateTextKeyVisibility(){
+      const isMock=document.querySelector('input[name="provider"]:checked')?.value==='mock';
+      document.getElementById('api-key-group').style.display=isMock?'none':'';
+    }
+    document.querySelectorAll('input[name="provider"]').forEach(r=>r.addEventListener('change',updateTextKeyVisibility));
+    updateTextKeyVisibility();
+
     function updateImgKeyVisibility(){
       const val=document.querySelector('input[name="img-provider"]:checked')?.value;
       document.getElementById('img-api-key-group').style.display=(val&&val!=='none')?'':'none';
