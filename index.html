@@ -339,6 +339,7 @@
     .dl-type { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; padding: 4px 10px; border-radius: 2px; font-weight: 600; }
     .dl-btn.pdf .dl-type { background: rgba(201,169,110,0.15); color: var(--accent); }
     .dl-btn.docx .dl-type { background: rgba(74,222,128,0.12); color: var(--green); }
+    .dl-btn.md .dl-type { background: rgba(99,179,237,0.12); color: #63b3ed; }
     .dl-name { font-size: 0.72rem; color: var(--text-dim); }
     .dl-btn:hover .dl-name { color: #fff; }
     .wf-restart-btn { background: none; border: none; color: var(--text-muted); font-size: 0.62rem; font-family: var(--font-mono); cursor: pointer; letter-spacing: 0.05em; padding: 0; transition: color 0.2s; }
@@ -601,6 +602,30 @@
                   <span class="provider-desc" data-i18n="prov.anthropic.desc">Best quality — requires an API key</span>
                 </div>
               </label>
+              <label class="provider-option">
+                <input type="radio" name="provider" value="gemini" id="prov-gemini">
+                <div class="provider-card">
+                  <span class="provider-name">Gemini</span>
+                  <span class="provider-model">gemini-2.0-flash</span>
+                  <span class="provider-desc" data-i18n="prov.gemini.desc">Google AI — requires an API key</span>
+                </div>
+              </label>
+              <label class="provider-option">
+                <input type="radio" name="provider" value="mistral" id="prov-mistral">
+                <div class="provider-card">
+                  <span class="provider-name">Mistral</span>
+                  <span class="provider-model">mistral-small-latest</span>
+                  <span class="provider-desc" data-i18n="prov.mistral.desc">European AI — requires an API key</span>
+                </div>
+              </label>
+              <label class="provider-option" style="grid-column:1/-1">
+                <input type="radio" name="provider" value="mock" id="prov-mock">
+                <div class="provider-card">
+                  <span class="provider-name" data-i18n="prov.mock.title">Try it (Offline)</span>
+                  <span class="provider-model">mock</span>
+                  <span class="provider-desc" data-i18n="prov.mock.desc">No account needed — perfect for testing</span>
+                </div>
+              </label>
             </div>
           </div>
 
@@ -613,6 +638,35 @@
             <p class="form-hint" data-i18n="f.apikey.hint">Stored only in your browser. Never sent to our servers.</p>
           </div>
 
+          <div class="form-group reveal">
+            <label class="form-label"><span data-i18n="f.imgprov.label">Image AI</span></label>
+            <div class="provider-toggle">
+              <label class="provider-option">
+                <input type="radio" name="img-provider" value="dalle" id="imgprov-dalle" checked>
+                <div class="provider-card">
+                  <span class="provider-name">DALL-E 3</span>
+                  <span class="provider-model">OpenAI</span>
+                  <span class="provider-desc" data-i18n="imgprov.dalle.desc">High-quality AI images — requires OpenAI key</span>
+                </div>
+              </label>
+              <label class="provider-option">
+                <input type="radio" name="img-provider" value="none" id="imgprov-none">
+                <div class="provider-card">
+                  <span class="provider-name" data-i18n="imgprov.none.title">None</span>
+                  <span class="provider-model">—</span>
+                  <span class="provider-desc" data-i18n="imgprov.none.desc">No image generation</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="form-group reveal" id="img-api-key-group">
+            <label class="form-label" for="img-api-key"><span data-i18n="f.imgkey.label">Image API Key</span> <span class="req">required</span></label>
+            <div class="api-key-wrap">
+              <input type="password" class="form-input" id="img-api-key" placeholder="sk-..." autocomplete="off">
+              <button type="button" class="api-key-toggle" id="img-api-key-toggle" data-i18n="apikey.show">Show</button>
+            </div>
+            <p class="form-hint" data-i18n="f.imgkey.hint">OpenAI key for DALL-E 3. Stored only in your browser.</p>
+          </div>
           <div class="form-group reveal">
             <label class="form-label" for="tone"><span data-i18n="f.tone.label">Tone</span> <span class="opt" data-i18n="f.optional">optional</span></label>
             <select class="form-input" id="tone" name="tone">
@@ -738,6 +792,10 @@
               <button class="dl-btn docx" onclick="downloadDocx()">
                 <span class="dl-type">DOC</span>
                 <span class="dl-name" data-i18n="wf.dl.doc">Download Word</span>
+              </button>
+              <button class="dl-btn md" onclick="downloadMarkdown()">
+                <span class="dl-type">MD</span>
+                <span class="dl-name" data-i18n="wf.dl.md">Download Markdown</span>
               </button>
             </div>
             <button class="wf-restart-btn" onclick="restartWorkflow()" data-i18n="wf.dl.restart">← Start over</button>
@@ -896,8 +954,10 @@
         'apikey.show':'Show','apikey.hide':'Hide','f.pages.unit':'pages',
         'f.tone.label':'Tone','f.optional':'optional',
         'q.fast':'70 — Quick','q.balanced':'82 — Balanced','q.best':'95 — Best',
-        'prov.anthropic.desc':'Best quality — requires an API key','prov.openai.desc':'Great results — requires an API key',
-        'prov.mock.title':'Try it out (Offline)','prov.mock.desc':'No account needed — great for testing',
+        'prov.anthropic.desc':'Best quality — requires an API key','prov.openai.desc':'Great results — requires an API key','prov.gemini.desc':'Google AI — requires an API key','prov.mistral.desc':'European AI — requires an API key',
+        'prov.mock.title':'Try it (Offline)','prov.mock.desc':'No account needed — perfect for testing',
+        'f.imgprov.label':'Image AI','imgprov.dalle.desc':'High-quality AI images — requires OpenAI key','imgprov.none.title':'None','imgprov.none.desc':'No image generation',
+        'f.imgkey.label':'Image API Key','f.imgkey.hint':'OpenAI key for DALL-E 3. Stored only in your browser.',
         'tone.auto':'Let the AI decide','tone.warm':'Warm & heartfelt','tone.funny':'Funny & playful','tone.epic':'Epic & dramatic','tone.calm':'Calm & reflective','tone.educational':'Clear & educational',
         'genre.auto':'Let the AI decide','genre.adventure':'Adventure','genre.romance':'Romance','genre.mystery':'Mystery','genre.fantasy':'Fantasy','genre.educational':'Educational','genre.biography':'Biography / True Story','genre.children':'Children\'s Story','genre.other':'Other',
         'age.auto':'Let the AI decide','age.kids':'Kids (4 – 8)','age.young':'Young Readers (9 – 13)','age.teens':'Teens (14 – 17)','age.adults':'Adults (18+)','age.all':'All Ages',
@@ -918,7 +978,7 @@
         'wf.img.title':'Generating illustrations…',
         'wf.revi.title':'Review your illustrations','wf.revi.sub':'Keep, regenerate, or skip each image.','wf.revi.continue':'Continue to Download →',
         'wf.illus.none.title':'No page illustrations','wf.illus.none.sub':'You selected a pure text book — no page illustrations will be generated.',
-        'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
+        'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.md':'Download Markdown','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
         'btn.keep':'✓ Keep','btn.rewrite':'↻ Rewrite','btn.redo':'↻ Redo','btn.remove':'✕ Remove','btn.accept':'✓ Accept','btn.reject':'✕ Reject',
         'how.tag':'How it works','how.title':'From idea to finished book.','how.subtitle':'A smart, step-by-step process with two moments where you stay in control.',
         'hw.s1.name':'You share your idea','hw.s1.desc':'A few words or a detailed description — whatever you have.',
@@ -963,8 +1023,10 @@
         'apikey.show':'Zeigen','apikey.hide':'Verbergen','f.pages.unit':'Seiten',
         'f.tone.label':'Tonalität','f.optional':'optional',
         'q.fast':'70 — Schnell','q.balanced':'82 — Ausgewogen','q.best':'95 — Bestmöglich',
-        'prov.anthropic.desc':'Beste Qualität — API-Schlüssel erforderlich','prov.openai.desc':'Tolle Ergebnisse — API-Schlüssel erforderlich',
+        'prov.anthropic.desc':'Beste Qualität — API-Schlüssel erforderlich','prov.openai.desc':'Tolle Ergebnisse — API-Schlüssel erforderlich','prov.gemini.desc':'Google KI — API-Schlüssel erforderlich','prov.mistral.desc':'Europäische KI — API-Schlüssel erforderlich',
         'prov.mock.title':'Ausprobieren (Offline)','prov.mock.desc':'Kein Konto nötig — perfekt zum Testen',
+        'f.imgprov.label':'Bild-KI','imgprov.dalle.desc':'Hochwertige KI-Bilder — OpenAI-Schlüssel erforderlich','imgprov.none.title':'Keine','imgprov.none.desc':'Ohne Bildgenerierung',
+        'f.imgkey.label':'Bild-API-Schlüssel','f.imgkey.hint':'OpenAI-Schlüssel für DALL-E 3. Nur in deinem Browser gespeichert.',
         'tone.auto':'KI entscheiden lassen','tone.warm':'Warm & herzlich','tone.funny':'Lustig & verspielt','tone.epic':'Episch & dramatisch','tone.calm':'Ruhig & nachdenklich','tone.educational':'Klar & lehrreich',
         'genre.auto':'KI entscheiden lassen','genre.adventure':'Abenteuer','genre.romance':'Romantik','genre.mystery':'Krimi','genre.fantasy':'Fantasy','genre.educational':'Sachbuch','genre.biography':'Biografie / Wahre Geschichte','genre.children':'Kinderbuch','genre.other':'Sonstiges',
         'age.auto':'KI entscheiden lassen','age.kids':'Kinder (4 – 8)','age.young':'Junge Leser (9 – 13)','age.teens':'Teenager (14 – 17)','age.adults':'Erwachsene (18+)','age.all':'Alle Altersgruppen',
@@ -985,7 +1047,7 @@
         'wf.img.title':'Illustrationen werden generiert…',
         'wf.revi.title':'Illustrationen prüfen','wf.revi.sub':'Behalten, neu generieren oder überspringen.','wf.revi.continue':'Weiter zum Download →',
         'wf.illus.none.title':'Keine Seitenillustrationen','wf.illus.none.sub':'Du hast ein reines Textbuch gewählt — es werden keine Seitenillustrationen erstellt.',
-        'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
+        'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.md':'Markdown herunterladen','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
         'btn.keep':'✓ Behalten','btn.rewrite':'↻ Neu schreiben','btn.redo':'↻ Neu','btn.remove':'✕ Entfernen','btn.accept':'✓ Annehmen','btn.reject':'✕ Ablehnen',
         'how.tag':'So funktioniert\'s','how.title':'Von der Idee zum fertigen Buch.','how.subtitle':'Ein intelligenter, schrittweiser Prozess — du behältst immer die Kontrolle.',
         'hw.s1.name':'Du teilst deine Idee','hw.s1.desc':'Ein paar Worte oder eine detaillierte Beschreibung — was auch immer du hast.',
@@ -1030,8 +1092,10 @@
         'apikey.show':'Afficher','apikey.hide':'Masquer','f.pages.unit':'pages',
         'f.tone.label':'Ton','f.optional':'optionnel',
         'q.fast':'70 — Rapide','q.balanced':'82 — Équilibré','q.best':'95 — Optimal',
-        'prov.anthropic.desc':'Meilleure qualité — clé API requise','prov.openai.desc':'Excellents résultats — clé API requise',
+        'prov.anthropic.desc':'Meilleure qualité — clé API requise','prov.openai.desc':'Excellents résultats — clé API requise','prov.gemini.desc':'IA Google — clé API requise','prov.mistral.desc':'IA européenne — clé API requise',
         'prov.mock.title':'Essayer (Hors ligne)','prov.mock.desc':'Aucun compte nécessaire — idéal pour tester',
+        'f.imgprov.label':'IA Image','imgprov.dalle.desc':'Images IA haute qualité — clé OpenAI requise','imgprov.none.title':'Aucune','imgprov.none.desc':'Sans génération d\'images',
+        'f.imgkey.label':'Clé API Image','f.imgkey.hint':'Clé OpenAI pour DALL-E 3. Stockée uniquement dans votre navigateur.',
         'tone.auto':'Laisser l\'IA décider','tone.warm':'Chaleureux & sincère','tone.funny':'Drôle & enjoué','tone.epic':'Épique & dramatique','tone.calm':'Calme & contemplatif','tone.educational':'Clair & éducatif',
         'genre.auto':'Laisser l\'IA décider','genre.adventure':'Aventure','genre.romance':'Romance','genre.mystery':'Mystère','genre.fantasy':'Fantasy','genre.educational':'Éducatif','genre.biography':'Biographie / Histoire vraie','genre.children':'Livre pour enfants','genre.other':'Autre',
         'age.auto':'Laisser l\'IA décider','age.kids':'Enfants (4 – 8)','age.young':'Jeunes lecteurs (9 – 13)','age.teens':'Ados (14 – 17)','age.adults':'Adultes (18+)','age.all':'Tous âges',
@@ -1052,7 +1116,7 @@
         'wf.img.title':'Génération des illustrations…',
         'wf.revi.title':'Vérifiez vos illustrations','wf.revi.sub':'Gardez, régénérez ou ignorez chaque image.','wf.revi.continue':'Continuer vers le téléchargement →',
         'wf.illus.none.title':'Aucune illustration de page','wf.illus.none.sub':'Vous avez sélectionné un livre sans illustrations — aucune image ne sera générée.',
-        'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
+        'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.md':'Télécharger Markdown','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
         'btn.keep':'✓ Garder','btn.rewrite':'↻ Réécrire','btn.redo':'↻ Refaire','btn.remove':'✕ Supprimer','btn.accept':'✓ Accepter','btn.reject':'✕ Rejeter',
         'how.tag':'Comment ça marche','how.title':'De l\'idée au livre fini.','how.subtitle':'Un processus intelligent, étape par étape, avec deux moments où vous gardez le contrôle.',
         'hw.s1.name':'Vous partagez votre idée','hw.s1.desc':'Quelques mots ou une description détaillée — ce que vous avez.',
@@ -1097,8 +1161,10 @@
         'apikey.show':'Mostra','apikey.hide':'Nascondi','f.pages.unit':'pagine',
         'f.tone.label':'Tono','f.optional':'opzionale',
         'q.fast':'70 — Veloce','q.balanced':'82 — Bilanciato','q.best':'95 — Ottimale',
-        'prov.anthropic.desc':'Migliore qualità — richiede una chiave API','prov.openai.desc':'Ottimi risultati — richiede una chiave API',
-        'prov.mock.title':'Prova (Offline)','prov.mock.desc':'Nessun account necessario — ottimo per testare',
+        'prov.anthropic.desc':'Migliore qualità — richiede una chiave API','prov.openai.desc':'Ottimi risultati — richiede una chiave API','prov.gemini.desc':'IA Google — richiede una chiave API','prov.mistral.desc':'IA europea — richiede una chiave API',
+        'prov.mock.title':'Prova (Offline)','prov.mock.desc':'Nessun account necessario — perfetto per testare',
+        'f.imgprov.label':'IA Immagini','imgprov.dalle.desc':'Immagini AI di alta qualità — chiave OpenAI richiesta','imgprov.none.title':'Nessuna','imgprov.none.desc':'Senza generazione di immagini',
+        'f.imgkey.label':'Chiave API Immagini','f.imgkey.hint':'Chiave OpenAI per DALL-E 3. Salvata solo nel tuo browser.',
         'tone.auto':'Lascia decidere all\'IA','tone.warm':'Caldo & sincero','tone.funny':'Divertente & giocoso','tone.epic':'Epico & drammatico','tone.calm':'Calmo & riflessivo','tone.educational':'Chiaro & educativo',
         'genre.auto':'Lascia decidere all\'IA','genre.adventure':'Avventura','genre.romance':'Romanzo','genre.mystery':'Giallo','genre.fantasy':'Fantasy','genre.educational':'Educativo','genre.biography':'Biografia / Storia vera','genre.children':'Libro per bambini','genre.other':'Altro',
         'age.auto':'Lascia decidere all\'IA','age.kids':'Bambini (4 – 8)','age.young':'Giovani lettori (9 – 13)','age.teens':'Adolescenti (14 – 17)','age.adults':'Adulti (18+)','age.all':'Tutte le età',
@@ -1119,7 +1185,7 @@
         'wf.img.title':'Generazione illustrazioni…',
         'wf.revi.title':'Rivedi le tue illustrazioni','wf.revi.sub':'Tieni, rigenera o salta ogni immagine.','wf.revi.continue':'Continua al download →',
         'wf.illus.none.title':'Nessuna illustrazione','wf.illus.none.sub':'Hai selezionato un libro solo testo — nessuna illustrazione verrà generata.',
-        'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
+        'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.md':'Scarica Markdown','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
         'btn.keep':'✓ Tieni','btn.rewrite':'↻ Riscrivi','btn.redo':'↻ Rifai','btn.remove':'✕ Rimuovi','btn.accept':'✓ Accetta','btn.reject':'✕ Rifiuta',
         'how.tag':'Come funziona','how.title':'Dall\'idea al libro finito.','how.subtitle':'Un processo intelligente, passo dopo passo, con due momenti in cui mantieni il controllo.',
         'hw.s1.name':'Condividi la tua idea','hw.s1.desc':'Poche parole o una descrizione dettagliata — qualunque cosa tu abbia.',
@@ -1371,7 +1437,10 @@
       const style=document.getElementById('illustration-style').value;
       const tone=document.getElementById('tone').value;
 
-      wfCfg={idea,cnt,genre,age,pages,density,style,tone,apiKey,provider};
+      const imgProvider=document.querySelector('input[name="img-provider"]:checked')?.value||'none';
+      const imgApiKey=document.getElementById('img-api-key').value.trim();
+      if(imgApiKey) localStorage.setItem('bm_img_api_key',imgApiKey);
+      wfCfg={idea,cnt,genre,age,pages,density,style,tone,apiKey,provider,imgProvider,imgApiKey};
       wfBooks=[];wfImages=[];wfCovers=[];
 
       document.getElementById('gen-start-section').style.display='none';
@@ -1512,22 +1581,10 @@ Return ONLY this JSON (no markdown):
 
         try{
           let responseText;
-          if(provider==='openai'){
-            const resp=await fetch('https://api.openai.com/v1/chat/completions',{
-              method:'POST',
-              headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-              body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.7,max_tokens:6000})
-            });
-            if(!resp.ok)throw new Error('HTTP '+resp.status);
-            responseText=(await resp.json()).choices[0].message.content;
-          }else{
-            const resp=await fetch('https://api.anthropic.com/v1/messages',{
-              method:'POST',
-              headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-              body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:6000,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
-            });
-            if(!resp.ok)throw new Error('HTTP '+resp.status);
-            responseText=(await resp.json()).content[0].text;
+          if(provider==='mock'){
+            responseText='{"pages":[]}';
+          } else {
+            responseText=await callProvider(provider,apiKey,systemPrompt,userPrompt,6000);
           }
           const jsonStr=responseText.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
           const parsed=safeParseBookJSON(jsonStr);
@@ -1549,6 +1606,46 @@ Return ONLY this JSON (no markdown):
 
     const LANG_NAMES={EN:'English',DE:'German',FR:'French',IT:'Italian'};
 
+    async function callProvider(provider,apiKey,systemPrompt,userPrompt,maxTokens){
+      let responseText;
+      if(provider==='openai'){
+        const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+          body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.8,max_tokens:maxTokens})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).choices[0].message.content;
+      } else if(provider==='anthropic'){
+        const resp=await fetch('https://api.anthropic.com/v1/messages',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:maxTokens,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).content[0].text;
+      } else if(provider==='gemini'){
+        const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({contents:[{role:'user',parts:[{text:userPrompt}]}],systemInstruction:{parts:[{text:systemPrompt}]},generationConfig:{maxOutputTokens:maxTokens,temperature:0.8}})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
+      } else if(provider==='mistral'){
+        const resp=await fetch('https://api.mistral.ai/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+          body:JSON.stringify({model:'mistral-small-latest',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],max_tokens:maxTokens,temperature:0.8})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).choices?.[0]?.message?.content||'';
+      } else {
+        throw new Error('Unknown provider: '+provider);
+      }
+      return responseText;
+    }
+
     async function callAI(provider,apiKey,idea,n,total,genre,age,pages,tone,lang){
       const genreStr=genre!=='auto'?genre:'any genre';
       const ageStr=age!=='auto'?`for readers ${age}`:'suitable for all ages';
@@ -1565,25 +1662,7 @@ Language: Write all text (title, synopsis, pages) in ${langName}.
 Return JSON in this exact format (raw JSON only, no markdown):
 {"title":"The book title","synopsis":"A 2-3 sentence synopsis.","pages":["Full text for page 1 (2-4 sentences)","Full text for page 2",...exactly ${pageCount} items]}`;
 
-      let responseText;
-      if(provider==='openai'){
-        const resp=await fetch('https://api.openai.com/v1/chat/completions',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-          body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.8,max_tokens:8000})
-        });
-        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
-        responseText=(await resp.json()).choices[0].message.content;
-      } else {
-        const resp=await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-          body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8000,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
-        });
-        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
-        responseText=(await resp.json()).content[0].text;
-      }
-
+      const responseText=await callProvider(provider,apiKey,systemPrompt,userPrompt,8000);
       // Strip possible markdown code fences
       const jsonStr=responseText.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
       const parsed=safeParseBookJSON(jsonStr);
@@ -1728,7 +1807,7 @@ Return JSON in this exact format (raw JSON only, no markdown):
     async function dalleGenerate(prompt){
       const resp=await fetch('https://api.openai.com/v1/images/generations',{
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+wfCfg.apiKey},
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+wfCfg.imgApiKey},
         body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1024x1024',quality:'standard'})
       });
       if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error((e.error?.message)||'HTTP '+resp.status);}
@@ -1750,7 +1829,7 @@ Return JSON in this exact format (raw JSON only, no markdown):
     async function generateCovers(){
       const container=document.getElementById('wf-cover-progress');
       container.innerHTML='';
-      const useDALLE=(wfCfg.provider==='openai'&&wfCfg.apiKey);
+      const useDALLE=(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey);
 
       for(let i=0;i<wfCovers.length;i++){
         const cov=wfCovers[i];
@@ -1843,7 +1922,7 @@ Return JSON in this exact format (raw JSON only, no markdown):
         // Disable action buttons while loading
         card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
         (async()=>{
-          if(wfCfg.provider==='openai'&&wfCfg.apiKey){
+          if(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey){
             try{
               const book=wfBooks.find(b=>b.id===cov.bookId);
               const url=await dalleGenerate(buildCoverPrompt(cov,book));
@@ -2092,6 +2171,20 @@ Return JSON in this exact format (raw JSON only, no markdown):
       a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
     };
 
+    window.downloadMarkdown=function(){
+      const approved=downloadableBooks();
+      const d=T[currentLang]||T.EN;
+      if(!approved.length){alert(d['error.no.books']||'Keine freigegebenen Bücher vorhanden.');return;}
+      const pageLabel=d['wf.page']||'Page';
+      const md=approved.map(b=>{
+        const pages=b.pages.map((p,pi)=>`## ${pageLabel} ${pi+1}\n\n${p}`).join('\n\n---\n\n');
+        return `# ${b.title}\n\n> ${b.synopsis}\n\n---\n\n${pages}`;
+      }).join('\n\n\n---\n\n\n');
+      const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-books.md';
+      a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    };
+
     /* ── Feedback submit ─────────────────────────────────────────── */
     document.getElementById('fb-submit').addEventListener('click',()=>{
       const msg=document.getElementById('fb-msg').value.trim();
@@ -2103,6 +2196,28 @@ Return JSON in this exact format (raw JSON only, no markdown):
       }
       document.getElementById('feedback-form').style.display='none';
       document.getElementById('feedback-success').classList.add('show');
+    });
+
+    // Load saved image API key
+    const savedImgKey=localStorage.getItem('bm_img_api_key');
+    if(savedImgKey) document.getElementById('img-api-key').value=savedImgKey;
+
+    // Image provider toggle → show/hide image API key field
+    function updateImgKeyVisibility(){
+      const isDalle=document.querySelector('input[name="img-provider"]:checked')?.value==='dalle';
+      document.getElementById('img-api-key-group').style.display=isDalle?'':'none';
+    }
+    document.querySelectorAll('input[name="img-provider"]').forEach(r=>r.addEventListener('change',updateImgKeyVisibility));
+    updateImgKeyVisibility();
+
+    // Image API key show/hide toggle
+    const imgKeyInput=document.getElementById('img-api-key');
+    const imgKeyToggle=document.getElementById('img-api-key-toggle');
+    imgKeyToggle.addEventListener('click',()=>{
+      const isHidden=imgKeyInput.type==='password';
+      imgKeyInput.type=isHidden?'text':'password';
+      const d2=T[currentLang]||T.EN;
+      imgKeyToggle.textContent=isHidden?(d2['apikey.hide']||'Hide'):(d2['apikey.show']||'Show');
     });
 
     // Default language
