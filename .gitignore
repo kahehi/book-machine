@@ -30,10 +30,6 @@ data/outputs/
 data/approvals/
 data/logs/
 
-# Large media files
-*.mp4
-*.mov
-*.avi
 
 # Temp files
 tmpclaude-*
