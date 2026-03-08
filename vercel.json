@@ -1,7 +1,23 @@
 {
+  "installCommand": "",
   "buildCommand": "",
   "outputDirectory": ".",
   "framework": null,
+  "headers": [
+    {
+      "source": "/buch.mp4",
+      "headers": [
+        { "key": "Content-Type", "value": "video/mp4" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ],
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
