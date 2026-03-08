@@ -385,7 +385,7 @@ function sectionApprovalResult(record: ApprovalRecord, type: string): string {
 
 // ─── Section: Story tabs (multi-story review flow) ────────────────────────────
 
-function sectionStoryTabs(records: StoryRecord[], jobId: string, jobStatus: JobStatus): string {
+function sectionStoryTabs(records: StoryRecord[], _jobId: string, jobStatus: JobStatus): string {
   const STATUS_DOT: Record<string, string> = {
     pending:      'bg-slate-300',
     accepted:     'bg-emerald-500',
