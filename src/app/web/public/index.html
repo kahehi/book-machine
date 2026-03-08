@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Machine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* Scrollbar */
+    .scroll-dark::-webkit-scrollbar { width: 5px; }
+    .scroll-dark::-webkit-scrollbar-track { background: #111827; }
+    .scroll-dark::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+
+    /* Step pulse on active */
+    @keyframes ring {
+      0%   { box-shadow: 0 0 0 0 rgba(96,165,250,.5); }
+      70%  { box-shadow: 0 0 0 8px rgba(96,165,250,0); }
+      100% { box-shadow: 0 0 0 0 rgba(96,165,250,0); }
+    }
+    .step-active { animation: ring 1.8s infinite; }
+
+    /* Prose for rendered markdown */
+    .prose { color: #d1d5db; line-height: 1.7; }
+    .prose h1 { font-size: 1.4rem; font-weight: 700; color: #f9fafb; margin: 0 0 .5rem; }
+    .prose h2 { font-size: 1.05rem; font-weight: 600; color: #e5e7eb;
+                margin: 1.2rem 0 .3rem; border-bottom: 1px solid #374151; padding-bottom: .2rem; }
+    .prose p  { margin: .4rem 0; }
+    .prose blockquote { border-left: 3px solid #4b5563; padding-left: .8rem;
+                        color: #9ca3af; font-style: italic; margin: .3rem 0; }
+    .prose hr { border-color: #1f2937; margin: .8rem 0; }
+    .prose strong { color: #93c5fd; font-weight: 600; }
+  </style>
+</head>
+
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+
+<!-- ─── Header ─────────────────────────────────────────────────────────────── -->
+<header class="bg-gray-900 border-b border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">📚</span>
+    <span class="font-bold text-lg text-blue-400 tracking-tight">Book Machine</span>
+    <span class="text-xs text-gray-600 font-mono hidden sm:inline">Agentic Workflow · Mock Mode</span>
+  </div>
+  <button id="resetBtn"
+    class="text-xs text-gray-500 hover:text-gray-300 border border-gray-700 hover:border-gray-500
+           px-3 py-1 rounded transition-colors hidden"
+    onclick="resetUI()">
+    + Neu
+  </button>
+</header>
+
+<!-- ─── Main ───────────────────────────────────────────────────────────────── -->
+<main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 flex flex-col gap-5">
+
+  <!-- Idea Input -->
+  <section id="inputSection">
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-5">
+      <label class="block text-sm text-gray-400 mb-2 font-medium">Deine Buchidee</label>
+      <div class="flex gap-3">
+        <textarea id="ideaInput" rows="2"
+          class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm
+                 text-gray-100 placeholder-gray-600 font-mono resize-none
+                 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          placeholder="z.B. Eine Gutenacht-Geschichte über einen tapferen kleinen Stern, der Angst vor dem Dunkel hat..."></textarea>
+        <button id="startBtn"
+          class="px-5 py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+                 text-white text-sm font-semibold rounded-lg transition-colors
+                 self-start whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+          onclick="startJob()">
+          ▶ Generieren
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress Steps -->
+  <section id="stepsSection" class="hidden">
+    <div class="bg-gray-900 rounded-xl border border-gray-800 px-5 py-4">
+      <div id="stepBar" class="flex items-start gap-1 overflow-x-auto pb-1"></div>
+    </div>
+  </section>
+
+  <!-- Work Area -->
+  <div id="workArea" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+    <!-- Left column: logs + quality -->
+    <div class="flex flex-col gap-4">
+
+      <!-- Live Log -->
+      <div class="bg-gray-900 rounded-xl border border-gray-800 flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-800">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Live Log</span>
+          <span id="logBadge" class="text-xs text-gray-600 font-mono">0</span>
+        </div>
+        <div id="logFeed"
+          class="scroll-dark h-72 overflow-y-auto px-4 py-3 font-mono text-xs space-y-0.5">
+        </div>
+      </div>
+
+      <!-- Quality panel (hidden until quality events arrive) -->
+      <div id="qualityPanel" class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden hidden">
+        <div class="px-4 py-2.5 border-b border-gray-800">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Quality Loop</span>
+        </div>
+        <div id="qualityContent" class="p-4 space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- Right column: placeholder / approval / manuscript -->
+    <div id="rightCol" class="flex flex-col gap-4">
+
+      <!-- Idle placeholder -->
+      <div id="rightPlaceholder"
+        class="bg-gray-900 rounded-xl border border-gray-800 flex-1 flex flex-col
+               items-center justify-center text-center py-16 px-6">
+        <div class="text-4xl mb-3 opacity-40">⚙️</div>
+        <p class="text-sm text-gray-600">Workflow läuft…</p>
+        <p class="text-xs text-gray-700 mt-1">Warte auf Approval oder Fertigstellung.</p>
+      </div>
+
+      <!-- Approval panel (hidden) -->
+      <div id="approvalPanel" class="bg-gray-900 rounded-xl border border-yellow-700 overflow-hidden hidden">
+        <div class="flex items-center gap-2 px-4 py-3 bg-yellow-900/20 border-b border-yellow-700/50">
+          <span class="text-yellow-400 font-bold text-sm">⏸ Genehmigung erforderlich</span>
+          <span id="approvalTypeBadge"
+            class="bg-yellow-600 text-black text-xs px-2 py-0.5 rounded font-mono font-bold"></span>
+        </div>
+        <div id="approvalContext"
+          class="scroll-dark p-4 font-mono text-xs text-gray-300 bg-gray-950/60
+                 overflow-y-auto max-h-64 whitespace-pre-wrap"></div>
+        <div class="p-4 flex gap-3 border-t border-gray-800">
+          <button id="approveBtn"
+            class="flex-1 py-2.5 bg-green-700 hover:bg-green-600 text-white text-sm
+                   font-bold rounded-lg transition-colors"
+            onclick="submitApproval(true)">
+            ✓ Genehmigen
+          </button>
+          <button class="px-4 py-2.5 bg-red-900/70 hover:bg-red-800 text-red-300 text-sm
+                         font-bold rounded-lg transition-colors border border-red-800"
+            onclick="submitApproval(false)">
+            ✗ Ablehnen
+          </button>
+        </div>
+      </div>
+
+      <!-- Manuscript panel (hidden) -->
+      <div id="manuscriptPanel"
+        class="bg-gray-900 rounded-xl border border-green-800 overflow-hidden hidden flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3
+                    bg-green-900/20 border-b border-green-800/50">
+          <span class="text-green-400 font-bold text-sm">✓ Manuskript fertig</span>
+          <button onclick="downloadManuscript()"
+            class="text-xs bg-green-800 hover:bg-green-700 px-3 py-1 rounded text-white transition-colors">
+            ⬇ Download .md
+          </button>
+        </div>
+        <div id="manuscriptContent"
+          class="prose scroll-dark p-5 text-sm overflow-y-auto max-h-[36rem]"></div>
+      </div>
+
+    </div><!-- /rightCol -->
+  </div><!-- /workArea -->
+
+  <!-- Error Banner -->
+  <div id="errorBanner"
+    class="hidden bg-red-950/60 border border-red-800 rounded-xl px-5 py-4
+           text-red-300 font-mono text-sm">
+  </div>
+
+</main>
+
+<!-- ─── Script ─────────────────────────────────────────────────────────────── -->
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentJobId      = null;
+let currentEventSource = null;
+let pendingApprovalType = null;
+let manuscriptRaw     = '';
+let logCount          = 0;
+let activeStep        = 0;
+
+const STEPS = [
+  { n: 1, label: 'Planen'       },
+  { n: 2, label: 'Reality'      },
+  { n: 3, label: 'PLAN_OK'      },
+  { n: 4, label: 'Story'        },
+  { n: 5, label: 'Quality'      },
+  { n: 6, label: 'TEXT_OK'      },
+  { n: 7, label: 'Export'       },
+];
+
+// ── Start Job ──────────────────────────────────────────────────────────────────
+async function startJob() {
+  const idea = document.getElementById('ideaInput').value.trim();
+  if (!idea) { alert('Bitte eine Idee eingeben.'); return; }
+
+  resetUI(false);
+
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Läuft…';
+  document.getElementById('resetBtn').classList.remove('hidden');
+
+  const res = await fetch('/api/jobs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idea }),
+  });
+  const { jobId, error } = await res.json();
+  if (error) { showError(error); restoreStartBtn(); return; }
+
+  currentJobId = jobId;
+
+  show('stepsSection');
+  show('workArea');
+  renderStepBar();
+
+  currentEventSource = new EventSource(`/api/jobs/${jobId}/stream`);
+  currentEventSource.onmessage = handleEvent;
+  currentEventSource.onerror   = () => appendLog('warn', 'SSE-Verbindung unterbrochen.');
+}
+
+// ── SSE Handler ────────────────────────────────────────────────────────────────
+function handleEvent(e) {
+  const ev = JSON.parse(e.data);
+  switch (ev.type) {
+    case 'log':              appendLog(ev.level, ev.message); break;
+    case 'step':             setStep(ev.step); break;
+    case 'approval_required': showApproval(ev.approvalType, ev.context); break;
+    case 'quality':          showQuality(ev); break;
+    case 'done':             handleDone(ev); break;
+    case 'error':            showError(ev.message); restoreStartBtn(); break;
+  }
+}
+
+// ── Step Bar ───────────────────────────────────────────────────────────────────
+function setStep(n) {
+  activeStep = n;
+  renderStepBar();
+}
+
+function renderStepBar() {
+  const bar = document.getElementById('stepBar');
+  bar.innerHTML = STEPS.map((s, i) => {
+    const done   = s.n < activeStep;
+    const active = s.n === activeStep;
+    const circle = done
+      ? 'bg-green-600 text-white'
+      : active
+        ? 'bg-blue-600 text-white step-active'
+        : 'bg-gray-800 text-gray-500';
+    const lbl = done
+      ? 'text-green-500'
+      : active
+        ? 'text-blue-400 font-semibold'
+        : 'text-gray-600';
+    const connector = i < STEPS.length - 1
+      ? `<div class="mt-3 mx-1 h-px w-5 shrink-0 ${done ? 'bg-green-700' : 'bg-gray-800'}"></div>`
+      : '';
+    return `
+      <div class="flex items-start">
+        <div class="flex flex-col items-center gap-1 shrink-0">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${circle}">
+            ${done ? '✓' : s.n}
+          </div>
+          <span class="text-[10px] leading-tight text-center w-12 ${lbl}">${s.label}</span>
+        </div>
+        ${connector}
+      </div>`;
+  }).join('');
+}
+
+// ── Log Feed ───────────────────────────────────────────────────────────────────
+function appendLog(level, message) {
+  logCount++;
+  const feed = document.getElementById('logFeed');
+  const colors = { info: 'text-cyan-400', warn: 'text-yellow-400', error: 'text-red-400' };
+  const levelColor = colors[level] || 'text-gray-400';
+  const t = new Date().toLocaleTimeString('de-DE', { hour12: false });
+
+  const row = document.createElement('div');
+  row.className = 'flex gap-2 items-baseline';
+  row.innerHTML =
+    `<span class="text-gray-700 shrink-0 w-16">${t}</span>` +
+    `<span class="text-[10px] uppercase shrink-0 ${levelColor} w-8">${level}</span>` +
+    `<span class="text-gray-300 break-all">${esc(message)}</span>`;
+  feed.appendChild(row);
+  feed.scrollTop = feed.scrollHeight;
+  document.getElementById('logBadge').textContent = logCount;
+}
+
+// ── Approval ───────────────────────────────────────────────────────────────────
+function showApproval(type, context) {
+  pendingApprovalType = type;
+  document.getElementById('approvalTypeBadge').textContent = type;
+  document.getElementById('approvalContext').textContent = JSON.stringify(context, null, 2);
+  document.getElementById('approveBtn').textContent = `✓ ${type}`;
+  hide('rightPlaceholder');
+  hide('manuscriptPanel');
+  show('approvalPanel');
+}
+
+async function submitApproval(approve) {
+  if (!currentJobId || !pendingApprovalType) return;
+  const type   = pendingApprovalType;
+  const answer = approve ? type : 'REJECT';
+  pendingApprovalType = null;
+
+  hide('approvalPanel');
+  show('rightPlaceholder');
+
+  await fetch(`/api/jobs/${currentJobId}/approve`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answer }),
+  });
+
+  if (!approve) appendLog('warn', `${type} abgelehnt – Workflow wird abgebrochen.`);
+}
+
+// ── Quality ────────────────────────────────────────────────────────────────────
+function showQuality(ev) {
+  show('qualityPanel');
+  const pct      = Math.round(ev.score);
+  const barColor = ev.score >= ev.target ? 'bg-green-500' : ev.score >= 70 ? 'bg-yellow-500' : 'bg-red-500';
+  const scoreColor = ev.score >= ev.target ? 'text-green-400' : 'text-yellow-400';
+  const highN    = (ev.issues || []).filter(i => i.severity === 'high').length;
+
+  const issuesHtml = (ev.issues || []).length
+    ? (ev.issues || []).map(i => {
+        const c = { high:'text-red-400', medium:'text-yellow-400', low:'text-gray-500' }[i.severity] || 'text-gray-400';
+        return `<div class="text-xs ${c}">▸ <span class="font-semibold">[${i.severity}]</span> ${esc(i.category)}: ${esc(i.description)}</div>`;
+      }).join('')
+    : '<div class="text-xs text-green-400">Keine Issues</div>';
+
+  document.getElementById('qualityContent').innerHTML = `
+    <div>
+      <div class="flex justify-between items-baseline mb-1">
+        <span class="text-xs text-gray-500">Iteration ${ev.iter} · Score</span>
+        <span class="text-sm font-bold ${scoreColor}">${pct} / 100</span>
+      </div>
+      <div class="w-full bg-gray-800 rounded-full h-1.5">
+        <div class="${barColor} h-1.5 rounded-full transition-all duration-500" style="width:${pct}%"></div>
+      </div>
+      <div class="flex gap-4 mt-1">
+        <span class="text-[10px] text-gray-600">Ziel: ${ev.target}/100</span>
+        <span class="text-[10px] ${highN ? 'text-red-400' : 'text-gray-600'}">${highN} kritisch</span>
+      </div>
+    </div>
+    <div class="space-y-0.5 border-t border-gray-800 pt-2">${issuesHtml}</div>
+    ${(ev.improvementSummary||[]).length ? `
+    <div class="border-t border-gray-800 pt-2 space-y-0.5">
+      ${(ev.improvementSummary||[]).map(s => `<div class="text-[10px] text-gray-500">→ ${esc(s)}</div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ── Done ───────────────────────────────────────────────────────────────────────
+function handleDone(ev) {
+  manuscriptRaw = ev.manuscript || '';
+  hide('rightPlaceholder');
+  hide('approvalPanel');
+  show('manuscriptPanel');
+  document.getElementById('manuscriptContent').innerHTML =
+    window.marked ? marked.parse(ev.manuscript || '') : `<pre>${esc(ev.manuscript||'')}</pre>`;
+  setStep(8); // all done
+  restoreStartBtn();
+  if (currentEventSource) { currentEventSource.close(); currentEventSource = null; }
+}
+
+// ── Error ──────────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = `Fehler: ${msg}`;
+  el.classList.remove('hidden');
+}
+
+// ── Download ───────────────────────────────────────────────────────────────────
+function downloadManuscript() {
+  const blob = new Blob([manuscriptRaw], { type: 'text/markdown;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'manuscript.md';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── UI Utilities ───────────────────────────────────────────────────────────────
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function resetUI(full = true) {
+  logCount = 0;
+  activeStep = 0;
+  pendingApprovalType = null;
+  manuscriptRaw = '';
+  if (currentEventSource) { currentEventSource.close(); currentEventSource = null; }
+  document.getElementById('logFeed').innerHTML      = '';
+  document.getElementById('logBadge').textContent   = '0';
+  document.getElementById('qualityContent').innerHTML = '';
+  document.getElementById('errorBanner').classList.add('hidden');
+  hide('qualityPanel');
+  hide('approvalPanel');
+  hide('manuscriptPanel');
+  show('rightPlaceholder');
+  if (full) {
+    hide('stepsSection');
+    hide('workArea');
+    hide('resetBtn');
+  }
+}
+
+function restoreStartBtn() {
+  const btn = document.getElementById('startBtn');
+  btn.disabled   = false;
+  btn.textContent = '▶ Generieren';
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Gemeinsame Python-Abhaengigkeiten fuer alle Micro-Firma Services
+# Nur Standard-Bibliothek + minimal notwendige Pakete
+
+# Fuer Anthropic API Integration (optional)
+anthropic>=0.25.0
+
+# Fuer Schema-Validierung
+jsonschema>=4.22.0
+
+# Fuer Integration-Tests (pytest)
+pytest>=8.0.0

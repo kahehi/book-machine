@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "outline.schema.json",
+  "title": "BookOutline",
+  "description": "Gliederungs-Artefakt: Strukturierte Kapitel- und Szenenplanung.",
+  "type": "object",
+  "required": [
+    "project_id",
+    "run_id",
+    "title",
+    "chapters",
+    "character_list",
+    "narrative_arc",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "project_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "title": { "type": "string" },
+    "chapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["chapter_number", "title", "summary", "scenes"],
+        "properties": {
+          "chapter_number": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string" },
+          "summary": { "type": "string", "minLength": 20 },
+          "scenes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["scene_number", "description", "characters_present"],
+              "properties": {
+                "scene_number": { "type": "integer", "minimum": 1 },
+                "description": { "type": "string" },
+                "characters_present": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "emotional_beat": { "type": "string" },
+                "illustration_needed": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "character_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["protagonist", "antagonist", "supporting", "mentor", "other"]
+          },
+          "description": { "type": "string" },
+          "arc": { "type": "string" }
+        }
+      }
+    },
+    "narrative_arc": {
+      "type": "object",
+      "required": ["setup", "rising_action", "climax", "resolution"],
+      "properties": {
+        "setup": { "type": "string" },
+        "rising_action": { "type": "string" },
+        "climax": { "type": "string" },
+        "falling_action": { "type": "string" },
+        "resolution": { "type": "string" }
+      }
+    },
+    "estimated_word_count": { "type": "integer", "minimum": 0 },
+    "approved": { "type": "boolean", "default": false },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_by": { "type": "string" },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

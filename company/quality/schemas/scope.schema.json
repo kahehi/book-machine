@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "scope.schema.json",
+  "title": "ProjectScope",
+  "description": "Scope-Artefakt: Definiert den Rahmen eines Buchprojekts.",
+  "type": "object",
+  "required": [
+    "project_id",
+    "run_id",
+    "title",
+    "concept",
+    "target_audience",
+    "genre",
+    "language",
+    "page_count",
+    "deliverables",
+    "constraints",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "project_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "title": {
+      "type": "string",
+      "description": "Arbeitstitel des Projekts",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "concept": {
+      "type": "string",
+      "description": "Kernidee und Zusammenfassung (mind. 50 Zeichen)",
+      "minLength": 50
+    },
+    "target_audience": {
+      "type": "object",
+      "required": ["age_min", "age_max", "description"],
+      "properties": {
+        "age_min": { "type": "integer", "minimum": 0 },
+        "age_max": { "type": "integer", "maximum": 99 },
+        "description": { "type": "string" }
+      }
+    },
+    "genre": {
+      "type": "string",
+      "enum": [
+        "childrens_book",
+        "picture_book",
+        "early_reader",
+        "middle_grade",
+        "young_adult",
+        "non_fiction",
+        "educational"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "description": "ISO 639-1 Sprachcode",
+      "pattern": "^[a-z]{2}$",
+      "default": "de"
+    },
+    "page_count": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "maximum": 500 }
+      }
+    },
+    "series": {
+      "type": ["object", "null"],
+      "properties": {
+        "name": { "type": "string" },
+        "volume": { "type": "integer" },
+        "total_volumes": { "type": "integer" }
+      }
+    },
+    "tone": {
+      "type": "string",
+      "description": "Ton und Stil des Werks"
+    },
+    "key_themes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 10
+    },
+    "deliverables": {
+      "type": "array",
+      "description": "Erwartete Lieferobjekte",
+      "items": {
+        "type": "string",
+        "enum": [
+          "manuscript",
+          "illustrations",
+          "layout",
+          "publishing_package",
+          "marketing_campaign",
+          "press_kit"
+        ]
+      },
+      "minItems": 1
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Einschraenkungen und Anforderungen",
+      "properties": {
+        "content_restrictions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "platform_requirements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "legal_requirements": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "risk_assessment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "severity", "description", "mitigation"],
+        "properties": {
+          "category": { "type": "string" },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+          "description": { "type": "string" },
+          "mitigation": { "type": "string" }
+        }
+      }
+    },
+    "approved": {
+      "type": "boolean",
+      "description": "CEO-Freigabe erteilt",
+      "default": false
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_by": { "type": "string" },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

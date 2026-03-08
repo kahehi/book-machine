@@ -1,0 +1,45 @@
+# Build-Artefakte und temporaere Dateien
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Node.js (bestehende book-machine)
+node_modules/
+npm-debug.log*
+
+# TypeScript Build-Artefakte
+dist/
+*.js.map
+
+# Versionskontrolle
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Umgebungsvariablen (Secrets)
+.env
+.env.local
+.env.production
+
+# Laufzeit-Daten (nicht fuer Build benoetigt)
+workspace/projects/
+workspace/runs/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/

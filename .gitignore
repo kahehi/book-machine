@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.local
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Data & Cache
+data/jobs/
+data/outputs/
+data/approvals/
+data/logs/
+
+# Large media files
+*.mp4
+*.mov
+*.avi
+
+# Temp files
+tmpclaude-*

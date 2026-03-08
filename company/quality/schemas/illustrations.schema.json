@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "illustrations.schema.json",
+  "title": "Illustrations",
+  "description": "Illustrations-Artefakt: Bildprompts und Metadaten fuer alle Buchillustrationen.",
+  "type": "object",
+  "required": [
+    "project_id",
+    "run_id",
+    "style_guide",
+    "illustrations",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "project_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "style_guide": {
+      "type": "object",
+      "required": ["art_style", "color_palette", "mood"],
+      "properties": {
+        "art_style": {
+          "type": "string",
+          "description": "Zeichenstil (z.B. watercolor, digital, pencil sketch)"
+        },
+        "color_palette": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hauptfarben (Hex oder Farbname)"
+        },
+        "mood": { "type": "string" },
+        "reference_artists": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "forbidden_elements": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Verbotene Bildelemente (Safety-Regeln)"
+        }
+      }
+    },
+    "illustrations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["illustration_id", "page_number", "prompt_en", "prompt_de", "status"],
+        "properties": {
+          "illustration_id": { "type": "string" },
+          "page_number": { "type": "integer", "minimum": 1 },
+          "prompt_en": {
+            "type": "string",
+            "description": "Englischer Bildprompt fuer KI-Generator",
+            "minLength": 20
+          },
+          "prompt_de": {
+            "type": "string",
+            "description": "Deutsche Beschreibung fuer interne Dokumentation"
+          },
+          "negative_prompt": { "type": "string" },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": ["1:1", "4:3", "16:9", "3:4", "A4"],
+            "default": "4:3"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "GENERATED", "APPROVED", "REJECTED", "REWORK"]
+          },
+          "file_path": { "type": ["string", "null"] },
+          "rejection_reason": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "approved": { "type": "boolean", "default": false },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_by": { "type": "string" },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

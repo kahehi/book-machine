@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "task.schema.json",
+  "title": "Task",
+  "description": "Universelles Task-Schema fuer alle Agent-Services der Micro-Firma.",
+  "type": "object",
+  "required": [
+    "task_id",
+    "run_id",
+    "project_id",
+    "task_type",
+    "owner_service",
+    "input_artifacts",
+    "output_artifacts",
+    "acceptance_criteria",
+    "priority",
+    "max_retries",
+    "retry_count",
+    "status",
+    "created_at"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Eindeutige Task-ID (UUID v4)",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Lauf-ID fuer Traceability",
+      "pattern": "^run_[a-z0-9_]+$"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Projekt-ID, zu dem dieser Task gehoert"
+    },
+    "task_type": {
+      "type": "string",
+      "description": "Art des Tasks",
+      "enum": [
+        "SCOPE_DEFINE",
+        "SCOPE_REVIEW",
+        "OUTLINE_CREATE",
+        "OUTLINE_REVIEW",
+        "MANUSCRIPT_WRITE",
+        "MANUSCRIPT_REVIEW",
+        "ILLUSTRATIONS_CREATE",
+        "ILLUSTRATIONS_REVIEW",
+        "LAYOUT_CREATE",
+        "LAYOUT_REVIEW",
+        "PUBLISH_PREPARE",
+        "PUBLISH_REVIEW",
+        "CAMPAIGN_CREATE",
+        "CAMPAIGN_REVIEW",
+        "RELEASE_PREPARE",
+        "RELEASE_REVIEW",
+        "SUPPORT_REVIEW",
+        "DEPLOYMENT_PREPARE",
+        "DEPLOYMENT_REVIEW",
+        "QC_GATE_CHECK",
+        "REWORK"
+      ]
+    },
+    "owner_service": {
+      "type": "string",
+      "description": "Service, der diesen Task bearbeitet",
+      "enum": [
+        "orchestrator",
+        "quality-global",
+        "quality-product",
+        "quality-marketing",
+        "quality-tech",
+        "quality-customer",
+        "product-worker",
+        "marketing-worker",
+        "tech-worker",
+        "customer-worker"
+      ]
+    },
+    "input_artifacts": {
+      "type": "array",
+      "description": "Liste der Eingabe-Artefakte (relative Pfade)",
+      "items": { "type": "string" }
+    },
+    "output_artifacts": {
+      "type": "array",
+      "description": "Liste der erwarteten Ausgabe-Artefakte (relative Pfade)",
+      "items": { "type": "string" }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "description": "Pruefkriterien, die erfuellt sein muessen",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Prioritaet (1=hoechste, 10=niedrigste)",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "max_retries": {
+      "type": "integer",
+      "description": "Maximale Anzahl Wiederholungsversuche",
+      "minimum": 0,
+      "maximum": 5,
+      "default": 3
+    },
+    "retry_count": {
+      "type": "integer",
+      "description": "Aktuelle Anzahl Versuche",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "description": "Aktueller Task-Status",
+      "enum": [
+        "PENDING",
+        "IN_PROGRESS",
+        "COMPLETED",
+        "FAILED",
+        "DEAD_LETTER",
+        "BLOCKED"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Erstellungszeitpunkt (ISO 8601)"
+    },
+    "started_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Startzeit der Bearbeitung"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Abschlusszeit"
+    },
+    "error_message": {
+      "type": ["string", "null"],
+      "description": "Fehlermeldung bei FAILED oder DEAD_LETTER Status"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optionale zusaetzliche Metadaten",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,334 @@
+version: "3.9"
+
+# =============================================================================
+# Micro-Firma Buchproduktion – Docker Compose Stack
+# =============================================================================
+# Startet mit: docker compose up --build
+# Stoppt mit:  docker compose down
+#
+# Services: 10 Agent-Container
+#   orchestrator        – COO: Steuert Ablauf, Tasks, States
+#   quality-global      – CQO: Finales Publish Gate
+#   product-worker      – Inhaltliche Artefakte (Scope, Outline, Manuskript)
+#   marketing-worker    – Kampagnen und Pressematerialien
+#   tech-worker         – Layout, Export, Publishing-Paket
+#   customer-worker     – Support-Dokumentation
+#   quality-product     – Scope/Manuscript/Illustration Gates
+#   quality-marketing   – Campaign Gate
+#   quality-tech        – Layout Gate
+#   quality-customer    – Support Quality Gate
+
+networks:
+  firma_internal:
+    driver: bridge
+
+# =============================================================================
+# Gemeinsame Konfiguration (YAML Anchors)
+# =============================================================================
+x-common-env: &common-env
+  WORKSPACE_DIR: /workspace
+  COMPANY_DIR: /company
+  POLL_INTERVAL: ${POLL_INTERVAL:-5}
+  LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  TARGET_SCORE: ${TARGET_SCORE:-85}
+  MAX_ITERATIONS: ${MAX_ITERATIONS:-3}
+  MAX_REWORK_CYCLES: ${MAX_REWORK_CYCLES:-3}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+x-common-restart: &common-restart
+  restart: unless-stopped
+
+x-common-healthcheck: &common-healthcheck
+  healthcheck:
+    test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 15s
+
+# =============================================================================
+# Services
+# =============================================================================
+services:
+
+  # ---------------------------------------------------------------------------
+  # ORCHESTRATOR (COO) – Steuert den gesamten Ablauf
+  # ---------------------------------------------------------------------------
+  orchestrator:
+    build:
+      context: .
+      dockerfile: docker/orchestrator/Dockerfile
+    container_name: firma-orchestrator
+    hostname: orchestrator
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: COO
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      # Quellcode per Volume mounten erlaubt Hot-Reload ohne Build
+      - ./docker/orchestrator/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    labels:
+      - "firma.service=orchestrator"
+      - "firma.role=COO"
+
+  # ---------------------------------------------------------------------------
+  # GLOBAL QUALITY AGENT (CQO) – Publish Gate und Cross-Domain-Pruefung
+  # ---------------------------------------------------------------------------
+  quality-global:
+    build:
+      context: .
+      dockerfile: docker/quality-global/Dockerfile
+    container_name: firma-quality-global
+    hostname: quality-global
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: CQO
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/quality-global/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=quality-global"
+      - "firma.role=CQO"
+
+  # ---------------------------------------------------------------------------
+  # PRODUCT WORKER – Scope, Outline, Manuskript, Illustrationen
+  # ---------------------------------------------------------------------------
+  product-worker:
+    build:
+      context: .
+      dockerfile: docker/product-worker/Dockerfile
+    container_name: firma-product-worker
+    hostname: product-worker
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: PRODUCT_WORKER
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/product-worker/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=product-worker"
+      - "firma.role=WORKER"
+
+  # ---------------------------------------------------------------------------
+  # MARKETING WORKER – Kampagnen und Pressematerialien
+  # ---------------------------------------------------------------------------
+  marketing-worker:
+    build:
+      context: .
+      dockerfile: docker/marketing-worker/Dockerfile
+    container_name: firma-marketing-worker
+    hostname: marketing-worker
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: MARKETING_WORKER
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/marketing-worker/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=marketing-worker"
+      - "firma.role=WORKER"
+
+  # ---------------------------------------------------------------------------
+  # TECH WORKER – Layout, Export und Publishing-Paket
+  # ---------------------------------------------------------------------------
+  tech-worker:
+    build:
+      context: .
+      dockerfile: docker/tech-worker/Dockerfile
+    container_name: firma-tech-worker
+    hostname: tech-worker
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: TECH_WORKER
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/tech-worker/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=tech-worker"
+      - "firma.role=WORKER"
+
+  # ---------------------------------------------------------------------------
+  # CUSTOMER WORKER – Support-Dokumentation
+  # ---------------------------------------------------------------------------
+  customer-worker:
+    build:
+      context: .
+      dockerfile: docker/customer-worker/Dockerfile
+    container_name: firma-customer-worker
+    hostname: customer-worker
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: CUSTOMER_WORKER
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/customer-worker/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=customer-worker"
+      - "firma.role=WORKER"
+
+  # ---------------------------------------------------------------------------
+  # QUALITY PRODUCT – Scope, Manuscript, Illustration Gates
+  # ---------------------------------------------------------------------------
+  quality-product:
+    build:
+      context: .
+      dockerfile: docker/quality-product/Dockerfile
+    container_name: firma-quality-product
+    hostname: quality-product
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: QA_PRODUCT
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/quality-product/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=quality-product"
+      - "firma.role=QA"
+
+  # ---------------------------------------------------------------------------
+  # QUALITY MARKETING – Campaign Gate
+  # ---------------------------------------------------------------------------
+  quality-marketing:
+    build:
+      context: .
+      dockerfile: docker/quality-marketing/Dockerfile
+    container_name: firma-quality-marketing
+    hostname: quality-marketing
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: QA_MARKETING
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/quality-marketing/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=quality-marketing"
+      - "firma.role=QA"
+
+  # ---------------------------------------------------------------------------
+  # QUALITY TECH – Layout Gate und Release Gate
+  # ---------------------------------------------------------------------------
+  quality-tech:
+    build:
+      context: .
+      dockerfile: docker/quality-tech/Dockerfile
+    container_name: firma-quality-tech
+    hostname: quality-tech
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: QA_TECH
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/quality-tech/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=quality-tech"
+      - "firma.role=QA"
+
+  # ---------------------------------------------------------------------------
+  # QUALITY CUSTOMER – Support Quality Gate
+  # ---------------------------------------------------------------------------
+  quality-customer:
+    build:
+      context: .
+      dockerfile: docker/quality-customer/Dockerfile
+    container_name: firma-quality-customer
+    hostname: quality-customer
+    environment:
+      <<: *common-env
+      SERVICE_ROLE: QA_CUSTOMER
+    volumes:
+      - ./company:/company:ro
+      - ./workspace/projects:/workspace/projects
+      - ./docker/quality-customer/app.py:/app/app.py:ro
+      - ./company/lib:/company/lib:ro
+    networks:
+      - firma_internal
+    <<: *common-restart
+    <<: *common-healthcheck
+    depends_on:
+      - orchestrator
+    labels:
+      - "firma.service=quality-customer"
+      - "firma.role=QA"
+
+  # ---------------------------------------------------------------------------
+  # REDIS (Optional) – Fuer zukuenftige Message Queue Erweiterung
+  # Auskommentiert, da file-basiertes System ausreicht
+  # ---------------------------------------------------------------------------
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: firma-redis
+  #   networks:
+  #     - firma_internal
+  #   restart: unless-stopped

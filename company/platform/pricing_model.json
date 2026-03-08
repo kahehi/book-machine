@@ -1,0 +1,23 @@
+{
+  "currency": "EUR",
+  "billing": "monthly",
+  "plans": {
+    "free": {
+      "price_monthly": 0,
+      "description": "Einsteiger-Plan – 1 Projekt, Mock-LLM"
+    },
+    "starter": {
+      "price_monthly": 29,
+      "description": "Kleines Studio – 5 Projekte, echtes LLM"
+    },
+    "professional": {
+      "price_monthly": 99,
+      "description": "Professionelle Autoren – 20 Projekte, alle Plattformen"
+    },
+    "enterprise": {
+      "price_monthly": "auf Anfrage",
+      "description": "Verlage – unbegrenzte Projekte, dedizierte Instanz"
+    }
+  },
+  "notes": "Alle Preise zzgl. MwSt. Jaehrliche Zahlung mit 20% Rabatt moeglich."
+}

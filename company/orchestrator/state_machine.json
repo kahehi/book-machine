@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Micro-Firma State Machine",
+  "description": "Vollstaendige State Machine fuer den Buchproduktions-Lebenszyklus.",
+  "version": "1.0.0",
+  "initial_state": "IDEA_INTAKE",
+  "states": {
+    "IDEA_INTAKE": {
+      "description": "Projektidee eingegangen, noch kein Scope definiert.",
+      "type": "active",
+      "allowed_transitions": ["SCOPE_DEFINED", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "SCOPE_DEFINE",
+      "assigned_to": "product-worker"
+    },
+    "SCOPE_DEFINED": {
+      "description": "Scope wurde durch Product Worker definiert. Warte auf CEO-Freigabe.",
+      "type": "waiting_approval",
+      "allowed_transitions": ["OUTLINE_READY", "REWORK_SCOPE", "FAILED"],
+      "owner": "orchestrator",
+      "gate": "SCOPE_GATE",
+      "gate_owner": "quality-product"
+    },
+    "OUTLINE_READY": {
+      "description": "Gliederung wurde durch Product Worker erstellt.",
+      "type": "active",
+      "allowed_transitions": ["OUTLINE_APPROVED", "REWORK_OUTLINE", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "OUTLINE_CREATE",
+      "assigned_to": "product-worker",
+      "gate": "SCOPE_GATE",
+      "gate_owner": "quality-product"
+    },
+    "OUTLINE_APPROVED": {
+      "description": "Gliederung hat Gate bestanden und CEO-Freigabe erhalten.",
+      "type": "approved",
+      "allowed_transitions": ["DRAFT_READY", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "MANUSCRIPT_WRITE",
+      "assigned_to": "product-worker"
+    },
+    "DRAFT_READY": {
+      "description": "Erstentwurf des Manuskripts liegt vor.",
+      "type": "active",
+      "allowed_transitions": ["DRAFT_APPROVED", "REWORK_DRAFT", "FAILED"],
+      "owner": "orchestrator",
+      "gate": "MANUSCRIPT_GATE",
+      "gate_owner": "quality-product"
+    },
+    "DRAFT_APPROVED": {
+      "description": "Manuskript hat Gate bestanden und CEO-Freigabe erhalten.",
+      "type": "approved",
+      "allowed_transitions": ["ILLUSTRATIONS_READY", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "ILLUSTRATIONS_CREATE",
+      "assigned_to": "product-worker"
+    },
+    "ILLUSTRATIONS_READY": {
+      "description": "Illustrationsprompts und -dateien liegen vor.",
+      "type": "active",
+      "allowed_transitions": ["ILLUSTRATIONS_APPROVED", "REWORK_ILLUSTRATIONS", "FAILED"],
+      "owner": "orchestrator",
+      "gate": "ILLUSTRATION_GATE",
+      "gate_owner": "quality-product"
+    },
+    "ILLUSTRATIONS_APPROVED": {
+      "description": "Illustrationen haben Gate bestanden und CEO-Freigabe erhalten.",
+      "type": "approved",
+      "allowed_transitions": ["LAYOUT_READY", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "LAYOUT_CREATE",
+      "assigned_to": "tech-worker"
+    },
+    "LAYOUT_READY": {
+      "description": "Layout-Dateien wurden durch Tech Worker erstellt.",
+      "type": "active",
+      "allowed_transitions": ["LAYOUT_APPROVED", "REWORK_LAYOUT", "FAILED"],
+      "owner": "orchestrator",
+      "gate": "LAYOUT_GATE",
+      "gate_owner": "quality-tech"
+    },
+    "LAYOUT_APPROVED": {
+      "description": "Layout hat Gate bestanden und CEO-Freigabe erhalten.",
+      "type": "approved",
+      "allowed_transitions": ["PUBLISH_READY", "FAILED"],
+      "owner": "orchestrator",
+      "triggers_task": "PUBLISH_PREPARE",
+      "assigned_to": "tech-worker"
+    },
+    "PUBLISH_READY": {
+      "description": "Publishing-Paket ist vorbereitet.",
+      "type": "active",
+      "allowed_transitions": ["PUBLISH_APPROVED", "REWORK_PUBLISH", "FAILED"],
+      "owner": "orchestrator",
+      "gate": "PUBLISH_GATE",
+      "gate_owner": "quality-global"
+    },
+    "PUBLISH_APPROVED": {
+      "description": "Publishing-Paket hat finales Gate bestanden.",
+      "type": "approved",
+      "allowed_transitions": ["PUBLISHED", "FAILED"],
+      "owner": "orchestrator"
+    },
+    "PUBLISHED": {
+      "description": "Projekt erfolgreich veroeffentlicht. Terminal State.",
+      "type": "terminal",
+      "allowed_transitions": [],
+      "owner": "orchestrator"
+    },
+    "REWORK_SCOPE": {
+      "description": "Scope muss ueberarbeitet werden (nach FAIL beim Scope Gate).",
+      "type": "rework",
+      "allowed_transitions": ["SCOPE_DEFINED", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "product-worker"
+    },
+    "REWORK_OUTLINE": {
+      "description": "Gliederung muss ueberarbeitet werden.",
+      "type": "rework",
+      "allowed_transitions": ["OUTLINE_READY", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "product-worker"
+    },
+    "REWORK_DRAFT": {
+      "description": "Manuskript muss ueberarbeitet werden.",
+      "type": "rework",
+      "allowed_transitions": ["DRAFT_READY", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "product-worker"
+    },
+    "REWORK_ILLUSTRATIONS": {
+      "description": "Illustrationen muessen ueberarbeitet werden.",
+      "type": "rework",
+      "allowed_transitions": ["ILLUSTRATIONS_READY", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "product-worker"
+    },
+    "REWORK_LAYOUT": {
+      "description": "Layout muss ueberarbeitet werden.",
+      "type": "rework",
+      "allowed_transitions": ["LAYOUT_READY", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "tech-worker"
+    },
+    "REWORK_PUBLISH": {
+      "description": "Publishing-Paket muss ueberarbeitet werden.",
+      "type": "rework",
+      "allowed_transitions": ["PUBLISH_READY", "FAILED", "DEAD_LETTER"],
+      "owner": "orchestrator",
+      "triggers_task": "REWORK",
+      "assigned_to": "tech-worker"
+    },
+    "FAILED": {
+      "description": "Projekt ist fehlgeschlagen. Manueller Eingriff erforderlich.",
+      "type": "failure",
+      "allowed_transitions": ["DEAD_LETTER"],
+      "owner": "orchestrator"
+    },
+    "DEAD_LETTER": {
+      "description": "Projekt wurde in Dead Letter Queue verschoben. Terminal State.",
+      "type": "terminal",
+      "allowed_transitions": [],
+      "owner": "orchestrator"
+    }
+  },
+  "transition_rules": {
+    "gate_pass_required": true,
+    "ceo_approval_required_for": [
+      "SCOPE_DEFINED",
+      "OUTLINE_APPROVED",
+      "DRAFT_APPROVED",
+      "ILLUSTRATIONS_APPROVED",
+      "LAYOUT_APPROVED",
+      "PUBLISH_APPROVED"
+    ],
+    "max_rework_cycles": 3,
+    "dead_letter_after_max_rework": true
+  }
+}

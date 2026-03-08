@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "publishing_package.schema.json",
+  "title": "PublishingPackage",
+  "description": "Publishing-Paket-Artefakt: Vollstaendiges Veroeffentlichungspaket.",
+  "type": "object",
+  "required": [
+    "project_id",
+    "run_id",
+    "title",
+    "manuscript_ref",
+    "illustrations_ref",
+    "metadata",
+    "platform_configs",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "project_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "title": { "type": "string" },
+    "manuscript_ref": {
+      "type": "string",
+      "description": "Relativer Pfad zur finalen manuscript.json"
+    },
+    "illustrations_ref": {
+      "type": "string",
+      "description": "Relativer Pfad zur illustrations.json"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["isbn", "author", "publisher", "language", "categories"],
+      "properties": {
+        "isbn": { "type": ["string", "null"] },
+        "author": { "type": "string" },
+        "publisher": { "type": "string" },
+        "language": { "type": "string" },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "description": { "type": "string" },
+        "age_rating": { "type": "string" }
+      }
+    },
+    "platform_configs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["platform", "status", "format"],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": ["amazon_kdp", "tolino", "epub", "pdf", "print_on_demand"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "READY", "SUBMITTED", "PUBLISHED", "REJECTED"]
+          },
+          "format": { "type": "string" },
+          "price": { "type": ["number", "null"] },
+          "royalty_rate": { "type": ["number", "null"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "canva_package": {
+      "type": ["object", "null"],
+      "description": "Canva-kompatibles Exportpaket",
+      "properties": {
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "page_no": { "type": "integer" },
+              "text_de": { "type": "string" },
+              "image_prompt_en": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "approved": { "type": "boolean", "default": false },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_by": { "type": "string" },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

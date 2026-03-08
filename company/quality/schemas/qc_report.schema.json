@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qc_report.schema.json",
+  "title": "QCReport",
+  "description": "Quality-Control-Bericht eines QA-Agenten.",
+  "type": "object",
+  "required": [
+    "report_id",
+    "task_id",
+    "project_id",
+    "run_id",
+    "gate_name",
+    "reviewer_service",
+    "artifact_reviewed",
+    "status",
+    "failed_rules",
+    "failed_checks",
+    "compliance_flags",
+    "fix_tasks",
+    "improvements",
+    "evidence",
+    "created_at"
+  ],
+  "properties": {
+    "report_id": { "type": "string" },
+    "task_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "gate_name": {
+      "type": "string",
+      "description": "Name des geprueften Gates",
+      "enum": [
+        "SCOPE_GATE",
+        "MANUSCRIPT_GATE",
+        "ILLUSTRATION_GATE",
+        "LAYOUT_GATE",
+        "PUBLISH_GATE",
+        "CAMPAIGN_GATE",
+        "RELEASE_GATE",
+        "SUPPORT_QUALITY_GATE",
+        "DEPLOYMENT_GATE"
+      ]
+    },
+    "reviewer_service": {
+      "type": "string",
+      "enum": [
+        "quality-global",
+        "quality-product",
+        "quality-marketing",
+        "quality-tech",
+        "quality-customer"
+      ]
+    },
+    "artifact_reviewed": {
+      "type": "string",
+      "description": "Relativer Pfad des geprueften Artefakts"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"],
+      "description": "Eindeutiges Ergebnis der Gate-Pruefung"
+    },
+    "failed_rules": {
+      "type": "array",
+      "description": "Liste aller verletzten Strukturregeln (BLOCKER und MAJOR)",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "rule_name", "severity", "description"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "rule_name": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKER", "MAJOR", "MINOR"]
+          },
+          "description": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "failed_checks": {
+      "type": "array",
+      "description": "Fehlgeschlagene Einzelpruefungen",
+      "items": {
+        "type": "object",
+        "required": ["check_name", "expected", "actual"],
+        "properties": {
+          "check_name": { "type": "string" },
+          "expected": {},
+          "actual": {},
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "compliance_flags": {
+      "type": "array",
+      "description": "Compliance-Vermerke (Datenschutz, Recht, Safety)",
+      "items": {
+        "type": "object",
+        "required": ["flag_type", "description"],
+        "properties": {
+          "flag_type": {
+            "type": "string",
+            "enum": ["SAFETY", "LEGAL", "GDPR", "PLATFORM", "CONTENT"]
+          },
+          "description": { "type": "string" },
+          "severity": { "type": "string", "enum": ["BLOCKER", "MAJOR", "MINOR"] }
+        }
+      }
+    },
+    "fix_tasks": {
+      "type": "array",
+      "description": "Liste konkreter Nachbesserungsaufgaben (bei FAIL)",
+      "items": {
+        "type": "object",
+        "required": ["fix_id", "description", "target_artifact"],
+        "properties": {
+          "fix_id": { "type": "string" },
+          "description": { "type": "string" },
+          "target_artifact": { "type": "string" },
+          "priority": { "type": "integer", "minimum": 1, "maximum": 10 }
+        }
+      }
+    },
+    "improvements": {
+      "type": "array",
+      "description": "Nicht-blockierende Verbesserungsvorschlaege (heuristisch)",
+      "items": {
+        "type": "object",
+        "required": ["suggestion"],
+        "properties": {
+          "suggestion": { "type": "string" },
+          "rationale": { "type": "string" },
+          "impact": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH"] }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Belege und Messwerte fuer die Pruefung",
+      "properties": {
+        "schema_valid": { "type": "boolean" },
+        "word_count": { "type": ["integer", "null"] },
+        "quality_score": { "type": ["number", "null"] },
+        "page_count": { "type": ["integer", "null"] },
+        "custom_metrics": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

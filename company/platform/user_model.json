@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Benutzermodell fuer zukuenftige Kunden-Plattform",
+  "fields": {
+    "user_id": "UUID v4, auto-generiert",
+    "email": "E-Mail-Adresse (einzigartig)",
+    "display_name": "Anzeigename",
+    "plan": "free | starter | professional | enterprise",
+    "created_at": "ISO 8601 Datetime",
+    "projects_limit": "Maximale Projektanzahl je Plan",
+    "api_calls_limit": "Maximale LLM-Aufrufe je Monat",
+    "custom_llm_key": "Optionaler eigener API-Key"
+  },
+  "plans": {
+    "free": {
+      "projects_limit": 1,
+      "api_calls_limit": 100,
+      "max_iterations": 2,
+      "platforms": ["epub"]
+    },
+    "starter": {
+      "projects_limit": 5,
+      "api_calls_limit": 1000,
+      "max_iterations": 3,
+      "platforms": ["epub", "amazon_kdp"]
+    },
+    "professional": {
+      "projects_limit": 20,
+      "api_calls_limit": 5000,
+      "max_iterations": 5,
+      "platforms": ["epub", "amazon_kdp", "tolino", "print_on_demand"]
+    },
+    "enterprise": {
+      "projects_limit": -1,
+      "api_calls_limit": -1,
+      "max_iterations": 10,
+      "platforms": ["all"],
+      "custom_llm_key": true
+    }
+  }
+}

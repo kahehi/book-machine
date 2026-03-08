@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Creator — Your AI-Powered Book Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #000000;
+      --surface:      #0a0a0a;
+      --border:       #1c1c1c;
+      --border-focus: #3a3a3a;
+      --text:         #ffffff;
+      --text-dim:     #888888;
+      --text-muted:   #3d3d3d;
+      --accent:       #C9A96E;
+      --accent-dim:   #7a6342;
+      --accent-hover: #d9b87e;
+      --green:        #4ade80;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Inter', system-ui, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    html { background: #000; scroll-behavior: smooth; }
+    body { background: #000; color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+
+    /* ── HEADER ───────────────────────────────────────────────── */
+    .site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .logo {
+      font-family: var(--font-display); font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.28em; color: #fff; text-transform: uppercase;
+      pointer-events: auto; opacity: 0; transform: translateY(-6px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .logo.visible { opacity: 1; transform: translateY(0); }
+
+    .header-right {
+      display: flex; align-items: center; gap: 20px;
+      pointer-events: auto; opacity: 0; transform: translateY(-6px);
+      transition: opacity 0.6s 0.1s, transform 0.6s 0.1s;
+    }
+    .header-right.visible { opacity: 1; transform: translateY(0); }
+
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.05em; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta { color: var(--accent) !important; border: 1px solid var(--accent-dim) !important; padding: 7px 16px; border-radius: 2px; font-size: 0.7rem !important; letter-spacing: 0.1em !important; transition: background 0.2s, color 0.2s !important; }
+    .nav-cta:hover { background: var(--accent) !important; color: #000 !important; }
+
+    /* Language switcher */
+    .lang-switcher {
+      display: flex; gap: 2px; border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+    }
+    .lang-btn {
+      background: none; border: none; color: var(--text-muted); font-family: var(--font-mono);
+      font-size: 0.6rem; letter-spacing: 0.08em; padding: 5px 9px; cursor: pointer;
+      transition: background 0.15s, color 0.15s; border-right: 1px solid var(--border);
+    }
+    .lang-btn:last-child { border-right: none; }
+    .lang-btn:hover { color: #fff; background: #111; }
+    .lang-btn.active { background: var(--accent); color: #000; font-weight: 600; }
+
+    /* ── HERO ─────────────────────────────────────────────────── */
+    .hero {
+      position: relative; height: 100vh; overflow: hidden;
+      display: flex; align-items: center; justify-content: flex-start;
+    }
+
+    .hero-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    .hero-video.loaded { opacity: 1; }
+
+    .hero-gradient {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.05) 35%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.7) 78%, #000 100%),
+        linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 55%, rgba(0,0,0,0.25) 100%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 2; padding: 0 8vw; max-width: 68vw; }
+
+    .hero-label {
+      display: block; font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--accent); letter-spacing: 0.3em; text-transform: uppercase;
+      margin-bottom: 24px; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.7s 0.4s, transform 0.7s 0.4s;
+    }
+    .hero-label.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-heading { font-family: var(--font-display); font-size: clamp(4.8rem, 11.5vw, 13.5rem); font-weight: 900; line-height: 0.88; color: #fff; margin-bottom: 30px; }
+    .hero-heading .word { display: block; overflow: hidden; }
+    .hero-heading .word-inner { display: block; transform: translateY(110%); opacity: 0; transition: transform 0.9s cubic-bezier(0.16,1,0.3,1), opacity 0.5s; }
+    .hero-heading .word:nth-child(2) .word-inner { transition-delay: 0.18s; }
+    .hero-heading .word-inner.visible { transform: translateY(0); opacity: 1; }
+
+    .hero-tagline { font-size: clamp(0.9rem, 1.1vw, 1.05rem); color: rgba(255,255,255,0.58); font-weight: 300; line-height: 1.75; max-width: 460px; margin-bottom: 48px; opacity: 0; transform: translateY(10px); transition: opacity 0.7s 0.7s, transform 0.7s 0.7s; }
+    .hero-tagline.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-actions { display: flex; gap: 16px; align-items: center; opacity: 0; transform: translateY(10px); transition: opacity 0.7s 0.9s, transform 0.7s 0.9s; }
+    .hero-actions.visible { opacity: 1; transform: translateY(0); }
+
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #000; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.06em; padding: 13px 28px; border-radius: 2px; text-decoration: none; transition: background 0.2s, transform 0.15s; }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    .btn-ghost { display: inline-flex; align-items: center; color: var(--text-dim); font-size: 0.78rem; text-decoration: none; padding: 13px 4px; border-bottom: 1px solid var(--text-muted); transition: color 0.2s, border-color 0.2s; }
+    .btn-ghost:hover { color: #fff; border-color: #fff; }
+
+    .scroll-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; opacity: 0; transition: opacity 0.6s 1.4s; }
+    .scroll-hint.visible { opacity: 1; }
+    .scroll-hint span { font-size: 0.58rem; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; font-family: var(--font-mono); }
+    .scroll-dot { width: 1px; height: 36px; background: linear-gradient(to bottom, var(--text-muted), transparent); animation: scrollLine 2s ease-in-out infinite; }
+    @keyframes scrollLine { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0} }
+
+    /* ── SHARED ────────────────────────────────────────────────── */
+    .section { padding: 100px 8vw; }
+    .section-tag { display: block; font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 18px; }
+    .section-title { font-family: var(--font-display); font-size: clamp(2rem, 3.8vw, 4.2rem); font-weight: 700; line-height: 1.05; color: #fff; margin-bottom: 18px; }
+    .section-subtitle { font-size: 0.92rem; color: var(--text-dim); line-height: 1.75; max-width: 520px; font-weight: 300; }
+
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+    /* ── FEATURES ──────────────────────────────────────────────── */
+    .features { padding: 80px 8vw; border-top: 1px solid var(--border); }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .feature-card { background: var(--bg); padding: 40px 34px; transition: background 0.2s; }
+    .feature-card:hover { background: #080808; }
+    .feature-num { font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 18px; display: block; }
+    .feature-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: #fff; margin-bottom: 12px; line-height: 1.2; }
+    .feature-body { font-size: 0.82rem; color: var(--text-dim); line-height: 1.75; font-weight: 300; }
+
+    /* ── CREATE FORM ───────────────────────────────────────────── */
+    .create-section { padding: 100px 8vw; border-top: 1px solid var(--border); }
+    .create-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+
+    .book-form { display: flex; flex-direction: column; gap: 30px; }
+    .form-group { display: flex; flex-direction: column; gap: 10px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-label { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; font-family: var(--font-mono); display: flex; align-items: center; gap: 8px; }
+    .form-label .req { color: var(--accent); font-size: 0.5rem; }
+    .form-label .opt { color: var(--text-muted); font-size: 0.55rem; text-transform: none; font-family: var(--font-body); letter-spacing: 0; }
+    .form-hint { font-size: 0.69rem; color: var(--text-muted); line-height: 1.5; margin-top: -4px; }
+
+    textarea.form-input, input.form-input, select.form-input {
+      background: var(--surface); border: 1px solid var(--border); color: #fff;
+      font-family: var(--font-body); font-size: 0.88rem; font-weight: 300;
+      padding: 13px 16px; border-radius: 3px; outline: none; width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    textarea.form-input { resize: vertical; min-height: 108px; line-height: 1.65; }
+    select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; cursor: pointer; }
+    textarea.form-input:focus, input.form-input:focus, select.form-input:focus { border-color: var(--accent-dim); background: #0d0d0d; }
+    textarea.form-input::placeholder, input.form-input::placeholder { color: var(--text-muted); }
+
+    /* Range */
+    .range-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .range-header { display: flex; justify-content: space-between; align-items: center; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--border); outline: none; border-radius: 2px; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid #000; box-shadow: 0 0 0 1px var(--accent-dim); }
+    input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid #000; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .range-value { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent); }
+
+    /* Slider */
+    .slider-label-row { display: flex; align-items: baseline; justify-content: space-between; }
+    .slider-value { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--accent); }
+    .form-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; margin: 10px 0 4px; }
+    .form-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid #000; box-shadow: 0 0 0 1px var(--accent); }
+    .form-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid #000; box-shadow: 0 0 0 1px var(--accent); }
+    .slider-ticks { display: flex; justify-content: space-between; font-size: 0.58rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+    /* Radio */
+    .radio-group { display: flex; flex-direction: column; gap: 7px; }
+    .radio-option { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--border); border-radius: 3px; background: var(--surface); cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .radio-option:hover { border-color: var(--border-focus); }
+    .radio-option.selected { border-color: var(--accent-dim); background: #0d0a05; }
+    .radio-option input[type="radio"] { display: none; }
+    .radio-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--text-muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+    .radio-option.selected .radio-dot { border-color: var(--accent); background: var(--accent); }
+    .radio-option.selected .radio-dot::after { content:''; width:5px; height:5px; border-radius:50%; background:#000; }
+    .radio-text { display: flex; flex-direction: column; gap: 2px; }
+    .radio-title { font-size: 0.82rem; color: #fff; font-weight: 400; }
+    .radio-desc { font-size: 0.68rem; color: var(--text-muted); font-weight: 300; }
+
+    /* Section label divider */
+    .form-section-label { font-family: var(--font-mono); font-size: 0.56rem; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+
+    /* Submit */
+    .form-submit { display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+    .submit-btn { width: 100%; padding: 15px; background: var(--accent); color: #000; font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+    .submit-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .submit-note { font-size: 0.67rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+
+    /* ── OUTPUT PANEL ──────────────────────────────────────────── */
+    .output-panel { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 22px; }
+    .output-header { display: flex; flex-direction: column; gap: 10px; padding-bottom: 26px; border-bottom: 1px solid var(--border); }
+    .output-label { font-family: var(--font-mono); font-size: 0.56rem; color: var(--accent); letter-spacing: 0.25em; text-transform: uppercase; }
+    .output-title { font-family: var(--font-display); font-size: clamp(1.6rem, 2.2vw, 2.8rem); font-weight: 700; line-height: 1.1; color: #fff; }
+    .output-desc { font-size: 0.8rem; color: var(--text-dim); line-height: 1.7; font-weight: 300; }
+
+    .summary-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--surface); }
+    .summary-key { font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 0.04em; }
+    .summary-val { font-size: 0.78rem; color: var(--text); font-weight: 400; text-align: right; max-width: 55%; }
+
+
+    /* ── HOW IT WORKS ──────────────────────────────────────────── */
+    .pipeline-section { padding: 100px 8vw; border-top: 1px solid var(--border); }
+    .pipeline-full { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0; margin-top: 56px; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+    .p-step { padding: 26px 18px; border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 9px; transition: background 0.2s; }
+    .p-step:last-child { border-right: none; }
+    .p-step:hover { background: #0d0d0d; }
+    .p-step-num { font-family: var(--font-mono); font-size: 0.54rem; color: var(--accent); letter-spacing: 0.12em; }
+    .p-step-name { font-size: 0.78rem; color: #fff; font-weight: 500; line-height: 1.3; }
+    .p-step-desc { font-size: 0.67rem; color: var(--text-muted); line-height: 1.5; }
+    .p-step.gate { background: #030a03; border-color: #1a2e1a; }
+    .p-step.gate .p-step-num { color: var(--green); }
+    .p-step.gate .p-step-name { color: var(--green); }
+
+    /* ── WORKFLOW ──────────────────────────────────────────────── */
+    .wf-hint { font-size: 0.78rem; color: var(--text-dim); line-height: 1.55; padding: 12px 0 4px; }
+
+    .wf-steps-nav { display: flex; align-items: center; margin-bottom: 18px; }
+    .wf-step-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+    .wf-step-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); border: 1px solid var(--border-focus); transition: background 0.3s, border-color 0.3s; }
+    .wf-step-nav.active .wf-step-dot { background: var(--accent); border-color: var(--accent); }
+    .wf-step-nav.done .wf-step-dot { background: var(--green); border-color: var(--green); }
+    .wf-step-label { font-size: 0.5rem; font-family: var(--font-mono); letter-spacing: 0.07em; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
+    .wf-step-nav.active .wf-step-label { color: var(--accent); }
+    .wf-step-nav.done .wf-step-label { color: var(--green); }
+    .wf-step-nav-line { flex: 1; height: 1px; background: var(--border); margin: 0 5px 14px; }
+
+    .wf-content { animation: wfFadeIn 0.35s ease; }
+    @keyframes wfFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .wf-title { font-family: var(--font-display); font-size: 1.05rem; color: #fff; margin-bottom: 5px; }
+    .wf-subtitle { font-size: 0.72rem; color: var(--text-dim); margin-bottom: 14px; }
+    .wf-continue-btn { width: 100%; margin-top: 14px; }
+
+    /* Progress rows */
+    .gen-book-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .gen-book-row:last-child { border-bottom: none; }
+    .gen-book-label { font-size: 0.68rem; color: var(--text-dim); font-family: var(--font-mono); width: 72px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gen-book-bar-wrap { flex: 1; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .gen-book-bar { height: 100%; width: 0; background: var(--accent); transition: width 0.05s linear; border-radius: 2px; }
+    .gen-book-status { font-size: 0.62rem; font-family: var(--font-mono); width: 34px; text-align: right; color: var(--text-muted); }
+    .gen-book-status.done { color: var(--green); }
+    .gen-book-status.error { color: #e55; }
+    .gen-book-error { font-size: 0.58rem; color: #e55; padding: 3px 0 2px; flex-basis: 100%; margin-top: 3px; line-height: 1.4; }
+    .gen-book-row { flex-wrap: wrap; }
+    .gen-book-qa { font-size: 0.56rem; font-family: var(--font-mono); flex-basis: 100%; padding: 2px 0 0 0; color: var(--text-dim); line-height: 1.4; }
+    .gen-book-qa.ok { color: var(--green); }
+    .gen-book-qa.fixed { color: #f0a500; }
+    .gen-book-qa.warn { color: #e55; }
+
+    /* Provider toggle */
+    .provider-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 2px; }
+    .provider-option { cursor: pointer; }
+    .provider-option input[type="radio"] { display: none; }
+    .provider-card { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.75rem 0.85rem; border: 1.5px solid var(--border); border-radius: 8px; background: transparent; transition: border-color 0.2s, background 0.2s; }
+    .provider-card:hover { border-color: rgba(255,255,255,0.28); }
+    .provider-option input:checked + .provider-card { border-color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.06); }
+    .provider-name { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); }
+    .provider-model { font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .provider-desc { font-size: 0.62rem; color: var(--text-dim); margin-top: 0.12rem; line-height: 1.35; }
+    /* API key */
+    .api-key-wrap { display: flex; gap: 0.5rem; }
+    .api-key-wrap .form-input { flex: 1; font-family: var(--font-mono); font-size: 0.78rem; }
+    .api-key-toggle { background: transparent; border: 1.5px solid var(--border); border-radius: 6px; color: var(--text-muted); cursor: pointer; padding: 0 0.8rem; font-size: 0.7rem; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+    .api-key-toggle:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+
+    /* Book review cards */
+    .book-card { border: 1px solid var(--border); border-radius: 4px; padding: 14px; margin-bottom: 10px; transition: border-color 0.25s, opacity 0.3s; }
+    .book-card.approved { border-color: var(--green); }
+    .book-card.discarded { opacity: 0.28; }
+    .book-card-num { font-size: 0.5rem; font-family: var(--font-mono); color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 4px; }
+    .book-card-title { font-family: var(--font-display); font-size: 0.98rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .book-card-synopsis { font-size: 0.7rem; color: var(--text-dim); line-height: 1.55; margin-bottom: 12px; }
+    .book-card-actions { display: flex; gap: 7px; }
+    /* Text review */
+    .txt-book-card { border: 1px solid var(--border); border-radius: 4px; padding: 14px; margin-bottom: 12px; transition: border-color 0.25s, opacity 0.3s; }
+    .txt-book-card.approved { border-color: var(--green); }
+    .txt-book-card.rejected { opacity: 0.3; pointer-events: none; }
+    .txt-pages { max-height: 220px; overflow-y: auto; margin: 10px 0 12px; padding-right: 4px; }
+    .txt-pages::-webkit-scrollbar { width: 3px; } .txt-pages::-webkit-scrollbar-thumb { background: var(--border-focus); border-radius: 2px; }
+    .txt-page { font-size: 0.7rem; color: var(--text-dim); line-height: 1.6; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .txt-page:last-child { border-bottom: none; }
+    .txt-page-num { font-size: 0.48rem; font-family: var(--font-mono); color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+    .bc-btn { flex: 1; padding: 7px 4px; font-size: 0.62rem; font-family: var(--font-mono); letter-spacing: 0.05em; border-radius: 3px; cursor: pointer; border: 1px solid; transition: all 0.15s; background: none; }
+    .bc-btn.approve { border-color: #1a5c1a; color: var(--green); }
+    .bc-btn.approve:hover, .bc-btn.approve.active { background: var(--green); color: #000; border-color: var(--green); }
+    .bc-btn.rewrite { border-color: var(--accent-dim); color: var(--accent); }
+    .bc-btn.rewrite:hover { background: rgba(201,169,110,0.12); }
+    .bc-btn.discard { border-color: var(--border-focus); color: var(--text-muted); }
+    .bc-btn.discard:hover { border-color: #7a1515; color: #e05050; }
+    .bc-rewriting { font-size: 0.62rem; font-family: var(--font-mono); color: var(--accent); margin-top: 8px; display: none; }
+
+    /* Image review cards */
+    .img-card { display: flex; gap: 12px; border: 1px solid var(--border); border-radius: 4px; padding: 12px; margin-bottom: 10px; transition: border-color 0.25s, opacity 0.3s; }
+    .img-card.approved { border-color: var(--green); }
+    .img-card.skipped { opacity: 0.28; }
+    .img-placeholder { width: 60px; height: 60px; flex-shrink: 0; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-family: var(--font-mono); color: rgba(255,255,255,0.4); letter-spacing: 0.06em; }
+    .cover-placeholder { width: 72px; height: 96px; border-radius: 4px; font-size: 0.48rem; }
+    .cover-img { width: 90px; height: 120px; flex-shrink: 0; border-radius: 4px; object-fit: cover; display: block; cursor: zoom-in; transition: opacity 0.15s; }
+    .cover-img:hover { opacity: 0.85; }
+    .cover-loading { width: 90px; height: 120px; flex-shrink: 0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.48rem; font-family: var(--font-mono); color: rgba(255,255,255,0.4); letter-spacing: 0.06em; animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+    /* Cover lightbox */
+    #cover-preview { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; }
+    #cover-preview.visible { opacity: 1; pointer-events: auto; }
+    #cover-preview-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); }
+    #cover-preview-wrap { position: relative; display: flex; flex-direction: column; align-items: center; max-width: min(500px, 92vw); }
+    #cover-preview-img { width: 100%; border-radius: 6px; box-shadow: 0 28px 80px rgba(0,0,0,0.95); object-fit: contain; display: block; }
+    #cover-preview-title { margin-top: 12px; color: rgba(255,255,255,0.75); font-family: var(--font-display); font-size: 0.85rem; text-align: center; letter-spacing: 0.04em; }
+    .img-card-body { flex: 1; min-width: 0; }
+    .img-card-label { font-size: 0.5rem; font-family: var(--font-mono); color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 3px; }
+    .img-card-desc { font-size: 0.7rem; color: var(--text-dim); margin-bottom: 10px; line-height: 1.4; }
+
+    /* Download */
+    .dl-options { display: flex; gap: 12px; margin: 12px 0 16px; }
+    .dl-btn { flex: 1; border: 1px solid var(--border); border-radius: 4px; padding: 18px 10px; cursor: pointer; background: var(--surface); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: border-color 0.2s, background 0.2s; }
+    .dl-btn:hover { border-color: var(--accent); background: rgba(201,169,110,0.07); }
+    .dl-type { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; padding: 4px 10px; border-radius: 2px; font-weight: 600; }
+    .dl-btn.pdf .dl-type { background: rgba(201,169,110,0.15); color: var(--accent); }
+    .dl-btn.docx .dl-type { background: rgba(74,222,128,0.12); color: var(--green); }
+    .dl-name { font-size: 0.72rem; color: var(--text-dim); }
+    .dl-btn:hover .dl-name { color: #fff; }
+    .wf-restart-btn { background: none; border: none; color: var(--text-muted); font-size: 0.62rem; font-family: var(--font-mono); cursor: pointer; letter-spacing: 0.05em; padding: 0; transition: color 0.2s; }
+    .wf-restart-btn:hover { color: var(--text-dim); }
+
+    /* ── FEEDBACK BUBBLE + MODAL ───────────────────────────────── */
+    .fb-bubble {
+      position: fixed; bottom: 28px; right: 28px; z-index: 300;
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 24px rgba(201,169,110,0.35);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .fb-bubble:hover { transform: scale(1.1); background: var(--accent-hover); }
+    .fb-bubble svg { width: 22px; height: 22px; stroke: #000; }
+
+    .fb-modal {
+      position: fixed; bottom: 92px; right: 28px; z-index: 299;
+      width: 360px; max-height: 88vh;
+      background: #0c0c0c; border: 1px solid var(--border); border-radius: 8px;
+      display: flex; flex-direction: column; overflow: hidden;
+      opacity: 0; transform: translateY(12px) scale(0.97);
+      pointer-events: none; transition: opacity 0.22s ease, transform 0.22s ease;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+    }
+    .fb-modal.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+
+    .fb-modal-header {
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .fb-modal-title { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; color: #fff; }
+    .fb-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; padding: 2px 6px; transition: color 0.15s; line-height: 1; }
+    .fb-close:hover { color: #fff; }
+
+    .fb-modal-body { padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+    .stars-wrap { display: flex; gap: 6px; }
+    .star { font-size: 1.5rem; cursor: pointer; color: var(--text-muted); transition: color 0.12s; user-select: none; line-height: 1; }
+    .star.active { color: var(--accent); }
+    .stars-wrap:hover .star { color: var(--accent); }
+    .stars-wrap .star:hover ~ .star { color: var(--text-muted); }
+
+    .feedback-form { display: flex; flex-direction: column; gap: 14px; }
+    .feedback-success { display: none; padding: 24px 16px; border: 1px solid var(--green); border-radius: 3px; background: #030a03; text-align: center; flex-direction: column; gap: 10px; align-items: center; }
+    .feedback-success.show { display: flex; }
+    .feedback-success-icon { font-size: 1.8rem; line-height: 1; }
+    .feedback-success-title { font-family: var(--font-display); font-size: 1.1rem; color: var(--green); font-weight: 600; }
+    .feedback-success-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+
+    /* ── TECH / FOOTER ─────────────────────────────────────────── */
+    .tech-section { padding: 72px 8vw; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 60px; flex-wrap: wrap; }
+    .tech-left { max-width: 400px; }
+    .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge { font-family: var(--font-mono); font-size: 0.63rem; color: var(--text-dim); border: 1px solid var(--border); padding: 5px 12px; border-radius: 2px; background: var(--surface); }
+
+    footer { padding: 36px 8vw; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.25em; color: var(--text-muted); }
+    .footer-note { font-size: 0.67rem; color: var(--text-muted); letter-spacing: 0.04em; }
+
+    /* ── MOBILE ────────────────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .create-layout, .feedback-layout { grid-template-columns: 1fr; gap: 52px; }
+      .output-panel { position: static; }
+      .pipeline-full { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .site-header { padding: 16px 24px; }
+      .section, .create-section, .pipeline-section, .feedback-section { padding: 70px 5vw; }
+      .features, .tech-section { padding: 60px 5vw; }
+      .hero-content { padding: 0 5vw; max-width: 95vw; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .pipeline-full { grid-template-columns: 1fr; }
+      .tech-section { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header">
+    <div class="logo" id="logo">BOOK CREATOR</div>
+    <div class="header-right" id="header-right">
+      <nav class="nav-links">
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#create" data-i18n="nav.create">Create</a>
+        <a href="#workflow" data-i18n="nav.workflow">How it works</a>
+        <a href="#create" class="nav-cta" data-i18n="nav.cta">Get Started</a>
+      </nav>
+      <div class="lang-switcher">
+        <button class="lang-btn" onclick="setLang('EN')">EN</button>
+        <button class="lang-btn active" onclick="setLang('DE')">DE</button>
+        <button class="lang-btn" onclick="setLang('FR')">FR</button>
+        <button class="lang-btn" onclick="setLang('IT')">IT</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="hero">
+    <video class="hero-video" id="hero-video" autoplay muted playsinline loop>
+      <source src="buch.mp4" type="video/mp4">
+    </video>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <span class="hero-label" id="hero-label" data-i18n="hero.label">AI-Powered &nbsp;·&nbsp; Books for Every Age</span>
+      <h1 class="hero-heading">
+        <span class="word"><span class="word-inner" id="w1">Book</span></span>
+        <span class="word"><span class="word-inner" id="w2">Creator</span></span>
+      </h1>
+      <p class="hero-tagline" id="hero-tagline" data-i18n="hero.tagline">Turn your idea into a complete, beautifully written book — for any age, any genre, in minutes.</p>
+      <div class="hero-actions" id="hero-actions">
+        <a href="#create" class="btn-primary" data-i18n="hero.cta">Start Creating &nbsp;→</a>
+        <a href="#workflow" class="btn-ghost" data-i18n="hero.secondary">See how it works</a>
+      </div>
+    </div>
+    <div class="scroll-hint" id="scroll-hint">
+      <span data-i18n="hero.scroll">Scroll</span>
+      <div class="scroll-dot"></div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURES ═══ -->
+  <section class="features" id="features">
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="feature-num">01</span>
+        <div class="feature-title" data-i18n="f1.title">You imagine it.<br>We plan everything.</div>
+        <p class="feature-body" data-i18n="f1.body">Just tell us your idea. Our AI maps out the full story — plot, characters, chapter structure — so you can skip straight to the exciting part.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.1s">
+        <span class="feature-num">02</span>
+        <div class="feature-title" data-i18n="f2.title">Keeps refining<br>until it's great.</div>
+        <p class="feature-body" data-i18n="f2.body">Not happy with the first draft? Neither are we. The system reviews its own work and rewrites it up to three times, aiming for excellence every time.</p>
+      </div>
+      <div class="feature-card reveal" style="transition-delay:0.2s">
+        <span class="feature-num">03</span>
+        <div class="feature-title" data-i18n="f3.title">You decide<br>what gets published.</div>
+        <p class="feature-body" data-i18n="f3.body">At key moments, you review the result and say go ahead — or not. Your vision always has the final word.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CREATE ═══ -->
+  <section class="create-section" id="create">
+    <div class="create-layout">
+
+      <!-- FORM -->
+      <div>
+        <div class="reveal">
+          <span class="section-tag" data-i18n="create.tag">Create your book</span>
+          <h2 class="section-title" style="margin-bottom:8px" data-i18n="create.title">Tell us your story.</h2>
+          <p class="section-subtitle" style="margin-bottom:44px" data-i18n="create.subtitle">Fill in a few details and we'll generate a ready-to-run setup for you — no technical knowledge needed.</p>
+        </div>
+
+        <form class="book-form" id="book-form" onsubmit="return false;">
+
+          <div class="form-section-label reveal" data-i18n="fs.story">Your Story</div>
+
+          <div class="form-group reveal">
+            <label class="form-label" for="idea"><span data-i18n="f.idea.label">Your idea</span> <span class="req">required</span></label>
+            <textarea class="form-input" id="idea" name="idea" rows="4"
+              data-i18n-ph="f.idea.placeholder"
+              placeholder="A retired sailor who finds a message in a bottle that takes him on one last great adventure…"></textarea>
+            <p class="form-hint" data-i18n="f.idea.hint">Describe your story, topic, or the message you'd like the book to carry. Any genre, any age.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group reveal">
+              <label class="form-label" for="genre"><span data-i18n="f.genre.label">Genre</span> <span class="req">required</span></label>
+              <select class="form-input" id="genre" name="genre">
+                <option value="auto" selected data-i18n-opt="genre.auto">Let the AI decide</option>
+                <option value="adventure" data-i18n-opt="genre.adventure">Adventure</option>
+                <option value="romance" data-i18n-opt="genre.romance">Romance</option>
+                <option value="mystery" data-i18n-opt="genre.mystery">Mystery</option>
+                <option value="fantasy" data-i18n-opt="genre.fantasy">Fantasy</option>
+                <option value="educational" data-i18n-opt="genre.educational">Educational</option>
+                <option value="biography" data-i18n-opt="genre.biography">Biography / True Story</option>
+                <option value="children" data-i18n-opt="genre.children">Children's Story</option>
+                <option value="other" data-i18n-opt="genre.other">Other</option>
+              </select>
+            </div>
+            <div class="form-group reveal">
+              <label class="form-label" for="age"><span data-i18n="f.age.label">Audience age</span> <span class="req">required</span></label>
+              <select class="form-input" id="age" name="age">
+                <option value="auto" selected data-i18n-opt="age.auto">Let the AI decide</option>
+                <option value="4-8" data-i18n-opt="age.kids">Kids (4 – 8)</option>
+                <option value="9-13" data-i18n-opt="age.young">Young Readers (9 – 13)</option>
+                <option value="14-17" data-i18n-opt="age.teens">Teens (14 – 17)</option>
+                <option value="18+" data-i18n-opt="age.adults">Adults (18+)</option>
+                <option value="all" data-i18n-opt="age.all">All Ages</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section-label reveal" data-i18n="fs.series">The Series</div>
+
+          <div class="form-group reveal">
+            <div class="slider-label-row">
+              <label class="form-label" for="book-count"><span data-i18n="f.books.label">Number of books</span> <span class="req">required</span></label>
+              <span class="slider-value" id="books-val">1</span>
+            </div>
+            <input type="range" class="form-slider" id="book-count" name="bookCount" min="1" max="10" step="1" value="1">
+            <div class="slider-ticks"><span>1</span><span>10</span></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group reveal">
+              <div class="slider-label-row">
+                <label class="form-label" for="pages"><span data-i18n="f.pages.label">Pages per book</span> <span class="req">required</span></label>
+                <span class="slider-value" id="pages-val">30</span>
+              </div>
+              <input type="range" class="form-slider" id="pages" name="pageCount" min="10" max="50" step="1" value="30">
+              <div class="slider-ticks"><span>10</span><span>50</span></div>
+            </div>
+            <div class="form-group reveal">
+              <label class="form-label" for="illus-density"><span data-i18n="f.density.label">Illustrations</span> <span class="req">required</span></label>
+              <select class="form-input" id="illus-density" name="illusDensity">
+                <option value="full" data-i18n-opt="density.full">Every page — Picture book</option>
+                <option value="occasional" selected data-i18n-opt="density.occasional">Occasional — Story support</option>
+                <option value="none" data-i18n-opt="density.none">None — Novel / Pure text</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group reveal" id="illus-style-group">
+            <label class="form-label" for="illustration-style"><span data-i18n="f.style.label">Illustration style</span> <span class="opt" data-i18n="f.optional">optional</span></label>
+            <select class="form-input" id="illustration-style" name="illustrationStyle">
+              <option value="auto" selected data-i18n-opt="style.auto">Let the AI decide</option>
+              <option value="watercolor" data-i18n-opt="style.watercolor">Watercolor</option>
+              <option value="digital" data-i18n-opt="style.digital">Digital Art</option>
+              <option value="cartoon" data-i18n-opt="style.cartoon">Cartoon</option>
+              <option value="realistic" data-i18n-opt="style.realistic">Realistic</option>
+              <option value="pencil" data-i18n-opt="style.pencil">Pencil Sketch</option>
+            </select>
+          </div>
+
+          <div class="form-section-label reveal" data-i18n="fs.settings">Settings</div>
+
+          <div class="form-group reveal">
+            <label class="form-label"><span data-i18n="f.provider.label">AI Engine</span></label>
+            <div class="provider-toggle">
+              <label class="provider-option">
+                <input type="radio" name="provider" value="openai" id="prov-openai" checked>
+                <div class="provider-card">
+                  <span class="provider-name">OpenAI</span>
+                  <span class="provider-model">gpt-4o-mini</span>
+                  <span class="provider-desc" data-i18n="prov.openai.desc">Great results — requires an API key</span>
+                </div>
+              </label>
+              <label class="provider-option">
+                <input type="radio" name="provider" value="anthropic" id="prov-claude">
+                <div class="provider-card">
+                  <span class="provider-name">Claude</span>
+                  <span class="provider-model">haiku-4-5</span>
+                  <span class="provider-desc" data-i18n="prov.anthropic.desc">Best quality — requires an API key</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group reveal">
+            <label class="form-label" for="api-key"><span data-i18n="f.apikey.label">API Key</span> <span class="req">required</span></label>
+            <div class="api-key-wrap">
+              <input type="password" class="form-input" id="api-key" placeholder="sk-..." autocomplete="off">
+              <button type="button" class="api-key-toggle" id="api-key-toggle" data-i18n="apikey.show">Show</button>
+            </div>
+            <p class="form-hint" data-i18n="f.apikey.hint">Stored only in your browser. Never sent to our servers.</p>
+          </div>
+
+          <div class="form-group reveal">
+            <label class="form-label" for="tone"><span data-i18n="f.tone.label">Tone</span> <span class="opt" data-i18n="f.optional">optional</span></label>
+            <select class="form-input" id="tone" name="tone">
+              <option value="" data-i18n-opt="tone.auto">Let the AI decide</option>
+              <option value="warm" data-i18n-opt="tone.warm">Warm &amp; heartfelt</option>
+              <option value="funny" data-i18n-opt="tone.funny">Funny &amp; playful</option>
+              <option value="epic" data-i18n-opt="tone.epic">Epic &amp; dramatic</option>
+              <option value="calm" data-i18n-opt="tone.calm">Calm &amp; reflective</option>
+              <option value="educational" data-i18n-opt="tone.educational">Clear &amp; educational</option>
+            </select>
+          </div>
+
+          <div class="form-submit reveal">
+            <button type="submit" class="submit-btn" id="generate-btn" data-i18n="f.submit">Generate My Books &nbsp;→</button>
+            <p class="submit-note" data-i18n="f.submit.note">Your books will be created step by step — you review and decide at each stage.</p>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="output-panel reveal">
+        <div class="output-header">
+          <span class="output-label" data-i18n="out.label">Your setup</span>
+          <h3 class="output-title" data-i18n="out.title">Your book<br>at a glance.</h3>
+          <p class="output-desc" data-i18n="out.desc">Fill in the form and click "Generate My Setup" to see your configuration and run command here.</p>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-item"><span class="summary-key" data-i18n="s.idea">Idea</span><span class="summary-val" id="s-idea">—</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.genre">Genre</span><span class="summary-val" id="s-genre">—</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.age">Audience</span><span class="summary-val" id="s-age">Adults (18+)</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.books">Books</span><span class="summary-val" id="s-books">1</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.pages">Pages each</span><span class="summary-val" id="s-pages">12</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.style">Illustrations</span><span class="summary-val" id="s-style">Digital Art</span></div>
+        </div>
+
+        <!-- ── WORKFLOW PANEL ─────────────────────────────────────── -->
+        <div id="gen-start-section">
+          <p class="wf-hint" data-i18n="wf.hint">Fill in the form on the left, then click <strong>Generate My Books</strong> to start.</p>
+        </div>
+
+        <div id="wf-panel" style="display:none">
+          <!-- Step nav: Generate | Review | Covers | Illustrations | Download -->
+          <div class="wf-steps-nav">
+            <div class="wf-step-nav" id="wnav-1"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.gen">Generate</span></div>
+            <div class="wf-step-nav-line"></div>
+            <div class="wf-step-nav" id="wnav-2"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.review">Prüfen</span></div>
+            <div class="wf-step-nav-line"></div>
+            <div class="wf-step-nav" id="wnav-3"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.covers">Cover</span></div>
+            <div class="wf-step-nav-line"></div>
+            <div class="wf-step-nav" id="wnav-4"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.text">Text</span></div>
+            <div class="wf-step-nav-line"></div>
+            <div class="wf-step-nav" id="wnav-5"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.illus">Illustrationen</span></div>
+            <div class="wf-step-nav-line"></div>
+            <div class="wf-step-nav" id="wnav-6"><span class="wf-step-dot"></span><span class="wf-step-label" data-i18n="wf.nav.dl">Download</span></div>
+          </div>
+
+          <!-- Step 1: Generating books -->
+          <div id="wf-1" class="wf-content" style="display:none">
+            <p class="wf-title" data-i18n="wf.gen.title">Creating your books…</p>
+            <div id="wf-gen-progress"></div>
+          </div>
+
+          <!-- Step 2: Review books -->
+          <div id="wf-2" class="wf-content" style="display:none">
+            <p class="wf-title" data-i18n="wf.rev.title">Review your books</p>
+            <p class="wf-subtitle" data-i18n="wf.rev.sub">Keep, rewrite, or remove each book.</p>
+            <div id="wf-book-cards"></div>
+            <button id="wf-to-covers-btn" class="submit-btn wf-continue-btn" style="opacity:0.4;pointer-events:none" onclick="goToCovers()" data-i18n="wf.rev.continue">Continue to Covers &nbsp;→</button>
+          </div>
+
+          <!-- Step 3: Cover generation + review (inline) -->
+          <div id="wf-3" class="wf-content" style="display:none">
+            <div id="wf-cover-gen-phase">
+              <p class="wf-title" data-i18n="wf.cov.gen.title">Generating covers…</p>
+              <div id="wf-cover-progress"></div>
+            </div>
+            <div id="wf-cover-review-phase" style="display:none">
+              <p class="wf-title" data-i18n="wf.cov.rev.title">Review your covers</p>
+              <p class="wf-subtitle" data-i18n="wf.cov.rev.sub">Keep, regenerate, or remove each cover.</p>
+              <div id="wf-cover-cards"></div>
+              <button id="wf-to-text-btn" class="submit-btn wf-continue-btn" onclick="goToTextReview()" data-i18n="wf.cov.continue">Continue &nbsp;→</button>
+            </div>
+          </div>
+
+          <!-- Step 4: Text review -->
+          <div id="wf-4" class="wf-content" style="display:none">
+            <p class="wf-title" data-i18n="wf.txt.title">Read your books</p>
+            <p class="wf-subtitle" data-i18n="wf.txt.sub">Read the full text of each book and accept or reject it.</p>
+            <div id="wf-text-cards"></div>
+            <button id="wf-to-illus-btn" class="submit-btn wf-continue-btn" onclick="goToIllustrations()" data-i18n="wf.txt.continue">Continue to Illustrations &nbsp;→</button>
+          </div>
+
+          <!-- Step 5: Page illustration generation + review (inline) / or skip message -->
+          <div id="wf-5" class="wf-content" style="display:none">
+            <div id="wf-illus-gen-phase">
+              <p class="wf-title" data-i18n="wf.img.title">Generating illustrations…</p>
+              <div id="wf-img-progress"></div>
+            </div>
+            <div id="wf-illus-review-phase" style="display:none">
+              <p class="wf-title" data-i18n="wf.revi.title">Review your illustrations</p>
+              <p class="wf-subtitle" data-i18n="wf.revi.sub">Keep, regenerate, or skip each image.</p>
+              <div id="wf-img-cards"></div>
+              <button id="wf-to-dl-btn" class="submit-btn wf-continue-btn" onclick="goToDownloadStep()" data-i18n="wf.revi.continue">Continue to Download &nbsp;→</button>
+            </div>
+            <div id="wf-illus-none-phase" style="display:none">
+              <p class="wf-title" data-i18n="wf.illus.none.title">No illustrations</p>
+              <p class="wf-subtitle" data-i18n="wf.illus.none.sub">You selected a pure text book — no page illustrations will be generated.</p>
+              <button class="submit-btn wf-continue-btn" onclick="goToDownloadStep()" data-i18n="wf.revi.continue">Continue to Download &nbsp;→</button>
+            </div>
+          </div>
+
+          <!-- Step 6: Download -->
+          <div id="wf-6" class="wf-content" style="display:none">
+            <p class="wf-title" data-i18n="wf.dl.title">Your books are ready!</p>
+            <p class="wf-subtitle" data-i18n="wf.dl.sub">Download in your preferred format.</p>
+            <div class="dl-options">
+              <button class="dl-btn pdf" onclick="downloadPDF()">
+                <span class="dl-type">PDF</span>
+                <span class="dl-name" data-i18n="wf.dl.pdf">Download PDF</span>
+              </button>
+              <button class="dl-btn docx" onclick="downloadDocx()">
+                <span class="dl-type">DOC</span>
+                <span class="dl-name" data-i18n="wf.dl.doc">Download Word</span>
+              </button>
+            </div>
+            <button class="wf-restart-btn" onclick="restartWorkflow()" data-i18n="wf.dl.restart">← Start over</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <section class="pipeline-section" id="workflow">
+    <div class="reveal">
+      <span class="section-tag" data-i18n="how.tag">How it works</span>
+      <h2 class="section-title" data-i18n="how.title">From idea to finished book.</h2>
+      <p class="section-subtitle" data-i18n="how.subtitle">A smart, step-by-step process with two moments where you stay in control.</p>
+    </div>
+    <div class="pipeline-full reveal" style="transition-delay:0.15s">
+      <div class="p-step">
+        <span class="p-step-num">01</span>
+        <div class="p-step-name" data-i18n="hw.s1.name">You share your idea</div>
+        <p class="p-step-desc" data-i18n="hw.s1.desc">A few words or a detailed description — whatever you have.</p>
+      </div>
+      <div class="p-step">
+        <span class="p-step-num">02</span>
+        <div class="p-step-name" data-i18n="hw.s2.name">AI builds the plan</div>
+        <p class="p-step-desc" data-i18n="hw.s2.desc">Titles, characters, plot arcs — the full blueprint for your series.</p>
+      </div>
+      <div class="p-step">
+        <span class="p-step-num">03</span>
+        <div class="p-step-name" data-i18n="hw.s3.name">Review &amp; safety check</div>
+        <p class="p-step-desc" data-i18n="hw.s3.desc">The plan is checked for quality, tone, and appropriateness.</p>
+      </div>
+      <div class="p-step gate">
+        <span class="p-step-num">✓</span>
+        <div class="p-step-name" data-i18n="hw.s4.name">You say go ahead</div>
+        <p class="p-step-desc" data-i18n="hw.s4.desc">You review the outline and approve it before writing begins.</p>
+      </div>
+      <div class="p-step">
+        <span class="p-step-num">04</span>
+        <div class="p-step-name" data-i18n="hw.s5.name">AI writes your book</div>
+        <p class="p-step-desc" data-i18n="hw.s5.desc">Every page written, adapted to your chosen style and audience.</p>
+      </div>
+      <div class="p-step">
+        <span class="p-step-num">05</span>
+        <div class="p-step-name" data-i18n="hw.s6.name">Refines until excellent</div>
+        <p class="p-step-desc" data-i18n="hw.s6.desc">The writing is scored and improved, up to three rounds.</p>
+      </div>
+      <div class="p-step gate">
+        <span class="p-step-num">✓</span>
+        <div class="p-step-name" data-i18n="hw.s7.name">You approve the text</div>
+        <p class="p-step-desc" data-i18n="hw.s7.desc">One final review before your book is packaged and exported.</p>
+      </div>
+      <div class="p-step">
+        <span class="p-step-num">06</span>
+        <div class="p-step-name" data-i18n="hw.s8.name">Your book is ready</div>
+        <p class="p-step-desc" data-i18n="hw.s8.desc">Delivered as a clean document, ready to read, print, or publish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEEDBACK BUBBLE ═══ -->
+  <button class="fb-bubble" id="fb-bubble" aria-label="Feedback" title="Feedback">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
+
+  <div class="fb-modal" id="fb-modal" role="dialog" aria-modal="true">
+    <div class="fb-modal-header">
+      <span class="fb-modal-title" data-i18n="fb.title">We'd love to hear from you.</span>
+      <button class="fb-close" id="fb-close" aria-label="Close">✕</button>
+    </div>
+    <div class="fb-modal-body">
+      <div class="feedback-success" id="feedback-success">
+        <div class="feedback-success-icon">✓</div>
+        <div class="feedback-success-title" data-i18n="fb.thanks.title">Thank you!</div>
+        <p class="feedback-success-text" data-i18n="fb.thanks.text">Your feedback means a lot. We read every message and use it to make Book Creator better.</p>
+      </div>
+      <form class="feedback-form" id="feedback-form" onsubmit="return false;">
+        <div class="form-group">
+          <label class="form-label" data-i18n="fb.rating.label">Your rating</label>
+          <div class="stars-wrap" id="stars-wrap">
+            <span class="star" data-v="1">★</span>
+            <span class="star" data-v="2">★</span>
+            <span class="star" data-v="3">★</span>
+            <span class="star" data-v="4">★</span>
+            <span class="star" data-v="5">★</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fb-name"><span data-i18n="fb.name.label">Your name</span> <span class="opt" data-i18n="f.optional">optional</span></label>
+            <input class="form-input" type="text" id="fb-name" data-i18n-ph="fb.name.placeholder" placeholder="Jane">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fb-email"><span data-i18n="fb.email.label">Email</span> <span class="opt" data-i18n="f.optional">optional</span></label>
+            <input class="form-input" type="email" id="fb-email" data-i18n-ph="fb.email.placeholder" placeholder="jane@example.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fb-msg"><span data-i18n="fb.msg.label">Your message</span> <span class="req">required</span></label>
+          <textarea class="form-input" id="fb-msg" rows="4" data-i18n-ph="fb.msg.placeholder" placeholder="I really enjoyed how easy it was to get started…"></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="fb-submit" data-i18n="fb.submit">Send Feedback &nbsp;→</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ TECH ═══ -->
+  <section class="tech-section">
+    <div class="tech-left reveal">
+      <span class="section-tag" data-i18n="tech.tag">Powered by</span>
+      <h2 class="section-title" style="font-size:clamp(1.6rem,2.2vw,2.8rem);margin-bottom:10px" data-i18n="tech.title">Serious technology,<br>simple experience.</h2>
+      <p class="section-subtitle" style="font-size:0.8rem" data-i18n="tech.subtitle">Built to be reliable, fast, and flexible — so you can focus on your story, not the setup.</p>
+    </div>
+    <div class="tech-badges reveal" style="transition-delay:0.15s">
+      <span class="badge">Anthropic Claude</span>
+      <span class="badge">OpenAI GPT</span>
+      <span class="badge">TypeScript</span>
+      <span class="badge" data-i18n="badge.loop">Self-Improving AI</span>
+      <span class="badge" data-i18n="badge.human">Human Approval Flow</span>
+      <span class="badge" data-i18n="badge.export">Markdown Export</span>
+      <span class="badge" data-i18n="badge.offline">Offline Mode</span>
+      <span class="badge" data-i18n="badge.ages">All Ages &amp; Genres</span>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <span class="footer-logo">BOOK CREATOR</span>
+    <span class="footer-note" data-i18n="footer.note">AI-Powered Book Generation &nbsp;·&nbsp; For Every Age &nbsp;·&nbsp; Open Source</span>
+  </footer>
+
+  <!-- ═══ SCRIPTS ═══ -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── TRANSLATIONS ────────────────────────────────────────────── */
+    const T = {
+      EN: {
+        'nav.features':'Features','nav.create':'Create','nav.workflow':'How it works','nav.feedback':'Feedback','nav.cta':'Get Started',
+        'hero.label':'AI-Powered · Books for Every Age',
+        'hero.tagline':'Turn your idea into a complete, beautifully written book — for any age, any genre, in minutes.',
+        'hero.cta':'Start Creating →','hero.secondary':'See how it works','hero.scroll':'Scroll',
+        'f1.title':'You imagine it.\nWe plan everything.','f1.body':'Just tell us your idea. Our AI maps out the full story — plot, characters, chapter structure — so you can skip straight to the exciting part.',
+        'f2.title':'Keeps refining\nuntil it\'s great.','f2.body':'Not happy with the first draft? Neither are we. The system reviews its own work and rewrites it up to three times, aiming for excellence every time.',
+        'f3.title':'You decide\nwhat gets published.','f3.body':'At key moments, you review the result and say go ahead — or not. Your vision always has the final word.',
+        'create.tag':'Create your book','create.title':'Tell us your story.','create.subtitle':'Fill in a few details and we\'ll generate a ready-to-run setup for you — no technical knowledge needed.',
+        'fs.story':'Your Story','fs.series':'The Series','fs.settings':'Settings',
+        'f.idea.label':'Your idea','f.idea.placeholder':'A retired sailor who finds a message in a bottle that takes him on one last great adventure…','f.idea.hint':'Describe your story, topic, or the message you\'d like the book to carry. Any genre, any age.',
+        'f.genre.label':'Genre','f.age.label':'Audience age','f.books.label':'Number of books',
+        'f.pages.label':'Pages per book','f.style.label':'Illustration style','f.title.label':'Series name','f.title.placeholder':'Leave blank — we\'ll come up with one for you',
+        'f.provider.label':'AI Engine','f.quality.label':'Writing quality',
+        'f.apikey.label':'API Key','f.apikey.hint':'Stored only in your browser. Never sent to our servers.','f.apikey.missing':'Please enter your API key in the Settings section.',
+        'apikey.show':'Show','apikey.hide':'Hide','f.pages.unit':'pages',
+        'f.tone.label':'Tone','f.optional':'optional',
+        'q.fast':'70 — Quick','q.balanced':'82 — Balanced','q.best':'95 — Best',
+        'prov.anthropic.desc':'Best quality — requires an API key','prov.openai.desc':'Great results — requires an API key',
+        'prov.mock.title':'Try it out (Offline)','prov.mock.desc':'No account needed — great for testing',
+        'tone.auto':'Let the AI decide','tone.warm':'Warm & heartfelt','tone.funny':'Funny & playful','tone.epic':'Epic & dramatic','tone.calm':'Calm & reflective','tone.educational':'Clear & educational',
+        'genre.auto':'Let the AI decide','genre.adventure':'Adventure','genre.romance':'Romance','genre.mystery':'Mystery','genre.fantasy':'Fantasy','genre.educational':'Educational','genre.biography':'Biography / True Story','genre.children':'Children\'s Story','genre.other':'Other',
+        'age.auto':'Let the AI decide','age.kids':'Kids (4 – 8)','age.young':'Young Readers (9 – 13)','age.teens':'Teens (14 – 17)','age.adults':'Adults (18+)','age.all':'All Ages',
+        'pages.8':'8 pages','pages.12':'12 pages','pages.20':'20 pages','pages.32':'32 pages','pages.50':'50 pages',
+        'style.auto':'Let the AI decide','style.none':'No illustrations','style.watercolor':'Watercolor','style.digital':'Digital Art','style.cartoon':'Cartoon','style.realistic':'Realistic','style.pencil':'Pencil Sketch',
+        'f.density.label':'Illustrations','density.full':'Every page — Picture book','density.occasional':'Occasional — Story support','density.none':'None — Novel / Pure text',
+        'f.submit':'Generate My Books →','f.submit.note':'Your books will be created step by step — you review and decide at each stage.',
+        'out.label':'Your setup','out.title':'Your book\nat a glance.','out.desc':'Fill in the form and click Generate to start.',
+        's.idea':'Idea','s.genre':'Genre','s.age':'Audience','s.books':'Books','s.pages':'Pages each','s.style':'Illustrations',
+        'wf.hint':'Fill in the form on the left, then click <strong>Generate My Books</strong> to start.',
+        'wf.book':'BOOK','wf.rewriting':'Rewriting…','wf.qa.running':'Checking quality…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incomplete','wf.qa.error':'Error','error.api':'API error','error.no.books':'No approved books available.','wf.story.illus':'Story illustration','btn.skip':'✕ Skip',
+        'wf.nav.gen':'Generate','wf.nav.review':'Review','wf.nav.covers':'Covers','wf.nav.text':'Text','wf.nav.illus':'Illustrations','wf.nav.dl':'Download',
+        'wf.gen.title':'Creating your books…',
+        'wf.rev.title':'Review your books','wf.rev.sub':'Keep, rewrite, or remove each book.','wf.rev.continue':'Continue to Covers →',
+        'wf.cov.gen.title':'Generating covers…','wf.cov.rev.title':'Review your covers','wf.cov.rev.sub':'Keep, regenerate, or remove each cover.','wf.cov.continue':'Continue →',
+        'wf.txt.title':'Read your books','wf.txt.sub':'Read the full text and accept or reject each book.','wf.txt.continue':'Continue to Illustrations →',
+        'wf.page':'Page',
+        'wf.img.title':'Generating illustrations…',
+        'wf.revi.title':'Review your illustrations','wf.revi.sub':'Keep, regenerate, or skip each image.','wf.revi.continue':'Continue to Download →',
+        'wf.illus.none.title':'No page illustrations','wf.illus.none.sub':'You selected a pure text book — no page illustrations will be generated.',
+        'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
+        'btn.keep':'✓ Keep','btn.rewrite':'↻ Rewrite','btn.redo':'↻ Redo','btn.remove':'✕ Remove','btn.accept':'✓ Accept','btn.reject':'✕ Reject',
+        'how.tag':'How it works','how.title':'From idea to finished book.','how.subtitle':'A smart, step-by-step process with two moments where you stay in control.',
+        'hw.s1.name':'You share your idea','hw.s1.desc':'A few words or a detailed description — whatever you have.',
+        'hw.s2.name':'AI builds the plan','hw.s2.desc':'Titles, characters, plot arcs — the full blueprint for your series.',
+        'hw.s3.name':'Review & safety check','hw.s3.desc':'The plan is checked for quality, tone, and appropriateness.',
+        'hw.s4.name':'You say go ahead','hw.s4.desc':'You review the outline and approve it before writing begins.',
+        'hw.s5.name':'AI writes your book','hw.s5.desc':'Every page written, adapted to your chosen style and audience.',
+        'hw.s6.name':'Refines until excellent','hw.s6.desc':'The writing is scored and improved, up to three rounds.',
+        'hw.s7.name':'You approve the text','hw.s7.desc':'One final review before your book is packaged and exported.',
+        'hw.s8.name':'Your book is ready','hw.s8.desc':'Delivered as a clean document, ready to read, print, or publish.',
+        'fb.tag':'Feedback','fb.title':'We\'d love to\nhear from you.','fb.subtitle':'Tell us what you think — what you love, what you\'d improve, or just share your experience with Book Creator.',
+        'fb.rating.label':'Your rating',
+        'fb.name.label':'Your name','fb.name.placeholder':'Jane',
+        'fb.email.label':'Email','fb.email.placeholder':'jane@example.com',
+        'fb.msg.label':'Your message','fb.msg.placeholder':'I really enjoyed how easy it was to get started…',
+        'fb.submit':'Send Feedback →',
+        'fb.thanks.title':'Thank you!','fb.thanks.text':'Your feedback means a lot. We read every message and use it to make Book Creator better.',
+        'fb.promise.tag':'Our promise',
+        'fb.p1':'<strong>We read every message.</strong> No auto-replies, no ignore pile. Real people read your words.',
+        'fb.p2':'<strong>Your feedback shapes the product.</strong> Features requested here get built. Bugs reported here get fixed.',
+        'fb.p3':'<strong>Your privacy matters.</strong> Email is optional and never shared. We only use it to reply to you.',
+        'fb.stats.tag':'Loved by readers','fb.avg':'Average rating','fb.books':'Books created',
+        'tech.tag':'Powered by','tech.title':'Serious technology,\nsimple experience.','tech.subtitle':'Built to be reliable, fast, and flexible — so you can focus on your story, not the setup.',
+        'badge.loop':'Self-Improving AI','badge.human':'Human Approval Flow','badge.export':'Markdown Export','badge.offline':'Offline Mode','badge.ages':'All Ages & Genres',
+        'footer.note':'AI-Powered Book Generation · For Every Age · Open Source',
+      },
+      DE: {
+        'nav.features':'Features','nav.create':'Erstellen','nav.workflow':'So funktioniert\'s','nav.feedback':'Feedback','nav.cta':'Loslegen',
+        'hero.label':'KI-gestützt · Bücher für jedes Alter',
+        'hero.tagline':'Verwandle deine Idee in ein vollständiges, wunderschön geschriebenes Buch — für jedes Alter, jedes Genre, in Minuten.',
+        'hero.cta':'Jetzt erstellen →','hero.secondary':'So funktioniert\'s','hero.scroll':'Scrollen',
+        'f1.title':'Du träumst.\nWir planen alles.','f1.body':'Sag uns einfach deine Idee. Unsere KI entwirft die komplette Geschichte — Plot, Charaktere, Kapitelstruktur — damit du direkt zum spannenden Teil kommst.',
+        'f2.title':'Verbessert sich\nbis es perfekt ist.','f2.body':'Mit dem ersten Entwurf nicht zufrieden? Wir auch nicht. Das System überprüft seine eigene Arbeit und schreibt sie bis zu dreimal um.',
+        'f3.title':'Du entscheidest,\nwas veröffentlicht wird.','f3.body':'An wichtigen Momenten überprüfst du das Ergebnis und sagst, ob es weitergehen soll. Deine Vision hat immer das letzte Wort.',
+        'create.tag':'Dein Buch erstellen','create.title':'Erzähl uns deine Geschichte.','create.subtitle':'Füll ein paar Details aus und wir erstellen eine fertige Konfiguration für dich — kein technisches Wissen nötig.',
+        'fs.story':'Deine Geschichte','fs.series':'Die Reihe','fs.settings':'Einstellungen',
+        'f.idea.label':'Deine Idee','f.idea.placeholder':'Ein pensionierter Seemann, der eine Flaschenpost findet, die ihn auf sein letztes großes Abenteuer führt…','f.idea.hint':'Beschreibe deine Geschichte, dein Thema oder die Botschaft, die das Buch vermitteln soll. Jedes Genre, jedes Alter.',
+        'f.genre.label':'Genre','f.age.label':'Zielgruppe','f.books.label':'Anzahl Bücher',
+        'f.pages.label':'Seiten pro Buch','f.style.label':'Illustrationsstil','f.title.label':'Reihenname','f.title.placeholder':'Freilassen — wir denken uns einen aus',
+        'f.provider.label':'KI-Engine','f.quality.label':'Schreibqualität',
+        'f.apikey.label':'API-Schlüssel','f.apikey.hint':'Nur in deinem Browser gespeichert. Wird nie an unsere Server gesendet.','f.apikey.missing':'Bitte gib deinen API-Schlüssel im Einstellungsbereich ein.',
+        'apikey.show':'Zeigen','apikey.hide':'Verbergen','f.pages.unit':'Seiten',
+        'f.tone.label':'Tonalität','f.optional':'optional',
+        'q.fast':'70 — Schnell','q.balanced':'82 — Ausgewogen','q.best':'95 — Bestmöglich',
+        'prov.anthropic.desc':'Beste Qualität — API-Schlüssel erforderlich','prov.openai.desc':'Tolle Ergebnisse — API-Schlüssel erforderlich',
+        'prov.mock.title':'Ausprobieren (Offline)','prov.mock.desc':'Kein Konto nötig — perfekt zum Testen',
+        'tone.auto':'KI entscheiden lassen','tone.warm':'Warm & herzlich','tone.funny':'Lustig & verspielt','tone.epic':'Episch & dramatisch','tone.calm':'Ruhig & nachdenklich','tone.educational':'Klar & lehrreich',
+        'genre.auto':'KI entscheiden lassen','genre.adventure':'Abenteuer','genre.romance':'Romantik','genre.mystery':'Krimi','genre.fantasy':'Fantasy','genre.educational':'Sachbuch','genre.biography':'Biografie / Wahre Geschichte','genre.children':'Kinderbuch','genre.other':'Sonstiges',
+        'age.auto':'KI entscheiden lassen','age.kids':'Kinder (4 – 8)','age.young':'Junge Leser (9 – 13)','age.teens':'Teenager (14 – 17)','age.adults':'Erwachsene (18+)','age.all':'Alle Altersgruppen',
+        'pages.8':'8 Seiten','pages.12':'12 Seiten','pages.20':'20 Seiten','pages.32':'32 Seiten','pages.50':'50 Seiten',
+        'style.auto':'KI entscheiden lassen','style.none':'Keine Illustrationen','style.watercolor':'Aquarell','style.digital':'Digitale Kunst','style.cartoon':'Cartoon','style.realistic':'Realistisch','style.pencil':'Bleistiftskizze',
+        'f.density.label':'Illustrationen','density.full':'Jede Seite — Bilderbuch','density.occasional':'Gelegentlich — zur Unterstützung','density.none':'Keine — Roman / Reiner Text',
+        'f.submit':'Bücher generieren →','f.submit.note':'Deine Bücher werden Schritt für Schritt erstellt — du prüfst und entscheidest.',
+        'out.label':'Deine Konfiguration','out.title':'Dein Buch\nauf einen Blick.','out.desc':'Füll das Formular aus und klicke Generieren.',
+        's.idea':'Idee','s.genre':'Genre','s.age':'Zielgruppe','s.books':'Bücher','s.pages':'Seiten','s.style':'Illustrationen',
+        'wf.hint':'Füll das Formular aus, dann klicke <strong>Bücher generieren</strong>.',
+        'wf.book':'BUCH','wf.rewriting':'Wird neu geschrieben…','wf.qa.running':'Qualität wird geprüft…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Unvollständig','wf.qa.error':'Fehler','error.api':'API-Fehler','error.no.books':'Keine freigegebenen Bücher vorhanden.','wf.story.illus':'Illustration','btn.skip':'✕ Überspringen',
+        'wf.nav.gen':'Generieren','wf.nav.review':'Prüfen','wf.nav.covers':'Cover','wf.nav.text':'Text','wf.nav.illus':'Illustrationen','wf.nav.dl':'Download',
+        'wf.gen.title':'Bücher werden erstellt…',
+        'wf.rev.title':'Bücher prüfen','wf.rev.sub':'Behalten, neu schreiben oder entfernen.','wf.rev.continue':'Weiter zu Covern →',
+        'wf.cov.gen.title':'Cover werden generiert…','wf.cov.rev.title':'Cover prüfen','wf.cov.rev.sub':'Behalten, neu generieren oder entfernen.','wf.cov.continue':'Weiter →',
+        'wf.txt.title':'Texte lesen','wf.txt.sub':'Lies den vollständigen Text und entscheide für jedes Buch.','wf.txt.continue':'Weiter zu Illustrationen →',
+        'wf.page':'Seite',
+        'wf.img.title':'Illustrationen werden generiert…',
+        'wf.revi.title':'Illustrationen prüfen','wf.revi.sub':'Behalten, neu generieren oder überspringen.','wf.revi.continue':'Weiter zum Download →',
+        'wf.illus.none.title':'Keine Seitenillustrationen','wf.illus.none.sub':'Du hast ein reines Textbuch gewählt — es werden keine Seitenillustrationen erstellt.',
+        'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
+        'btn.keep':'✓ Behalten','btn.rewrite':'↻ Neu schreiben','btn.redo':'↻ Neu','btn.remove':'✕ Entfernen','btn.accept':'✓ Annehmen','btn.reject':'✕ Ablehnen',
+        'how.tag':'So funktioniert\'s','how.title':'Von der Idee zum fertigen Buch.','how.subtitle':'Ein intelligenter, schrittweiser Prozess — du behältst immer die Kontrolle.',
+        'hw.s1.name':'Du teilst deine Idee','hw.s1.desc':'Ein paar Worte oder eine detaillierte Beschreibung — was auch immer du hast.',
+        'hw.s2.name':'KI erstellt den Plan','hw.s2.desc':'Titel, Charaktere, Handlungsbögen — der komplette Entwurf für deine Reihe.',
+        'hw.s3.name':'Qualitäts- & Sicherheitsprüfung','hw.s3.desc':'Der Plan wird auf Qualität, Tonalität und Eignung geprüft.',
+        'hw.s4.name':'Du gibst grünes Licht','hw.s4.desc':'Du überprüfst den Entwurf und genehmigst ihn, bevor das Schreiben beginnt.',
+        'hw.s5.name':'KI schreibt dein Buch','hw.s5.desc':'Jede Seite geschrieben, angepasst an deinen gewählten Stil und deine Zielgruppe.',
+        'hw.s6.name':'Verbessert bis exzellent','hw.s6.desc':'Der Text wird bewertet und bis zu dreimal überarbeitet.',
+        'hw.s7.name':'Du genehmigst den Text','hw.s7.desc':'Eine letzte Prüfung, bevor dein Buch verpackt und exportiert wird.',
+        'hw.s8.name':'Dein Buch ist fertig','hw.s8.desc':'Als sauberes Dokument geliefert, bereit zum Lesen, Drucken oder Veröffentlichen.',
+        'fb.tag':'Feedback','fb.title':'Wir freuen uns\nauf deine Meinung.','fb.subtitle':'Sag uns, was du denkst — was dir gefällt, was du verbessern würdest, oder teile einfach deine Erfahrung.',
+        'fb.rating.label':'Deine Bewertung',
+        'fb.name.label':'Dein Name','fb.name.placeholder':'Maria',
+        'fb.email.label':'E-Mail','fb.email.placeholder':'maria@beispiel.de',
+        'fb.msg.label':'Deine Nachricht','fb.msg.placeholder':'Ich fand es toll, wie einfach der Einstieg war…',
+        'fb.submit':'Feedback senden →',
+        'fb.thanks.title':'Danke!','fb.thanks.text':'Dein Feedback bedeutet uns viel. Wir lesen jede Nachricht und nutzen sie, um Book Creator besser zu machen.',
+        'fb.promise.tag':'Unser Versprechen',
+        'fb.p1':'<strong>Wir lesen jede Nachricht.</strong> Keine automatischen Antworten. Echte Menschen lesen deine Worte.',
+        'fb.p2':'<strong>Dein Feedback formt das Produkt.</strong> Hier angefragte Features werden umgesetzt.',
+        'fb.p3':'<strong>Deine Privatsphäre ist uns wichtig.</strong> E-Mail ist optional und wird nie weitergegeben.',
+        'fb.stats.tag':'Geliebt von Lesern','fb.avg':'Durchschnittsbewertung','fb.books':'Erstellte Bücher',
+        'tech.tag':'Angetrieben von','tech.title':'Starke Technologie,\neinfache Bedienung.','tech.subtitle':'Zuverlässig, schnell und flexibel — damit du dich auf deine Geschichte konzentrieren kannst.',
+        'badge.loop':'Selbstverbessernde KI','badge.human':'Menschliche Genehmigung','badge.export':'Markdown-Export','badge.offline':'Offline-Modus','badge.ages':'Alle Altersgruppen & Genres',
+        'footer.note':'KI-gestützte Bucherstellung · Für jedes Alter · Open Source',
+      },
+      FR: {
+        'nav.features':'Fonctionnalités','nav.create':'Créer','nav.workflow':'Comment ça marche','nav.feedback':'Retours','nav.cta':'Commencer',
+        'hero.label':'Propulsé par l\'IA · Des livres pour tous les âges',
+        'hero.tagline':'Transformez votre idée en un livre complet et magnifiquement écrit — pour tout âge, tout genre, en quelques minutes.',
+        'hero.cta':'Commencer →','hero.secondary':'Comment ça marche','hero.scroll':'Défiler',
+        'f1.title':'Vous imaginez.\nNous planifions tout.','f1.body':'Dites-nous simplement votre idée. Notre IA élabore l\'histoire complète — intrigue, personnages, structure des chapitres.',
+        'f2.title':'S\'améliore\njusqu\'à la perfection.','f2.body':'Pas satisfait du premier jet ? Nous non plus. Le système révise son propre travail et le réécrit jusqu\'à trois fois.',
+        'f3.title':'Vous décidez\nce qui est publié.','f3.body':'À des moments clés, vous examinez le résultat et décidez de la suite. Votre vision a toujours le dernier mot.',
+        'create.tag':'Créer votre livre','create.title':'Parlez-nous de votre histoire.','create.subtitle':'Remplissez quelques détails et nous générerons une configuration prête à l\'emploi — aucune connaissance technique requise.',
+        'fs.story':'Votre Histoire','fs.series':'La Série','fs.settings':'Paramètres',
+        'f.idea.label':'Votre idée','f.idea.placeholder':'Un marin retraité qui trouve un message dans une bouteille et se lance dans une dernière grande aventure…','f.idea.hint':'Décrivez votre histoire, votre sujet ou le message que vous souhaitez transmettre. Tout genre, tout âge.',
+        'f.genre.label':'Genre','f.age.label':'Public cible','f.books.label':'Nombre de livres',
+        'f.pages.label':'Pages par livre','f.style.label':'Style d\'illustration','f.title.label':'Nom de la série','f.title.placeholder':'Laissez vide — nous trouverons un nom',
+        'f.provider.label':'Moteur IA','f.quality.label':'Qualité d\'écriture',
+        'f.apikey.label':'Clé API','f.apikey.hint':'Stockée uniquement dans votre navigateur. Jamais envoyée à nos serveurs.','f.apikey.missing':'Veuillez entrer votre clé API dans la section Paramètres.',
+        'apikey.show':'Afficher','apikey.hide':'Masquer','f.pages.unit':'pages',
+        'f.tone.label':'Ton','f.optional':'optionnel',
+        'q.fast':'70 — Rapide','q.balanced':'82 — Équilibré','q.best':'95 — Optimal',
+        'prov.anthropic.desc':'Meilleure qualité — clé API requise','prov.openai.desc':'Excellents résultats — clé API requise',
+        'prov.mock.title':'Essayer (Hors ligne)','prov.mock.desc':'Aucun compte nécessaire — idéal pour tester',
+        'tone.auto':'Laisser l\'IA décider','tone.warm':'Chaleureux & sincère','tone.funny':'Drôle & enjoué','tone.epic':'Épique & dramatique','tone.calm':'Calme & contemplatif','tone.educational':'Clair & éducatif',
+        'genre.auto':'Laisser l\'IA décider','genre.adventure':'Aventure','genre.romance':'Romance','genre.mystery':'Mystère','genre.fantasy':'Fantasy','genre.educational':'Éducatif','genre.biography':'Biographie / Histoire vraie','genre.children':'Livre pour enfants','genre.other':'Autre',
+        'age.auto':'Laisser l\'IA décider','age.kids':'Enfants (4 – 8)','age.young':'Jeunes lecteurs (9 – 13)','age.teens':'Ados (14 – 17)','age.adults':'Adultes (18+)','age.all':'Tous âges',
+        'pages.8':'8 pages','pages.12':'12 pages','pages.20':'20 pages','pages.32':'32 pages','pages.50':'50 pages',
+        'style.auto':'Laisser l\'IA décider','style.none':'Sans illustrations','style.watercolor':'Aquarelle','style.digital':'Art numérique','style.cartoon':'Dessin animé','style.realistic':'Réaliste','style.pencil':'Croquis au crayon',
+        'f.density.label':'Illustrations','density.full':'Chaque page — Livre illustré','density.occasional':'Occasionnelles — Support narratif','density.none':'Aucune — Roman / Texte pur',
+        'f.submit':'Générer mes livres →','f.submit.note':'Vos livres seront créés étape par étape — vous vérifiez et décidez à chaque étape.',
+        'out.label':'Votre configuration','out.title':'Votre livre\nen un coup d\'œil.','out.desc':'Remplissez le formulaire et cliquez sur Générer.',
+        's.idea':'Idée','s.genre':'Genre','s.age':'Public','s.books':'Livres','s.pages':'Pages','s.style':'Illustrations',
+        'wf.hint':'Remplissez le formulaire, puis cliquez sur <strong>Générer mes livres</strong>.',
+        'wf.book':'LIVRE','wf.rewriting':'Réécriture…','wf.qa.running':'Vérification qualité…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incomplet','wf.qa.error':'Erreur','error.api':'Erreur API','error.no.books':'Aucun livre approuvé disponible.','wf.story.illus':'Illustration narrative','btn.skip':'✕ Ignorer',
+        'wf.nav.gen':'Générer','wf.nav.review':'Vérifier','wf.nav.covers':'Couvertures','wf.nav.text':'Texte','wf.nav.illus':'Illustrations','wf.nav.dl':'Télécharger',
+        'wf.gen.title':'Création de vos livres…',
+        'wf.rev.title':'Vérifiez vos livres','wf.rev.sub':'Gardez, réécrivez ou supprimez chaque livre.','wf.rev.continue':'Continuer vers les couvertures →',
+        'wf.cov.gen.title':'Génération des couvertures…','wf.cov.rev.title':'Vérifiez vos couvertures','wf.cov.rev.sub':'Gardez, régénérez ou supprimez chaque couverture.','wf.cov.continue':'Continuer →',
+        'wf.txt.title':'Lire vos livres','wf.txt.sub':'Lisez le texte complet et acceptez ou rejetez chaque livre.','wf.txt.continue':'Continuer vers les illustrations →',
+        'wf.page':'Page',
+        'wf.img.title':'Génération des illustrations…',
+        'wf.revi.title':'Vérifiez vos illustrations','wf.revi.sub':'Gardez, régénérez ou ignorez chaque image.','wf.revi.continue':'Continuer vers le téléchargement →',
+        'wf.illus.none.title':'Aucune illustration de page','wf.illus.none.sub':'Vous avez sélectionné un livre sans illustrations — aucune image ne sera générée.',
+        'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
+        'btn.keep':'✓ Garder','btn.rewrite':'↻ Réécrire','btn.redo':'↻ Refaire','btn.remove':'✕ Supprimer','btn.accept':'✓ Accepter','btn.reject':'✕ Rejeter',
+        'how.tag':'Comment ça marche','how.title':'De l\'idée au livre fini.','how.subtitle':'Un processus intelligent, étape par étape, avec deux moments où vous gardez le contrôle.',
+        'hw.s1.name':'Vous partagez votre idée','hw.s1.desc':'Quelques mots ou une description détaillée — ce que vous avez.',
+        'hw.s2.name':'L\'IA construit le plan','hw.s2.desc':'Titres, personnages, arcs narratifs — le plan complet de votre série.',
+        'hw.s3.name':'Vérification qualité','hw.s3.desc':'Le plan est vérifié pour la qualité, le ton et la pertinence.',
+        'hw.s4.name':'Vous donnez le feu vert','hw.s4.desc':'Vous examinez le plan et l\'approuvez avant que l\'écriture commence.',
+        'hw.s5.name':'L\'IA écrit votre livre','hw.s5.desc':'Chaque page écrite, adaptée à votre style et votre public.',
+        'hw.s6.name':'S\'améliore jusqu\'à l\'excellence','hw.s6.desc':'L\'écriture est évaluée et améliorée, jusqu\'à trois fois.',
+        'hw.s7.name':'Vous approuvez le texte','hw.s7.desc':'Une dernière révision avant que votre livre soit empaqueté et exporté.',
+        'hw.s8.name':'Votre livre est prêt','hw.s8.desc':'Livré comme un document propre, prêt à lire, imprimer ou publier.',
+        'fb.tag':'Retours','fb.title':'Nous aimerions\vous entendre.','fb.subtitle':'Dites-nous ce que vous pensez — ce que vous aimez, ce que vous amélioreriez, ou partagez simplement votre expérience.',
+        'fb.rating.label':'Votre note',
+        'fb.name.label':'Votre nom','fb.name.placeholder':'Marie',
+        'fb.email.label':'E-mail','fb.email.placeholder':'marie@exemple.fr',
+        'fb.msg.label':'Votre message','fb.msg.placeholder':'J\'ai vraiment apprécié la facilité de démarrage…',
+        'fb.submit':'Envoyer mon avis →',
+        'fb.thanks.title':'Merci !','fb.thanks.text':'Votre retour compte beaucoup. Nous lisons chaque message et l\'utilisons pour améliorer Book Creator.',
+        'fb.promise.tag':'Notre engagement',
+        'fb.p1':'<strong>Nous lisons chaque message.</strong> Pas de réponses automatiques. De vraies personnes lisent vos mots.',
+        'fb.p2':'<strong>Votre avis façonne le produit.</strong> Les fonctionnalités demandées ici sont développées.',
+        'fb.p3':'<strong>Votre vie privée est importante.</strong> L\'e-mail est optionnel et jamais partagé.',
+        'fb.stats.tag':'Adoré par les lecteurs','fb.avg':'Note moyenne','fb.books':'Livres créés',
+        'tech.tag':'Propulsé par','tech.title':'Technologie sérieuse,\nexpérience simple.','tech.subtitle':'Fiable, rapide et flexible — pour que vous puissiez vous concentrer sur votre histoire.',
+        'badge.loop':'IA auto-améliorante','badge.human':'Approbation humaine','badge.export':'Export Markdown','badge.offline':'Mode hors ligne','badge.ages':'Tous âges & genres',
+        'footer.note':'Génération de livres par IA · Pour tous les âges · Open Source',
+      },
+      IT: {
+        'nav.features':'Funzionalità','nav.create':'Crea','nav.workflow':'Come funziona','nav.feedback':'Feedback','nav.cta':'Inizia',
+        'hero.label':'Alimentato dall\'IA · Libri per ogni età',
+        'hero.tagline':'Trasforma la tua idea in un libro completo e scritto magnificamente — per qualsiasi età, genere, in pochi minuti.',
+        'hero.cta':'Inizia a creare →','hero.secondary':'Come funziona','hero.scroll':'Scorri',
+        'f1.title':'Tu immagini.\nNoi pianifichiamo tutto.','f1.body':'Dicci semplicemente la tua idea. La nostra IA elabora la storia completa — trama, personaggi, struttura dei capitoli.',
+        'f2.title':'Si migliora\nfinché non è perfetto.','f2.body':'Non soddisfatto della prima bozza? Nemmeno noi. Il sistema rivede il proprio lavoro e lo riscrive fino a tre volte.',
+        'f3.title':'Sei tu a decidere\ncosa viene pubblicato.','f3.body':'In momenti chiave, esamini il risultato e decidi se andare avanti. La tua visione ha sempre l\'ultima parola.',
+        'create.tag':'Crea il tuo libro','create.title':'Raccontaci la tua storia.','create.subtitle':'Compila alcuni dettagli e genereremo una configurazione pronta all\'uso — nessuna conoscenza tecnica richiesta.',
+        'fs.story':'La Tua Storia','fs.series':'La Serie','fs.settings':'Impostazioni',
+        'f.idea.label':'La tua idea','f.idea.placeholder':'Un marinaio in pensione che trova un messaggio in una bottiglia che lo porta in un\'ultima grande avventura…','f.idea.hint':'Descrivi la tua storia, l\'argomento o il messaggio che vuoi trasmettere. Qualsiasi genere, qualsiasi età.',
+        'f.genre.label':'Genere','f.age.label':'Pubblico target','f.books.label':'Numero di libri',
+        'f.pages.label':'Pagine per libro','f.style.label':'Stile illustrazioni','f.title.label':'Nome della serie','f.title.placeholder':'Lascia vuoto — ne troveremo uno noi',
+        'f.provider.label':'Motore IA','f.quality.label':'Qualità della scrittura',
+        'f.apikey.label':'Chiave API','f.apikey.hint':'Salvata solo nel tuo browser. Non viene mai inviata ai nostri server.','f.apikey.missing':'Inserisci la tua chiave API nella sezione Impostazioni.',
+        'apikey.show':'Mostra','apikey.hide':'Nascondi','f.pages.unit':'pagine',
+        'f.tone.label':'Tono','f.optional':'opzionale',
+        'q.fast':'70 — Veloce','q.balanced':'82 — Bilanciato','q.best':'95 — Ottimale',
+        'prov.anthropic.desc':'Migliore qualità — richiede una chiave API','prov.openai.desc':'Ottimi risultati — richiede una chiave API',
+        'prov.mock.title':'Prova (Offline)','prov.mock.desc':'Nessun account necessario — ottimo per testare',
+        'tone.auto':'Lascia decidere all\'IA','tone.warm':'Caldo & sincero','tone.funny':'Divertente & giocoso','tone.epic':'Epico & drammatico','tone.calm':'Calmo & riflessivo','tone.educational':'Chiaro & educativo',
+        'genre.auto':'Lascia decidere all\'IA','genre.adventure':'Avventura','genre.romance':'Romanzo','genre.mystery':'Giallo','genre.fantasy':'Fantasy','genre.educational':'Educativo','genre.biography':'Biografia / Storia vera','genre.children':'Libro per bambini','genre.other':'Altro',
+        'age.auto':'Lascia decidere all\'IA','age.kids':'Bambini (4 – 8)','age.young':'Giovani lettori (9 – 13)','age.teens':'Adolescenti (14 – 17)','age.adults':'Adulti (18+)','age.all':'Tutte le età',
+        'pages.8':'8 pagine','pages.12':'12 pagine','pages.20':'20 pagine','pages.32':'32 pagine','pages.50':'50 pagine',
+        'style.auto':'Lascia decidere all\'IA','style.none':'Senza illustrazioni','style.watercolor':'Acquerello','style.digital':'Arte digitale','style.cartoon':'Cartone animato','style.realistic':'Realistico','style.pencil':'Schizzo a matita',
+        'f.density.label':'Illustrazioni','density.full':'Ogni pagina — Libro illustrato','density.occasional':'Occasionali — Supporto narrativo','density.none':'Nessuna — Romanzo / Solo testo',
+        'f.submit':'Genera i miei libri →','f.submit.note':'I tuoi libri verranno creati passo dopo passo — rivedi e decidi ad ogni fase.',
+        'out.label':'La tua configurazione','out.title':'Il tuo libro\nin sintesi.','out.desc':'Compila il modulo e clicca Genera.',
+        's.idea':'Idea','s.genre':'Genere','s.age':'Pubblico','s.books':'Libri','s.pages':'Pagine','s.style':'Illustrazioni',
+        'wf.hint':'Compila il modulo, poi clicca <strong>Genera i miei libri</strong>.',
+        'wf.book':'LIBRO','wf.rewriting':'Riscrittura…','wf.qa.running':'Controllo qualità…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incompleto','wf.qa.error':'Errore','error.api':'Errore API','error.no.books':'Nessun libro approvato disponibile.','wf.story.illus':'Illustrazione narrativa','btn.skip':'✕ Salta',
+        'wf.nav.gen':'Genera','wf.nav.review':'Rivedi','wf.nav.covers':'Copertine','wf.nav.text':'Testo','wf.nav.illus':'Illustrazioni','wf.nav.dl':'Download',
+        'wf.gen.title':'Creazione dei tuoi libri…',
+        'wf.rev.title':'Rivedi i tuoi libri','wf.rev.sub':'Tieni, riscrivi o rimuovi ogni libro.','wf.rev.continue':'Continua alle copertine →',
+        'wf.cov.gen.title':'Generazione copertine…','wf.cov.rev.title':'Rivedi le tue copertine','wf.cov.rev.sub':'Tieni, rigenera o rimuovi ogni copertina.','wf.cov.continue':'Continua →',
+        'wf.txt.title':'Leggi i tuoi libri','wf.txt.sub':'Leggi il testo completo e accetta o rifiuta ogni libro.','wf.txt.continue':'Continua alle illustrazioni →',
+        'wf.page':'Pagina',
+        'wf.img.title':'Generazione illustrazioni…',
+        'wf.revi.title':'Rivedi le tue illustrazioni','wf.revi.sub':'Tieni, rigenera o salta ogni immagine.','wf.revi.continue':'Continua al download →',
+        'wf.illus.none.title':'Nessuna illustrazione','wf.illus.none.sub':'Hai selezionato un libro solo testo — nessuna illustrazione verrà generata.',
+        'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
+        'btn.keep':'✓ Tieni','btn.rewrite':'↻ Riscrivi','btn.redo':'↻ Rifai','btn.remove':'✕ Rimuovi','btn.accept':'✓ Accetta','btn.reject':'✕ Rifiuta',
+        'how.tag':'Come funziona','how.title':'Dall\'idea al libro finito.','how.subtitle':'Un processo intelligente, passo dopo passo, con due momenti in cui mantieni il controllo.',
+        'hw.s1.name':'Condividi la tua idea','hw.s1.desc':'Poche parole o una descrizione dettagliata — qualunque cosa tu abbia.',
+        'hw.s2.name':'L\'IA costruisce il piano','hw.s2.desc':'Titoli, personaggi, archi narrativi — il progetto completo per la tua serie.',
+        'hw.s3.name':'Revisione qualità','hw.s3.desc':'Il piano viene verificato per qualità, tono e appropriatezza.',
+        'hw.s4.name':'Dai il via libera','hw.s4.desc':'Esamini il piano e lo approvi prima che inizi la scrittura.',
+        'hw.s5.name':'L\'IA scrive il tuo libro','hw.s5.desc':'Ogni pagina scritta, adattata al tuo stile e pubblico scelto.',
+        'hw.s6.name':'Si migliora fino all\'eccellenza','hw.s6.desc':'La scrittura viene valutata e migliorata, fino a tre volte.',
+        'hw.s7.name':'Approvi il testo','hw.s7.desc':'Una revisione finale prima che il libro venga esportato.',
+        'hw.s8.name':'Il tuo libro è pronto','hw.s8.desc':'Consegnato come documento pulito, pronto da leggere, stampare o pubblicare.',
+        'fb.tag':'Feedback','fb.title':'Ci piacerebbe\nsentirti.','fb.subtitle':'Dicci cosa pensi — cosa ami, cosa miglioreresti, o semplicemente condividi la tua esperienza con Book Creator.',
+        'fb.rating.label':'La tua valutazione',
+        'fb.name.label':'Il tuo nome','fb.name.placeholder':'Giulia',
+        'fb.email.label':'Email','fb.email.placeholder':'giulia@esempio.it',
+        'fb.msg.label':'Il tuo messaggio','fb.msg.placeholder':'Ho adorato quanto fosse facile iniziare…',
+        'fb.submit':'Invia feedback →',
+        'fb.thanks.title':'Grazie!','fb.thanks.text':'Il tuo feedback è prezioso. Leggiamo ogni messaggio e lo usiamo per migliorare Book Creator.',
+        'fb.promise.tag':'La nostra promessa',
+        'fb.p1':'<strong>Leggiamo ogni messaggio.</strong> Nessuna risposta automatica. Persone reali leggono le tue parole.',
+        'fb.p2':'<strong>Il tuo feedback plasma il prodotto.</strong> Le funzionalità richieste qui vengono realizzate.',
+        'fb.p3':'<strong>La tua privacy è importante.</strong> L\'email è opzionale e non viene mai condivisa.',
+        'fb.stats.tag':'Amato dai lettori','fb.avg':'Valutazione media','fb.books':'Libri creati',
+        'tech.tag':'Alimentato da','tech.title':'Tecnologia seria,\nesperienza semplice.','tech.subtitle':'Affidabile, veloce e flessibile — così puoi concentrarti sulla tua storia.',
+        'badge.loop':'IA auto-migliorante','badge.human':'Approvazione umana','badge.export':'Export Markdown','badge.offline':'Modalità offline','badge.ages':'Tutte le età e generi',
+        'footer.note':'Generazione di libri con IA · Per ogni età · Open Source',
+      }
+    };
+
+    let currentLang = 'DE';
+
+    window.setLang = function(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang));
+      document.documentElement.lang = lang.toLowerCase();
+      const d = T[lang];
+
+      // data-i18n elements
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.dataset.i18n;
+        if (d[k] !== undefined) el.innerHTML = d[k].replace(/\n/g,'<br>');
+      });
+
+      // placeholders
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+        const k = el.dataset.i18nPh;
+        if (d[k]) el.placeholder = d[k];
+      });
+
+      // select options
+      document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+        const k = el.dataset.i18nOpt;
+        if (d[k]) el.textContent = d[k];
+      });
+
+      // Update hero word 2
+      document.getElementById('w1').textContent = 'Book';
+      document.getElementById('w2').textContent = 'Creator';
+
+      syncSummary();
+    };
+
+    /* ── Lenis ───────────────────────────────────────────────────── */
+    const lenis = new Lenis({ duration:1.1, easing: t=>Math.min(1,1.001-Math.pow(2,-10*t)), smoothWheel:true });
+    function raf(t){lenis.raf(t);requestAnimationFrame(raf);}
+    requestAnimationFrame(raf);
+
+    /* ── Hero reveal ─────────────────────────────────────────────── */
+    const vid = document.getElementById('hero-video');
+    vid.addEventListener('canplay', ()=>vid.classList.add('loaded'));
+    setTimeout(()=>vid.classList.add('loaded'), 800);
+
+    setTimeout(()=>{
+      document.getElementById('hero-label').classList.add('visible');
+      setTimeout(()=>document.getElementById('w1').classList.add('visible'),200);
+      setTimeout(()=>document.getElementById('w2').classList.add('visible'),380);
+      setTimeout(()=>document.getElementById('hero-tagline').classList.add('visible'),550);
+      setTimeout(()=>document.getElementById('hero-actions').classList.add('visible'),700);
+      setTimeout(()=>document.getElementById('scroll-hint').classList.add('visible'),1000);
+      document.getElementById('logo').classList.add('visible');
+      document.getElementById('header-right').classList.add('visible');
+    }, 300);
+
+    /* ── Scroll reveal ───────────────────────────────────────────── */
+    const obs = new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in-view');obs.unobserve(e.target);} });
+    },{threshold:0.1});
+    document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+    /* ── Sliders ─────────────────────────────────────────────────── */
+    const bookCount = document.getElementById('book-count');
+    bookCount.addEventListener('input',()=>{
+      document.getElementById('books-val').textContent=bookCount.value;
+      syncSummary();
+    });
+    const pagesSlider = document.getElementById('pages');
+    pagesSlider.addEventListener('input',()=>{
+      document.getElementById('pages-val').textContent=pagesSlider.value;
+      syncSummary();
+    });
+
+    /* ── Feedback bubble ─────────────────────────────────────────── */
+    const fbBubble = document.getElementById('fb-bubble');
+    const fbModal  = document.getElementById('fb-modal');
+    const fbClose  = document.getElementById('fb-close');
+
+    fbBubble.addEventListener('click', () => fbModal.classList.toggle('open'));
+    fbClose.addEventListener('click',  () => fbModal.classList.remove('open'));
+    document.addEventListener('click', e => {
+      if (!fbModal.contains(e.target) && e.target !== fbBubble) fbModal.classList.remove('open');
+    });
+
+    /* ── Stars ───────────────────────────────────────────────────── */
+    let starRating = 0;
+    document.querySelectorAll('.star').forEach(star=>{
+      star.addEventListener('click',()=>{
+        starRating = parseInt(star.dataset.v);
+        document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<starRating));
+      });
+    });
+
+    /* ── Density toggle ──────────────────────────────────────────── */
+    function syncDensityVisibility(){
+      const density=document.getElementById('illus-density').value;
+      document.getElementById('illus-style-group').style.display=density==='none'?'none':'block';
+    }
+    document.getElementById('illus-density').addEventListener('change',()=>{syncDensityVisibility();syncSummary();});
+    syncDensityVisibility();
+
+    /* ── Summary sync ────────────────────────────────────────────── */
+    const genreNames={auto:'AI decides',adventure:'Adventure',romance:'Romance',mystery:'Mystery',fantasy:'Fantasy',educational:'Educational',biography:'Biography',children:"Children's",other:'Other'};
+    const ageNames={auto:'AI decides','4-8':'Kids (4–8)','9-13':'Young (9–13)','14-17':'Teens (14–17)','18+':'Adults (18+)','all':'All Ages'};
+    const densityNames={full:'Every page',occasional:'Occasional',none:'None'};
+
+    function syncSummary(){
+      const idea=document.getElementById('idea').value.trim();
+      const genre=document.getElementById('genre').value;
+      const age=document.getElementById('age').value;
+      const pages=document.getElementById('pages').value;
+      const density=document.getElementById('illus-density').value;
+      const d=T[currentLang];
+
+      document.getElementById('s-idea').textContent=idea?(idea.length>38?idea.slice(0,38)+'…':idea):'—';
+      document.getElementById('s-genre').textContent=d['genre.'+genre]||genreNames[genre]||genre;
+      const ageKeyMap={'auto':'auto','4-8':'kids','9-13':'young','14-17':'teens','18+':'adults','all':'all'};
+      document.getElementById('s-age').textContent=d['age.'+(ageKeyMap[age]||age)]||ageNames[age]||age;
+      document.getElementById('s-books').textContent=bookCount.value;
+      document.getElementById('s-pages').textContent=pages+' '+(d['f.pages.unit']||'Seiten');
+      document.getElementById('s-style').textContent=d['density.'+density]||densityNames[density]||density;
+    }
+
+    document.getElementById('book-form').addEventListener('input',syncSummary);
+    syncSummary();
+
+    /* ── Workflow ────────────────────────────────────────────────── */
+    function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+    let wfBooks=[], wfImages=[], wfCovers=[], wfCfg={};
+
+    const IMG_GRADIENTS=[
+      'linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)',
+      'linear-gradient(135deg,#2d1b69 0%,#11998e 100%)',
+      'linear-gradient(135deg,#4b1248 0%,#f10711 100%)',
+      'linear-gradient(135deg,#0d0d0d 0%,#3d5a80 100%)',
+      'linear-gradient(135deg,#1a472a 0%,#2d6a4f 100%)',
+      'linear-gradient(135deg,#3d2b1f 0%,#b5541e 100%)',
+    ];
+
+    function makeMockBook(idea,n,total,genre,age,pageCount){
+      const words=idea.trim().split(/\s+/).slice(0,3).join(' ');
+      const patterns=[
+        `The ${words}`,
+        `Beyond ${words}`,
+        `${words}: A Story`,
+        `Tales of ${words}`,
+        `The ${idea.trim().split(/\s+/)[0]||'Unknown'} Chronicles`,
+      ];
+      const title=patterns[n % patterns.length];
+      const g=genre!=='auto'?genre:'story';
+      const a=age!=='auto'?`for readers ${age}`:'for all ages';
+      const synopsis=`Book ${n+1} of ${total} — an engaging ${g} ${a}. `+
+        `Born from the idea of "${idea.slice(0,55)}${idea.length>55?'…':''}". `+
+        `Follow a cast of vivid characters through unexpected twists, heartfelt moments, and a journey that lingers long after the final page.`;
+      const starters=[
+        'The story opens on a quiet morning, just before everything changes.',
+        'Nobody expected what happened the day the letter arrived.',
+        'For years the secret had been kept hidden — until now.',
+        'It began with a single word that changed the course of everything.',
+        'The world looked ordinary from the outside, yet nothing was as it seemed.',
+        'Three things happened at once, and none of them were a coincidence.',
+      ];
+      const pages=Array.from({length:parseInt(pageCount)||8},(_,i)=>
+        starters[(n+i)%starters.length]+
+        ' The narrative unfolds with care, drawing readers into a world that feels both familiar and extraordinary, page after page.'
+      );
+      return {id:n,title,synopsis,pages,status:'pending'};
+    }
+
+    function goToStep(n){
+      document.querySelectorAll('.wf-step-nav').forEach((el,i)=>{
+        el.classList.remove('active','done');
+        if(i+1<n) el.classList.add('done');
+        if(i+1===n) el.classList.add('active');
+      });
+      document.querySelectorAll('.wf-content').forEach(el=>el.style.display='none');
+      const s=document.getElementById('wf-'+n);
+      if(s){s.style.display='block';}
+    }
+
+    // Load saved API key from localStorage
+    (function(){
+      const saved=localStorage.getItem('bm_api_key');
+      if(saved) document.getElementById('api-key').value=saved;
+    })();
+
+    // Show/hide API key
+    document.getElementById('api-key-toggle').addEventListener('click',function(){
+      const inp=document.getElementById('api-key');
+      const isHidden=inp.type==='password';
+      inp.type=isHidden?'text':'password';
+      const d=T[currentLang]||T.EN;
+      this.textContent=isHidden?(d['apikey.hide']||'Hide'):(d['apikey.show']||'Show');
+      this.setAttribute('data-i18n', isHidden?'apikey.hide':'apikey.show');
+    });
+
+    document.getElementById('generate-btn').addEventListener('click', async ()=>{
+      const idea=document.getElementById('idea').value.trim();
+      if(!idea){
+        const f=document.getElementById('idea');
+        f.focus();f.style.borderColor='#c0392b';
+        setTimeout(()=>f.style.borderColor='',2000);
+        return;
+      }
+      const apiKey=document.getElementById('api-key').value.trim();
+      if(!apiKey){
+        const f=document.getElementById('api-key');
+        f.focus();f.style.borderColor='#c0392b';
+        setTimeout(()=>f.style.borderColor='',2000);
+        f.scrollIntoView({behavior:'smooth',block:'center'});
+        return;
+      }
+      localStorage.setItem('bm_api_key',apiKey);
+
+      const provider=document.querySelector('input[name="provider"]:checked').value;
+      const cnt=parseInt(bookCount.value);
+      const genre=document.getElementById('genre').value;
+      const age=document.getElementById('age').value;
+      const pages=document.getElementById('pages').value;
+      const density=document.getElementById('illus-density').value;
+      const style=document.getElementById('illustration-style').value;
+      const tone=document.getElementById('tone').value;
+
+      wfCfg={idea,cnt,genre,age,pages,density,style,tone,apiKey,provider};
+      wfBooks=[];wfImages=[];wfCovers=[];
+
+      document.getElementById('gen-start-section').style.display='none';
+      document.getElementById('wf-panel').style.display='block';
+      goToStep(1);
+
+      // Build progress rows
+      const container=document.getElementById('wf-gen-progress');
+      container.innerHTML='';
+      for(let i=0;i<cnt;i++){
+        const row=document.createElement('div');
+        row.className='gen-book-row';
+        row.innerHTML=`<span class="gen-book-label">Buch ${i+1}</span>`+
+          `<div class="gen-book-bar-wrap"><div class="gen-book-bar" id="bar-wf-gen-progress-${i}"></div></div>`+
+          `<span class="gen-book-status" id="stat-wf-gen-progress-${i}">—</span>`+
+          `<span class="gen-book-qa" id="qa-${i}"></span>`;
+        container.appendChild(row);
+      }
+
+      const btn=document.getElementById('generate-btn');
+      btn.disabled=true;
+      const langName=LANG_NAMES[currentLang]||'German';
+
+      for(let i=0;i<cnt;i++){
+        const bar=document.getElementById(`bar-wf-gen-progress-${i}`);
+        const stat=document.getElementById(`stat-wf-gen-progress-${i}`);
+        const qaEl=document.getElementById(`qa-${i}`);
+        let pct=0, running=true;
+        const iv=setInterval(()=>{
+          if(!running)return;
+          pct+=(90-pct)*0.07;
+          bar.style.width=pct+'%';
+          stat.textContent=Math.round(pct)+'%';
+        },250);
+        try{
+          const book=await callAI(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang);
+          running=false;clearInterval(iv);
+          bar.style.width='95%';
+          stat.textContent='QA';
+          const d2=T[currentLang]||T.EN;
+          qaEl.textContent=d2['wf.qa.running']||'Qualität wird geprüft…';
+
+          const qaResult=await qualityGate(book,pages,provider,apiKey,langName,genre,age,tone);
+
+          bar.style.width='100%';
+          if(qaResult.status==='ok'||qaResult.status==='fixed'){
+            stat.textContent='✓';stat.className='gen-book-status done';
+            qaEl.textContent=d2['wf.qa.ok']||'✓ OK';qaEl.className='gen-book-qa ok';
+            if(qaResult.status==='fixed'){
+              console.log(`[QA] Buch ${i+1} korrigiert: ${qaResult.was}→${qaResult.book.pages.length}/${pages} Seiten`);
+            }
+          } else {
+            stat.textContent='~';
+            qaEl.textContent=d2['wf.qa.partial']||'⚠ Unvollständig';qaEl.className='gen-book-qa warn';
+            console.warn(`[QA] Buch ${i+1} unvollständig: ${qaResult.book.pages.length}/${pages} Seiten`);
+          }
+          wfBooks.push(qaResult.book);
+        }catch(err){
+          running=false;clearInterval(iv);
+          const d2=T[currentLang]||T.EN;
+          stat.textContent='✗';stat.className='gen-book-status error';
+          qaEl.textContent=d2['wf.qa.error']||'Fehler';qaEl.className='gen-book-qa warn';
+          console.error(`[QA] ${d2['error.api']||'API-Fehler'}:`,err.message||err);
+          wfBooks.push(makeMockBook(idea,i,cnt,genre,age,pages));
+          const errEl=document.createElement('span');
+          errEl.className='gen-book-error';
+          errEl.textContent=(d2['error.api']||'API-Fehler')+': '+(err.message||'');
+          bar.closest('.gen-book-row').appendChild(errEl);
+        }
+        await new Promise(r=>setTimeout(r,300));
+      }
+
+      btn.disabled=false;
+      setTimeout(()=>goToReviewBooks(),600);
+    });
+
+    // Robust JSON parser for AI responses that may contain unescaped quotes / bad formatting
+    function safeParseBookJSON(text){
+      // 1. Try direct parse
+      try{return JSON.parse(text);}catch(e){}
+
+      // 2. Fix common issues: literal newlines inside strings → \n, then retry
+      try{
+        const fixed=text
+          .replace(/:\s*"([\s\S]*?)"\s*([,\]}])/g,(_,v,tail)=>
+            ': "'+v.replace(/\n/g,'\\n').replace(/\r/g,'').replace(/(?<!\\)"/g,'\\"')+'"'+tail);
+        return JSON.parse(fixed);
+      }catch(e){}
+
+      // 3. Regex-based field extraction as last resort
+      function extractStr(key){
+        const m=text.match(new RegExp('"'+key+'"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+        return m?m[1].replace(/\\n/g,'\n').replace(/\\"/g,'"'):'';
+      }
+      function extractArr(key){
+        const m=text.match(new RegExp('"'+key+'"\\s*:\\s*\\[([\\s\\S]*?)\\]'));
+        if(!m)return[];
+        const items=[];const re=/"((?:[^"\\]|\\.)*)"/g;let r;
+        while((r=re.exec(m[1]))!==null) items.push(r[1].replace(/\\n/g,'\n').replace(/\\"/g,'"'));
+        return items;
+      }
+      return{title:extractStr('title'),synopsis:extractStr('synopsis'),pages:extractArr('pages')};
+    }
+
+    // ── Quality Gate ─────────────────────────────────────────────────
+    const PLACEHOLDER_RE=/^\.\.\.$|^Page \d+\.$|^Seite \d+\.$|^Pagina \d+\.$/;
+
+    async function qualityGate(book, pageCount, provider, apiKey, langName, genre, age, tone){
+      const target=parseInt(pageCount);
+
+      function validPages(pages){
+        return (pages||[]).filter(p=>p&&p.trim().length>10&&!PLACEHOLDER_RE.test(p.trim()));
+      }
+
+      let good=validPages(book.pages);
+      if(good.length>=target){
+        book.pages=good.slice(0,target);
+        return{book,status:'ok'};
+      }
+
+      const originalCount=good.length;
+      const MAX_ATTEMPTS=2;
+
+      for(let attempt=0;attempt<MAX_ATTEMPTS;attempt++){
+        const missing=target-good.length;
+        if(missing<=0)break;
+        console.log(`[QA] Versuch ${attempt+1}/${MAX_ATTEMPTS}: ${good.length}/${target} Seiten vorhanden, ${missing} fehlend`);
+
+        const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Return ONLY valid JSON, no markdown, no code fences.`;
+        const userPrompt=`The book "${book.title}" is incomplete. It has ${good.length} valid pages but needs exactly ${target} pages total.
+
+Continue the story from page ${good.length+1} to page ${target} (write exactly ${missing} pages).
+
+Last existing page: "${(good[good.length-1]||'').slice(0,300)}"
+
+Return ONLY this JSON (no markdown):
+{"pages":["text of page ${good.length+1}","text of page ${good.length+2}",...exactly ${missing} items, each 2-4 sentences]}`;
+
+        try{
+          let responseText;
+          if(provider==='openai'){
+            const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+              method:'POST',
+              headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+              body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.7,max_tokens:6000})
+            });
+            if(!resp.ok)throw new Error('HTTP '+resp.status);
+            responseText=(await resp.json()).choices[0].message.content;
+          }else{
+            const resp=await fetch('https://api.anthropic.com/v1/messages',{
+              method:'POST',
+              headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+              body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:6000,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
+            });
+            if(!resp.ok)throw new Error('HTTP '+resp.status);
+            responseText=(await resp.json()).content[0].text;
+          }
+          const jsonStr=responseText.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+          const parsed=safeParseBookJSON(jsonStr);
+          const newPages=validPages(Array.isArray(parsed.pages)?parsed.pages:[]);
+          good=[...good,...newPages];
+        }catch(e){
+          console.warn('QA fix attempt '+(attempt+1)+' failed:',e);
+        }
+      }
+
+      // Pad with ellipsis if still short
+      while(good.length<target)good.push('…');
+      book.pages=good.slice(0,target);
+
+      const finalValid=validPages(book.pages).length;
+      if(finalValid>=target)return{book,status:'fixed',was:originalCount};
+      return{book,status:'partial',has:finalValid,expected:target};
+    }
+
+    const LANG_NAMES={EN:'English',DE:'German',FR:'French',IT:'Italian'};
+
+    async function callAI(provider,apiKey,idea,n,total,genre,age,pages,tone,lang){
+      const genreStr=genre!=='auto'?genre:'any genre';
+      const ageStr=age!=='auto'?`for readers ${age}`:'suitable for all ages';
+      const toneStr=tone?`Tone: ${tone}.`:'';
+      const pageCount=parseInt(pages)||8;
+      const langName=LANG_NAMES[lang]||'English';
+      const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Generate a complete short book. Return ONLY valid JSON with no markdown, no code blocks, no extra text.`;
+      const userPrompt=`Create book ${n+1} of ${total} based on this idea: "${idea}"
+Genre: ${genreStr}
+Audience: ${ageStr}
+Pages: ${pageCount}${toneStr?'\n'+toneStr:''}
+Language: Write all text (title, synopsis, pages) in ${langName}.
+
+Return JSON in this exact format (raw JSON only, no markdown):
+{"title":"The book title","synopsis":"A 2-3 sentence synopsis.","pages":["Full text for page 1 (2-4 sentences)","Full text for page 2",...exactly ${pageCount} items]}`;
+
+      let responseText;
+      if(provider==='openai'){
+        const resp=await fetch('https://api.openai.com/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+          body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.8,max_tokens:8000})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).choices[0].message.content;
+      } else {
+        const resp=await fetch('https://api.anthropic.com/v1/messages',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8000,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
+        });
+        if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+resp.status);}
+        responseText=(await resp.json()).content[0].text;
+      }
+
+      // Strip possible markdown code fences
+      const jsonStr=responseText.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+      const parsed=safeParseBookJSON(jsonStr);
+      const pageTexts=Array.isArray(parsed.pages)?parsed.pages:[];
+      while(pageTexts.length<pageCount) pageTexts.push('...');
+      return {id:n,title:parsed.title||'Book '+(n+1),synopsis:parsed.synopsis||'',pages:pageTexts.slice(0,pageCount),status:'pending'};
+    }
+
+    function runGenerationAnim(containerId, count, speed, onDone){
+      const container=document.getElementById(containerId);
+      container.innerHTML='';
+      for(let i=0;i<count;i++){
+        const row=document.createElement('div');
+        row.className='gen-book-row';
+        const label = containerId==='wf-gen-progress'
+          ? `Book ${i+1}`
+          : (wfImages[i]?wfImages[i].bookTitle.slice(0,12)+'…':'Image '+(i+1));
+        row.innerHTML=`<span class="gen-book-label">${escHtml(label)}</span>`+
+          `<div class="gen-book-bar-wrap"><div class="gen-book-bar" id="bar-${containerId}-${i}"></div></div>`+
+          `<span class="gen-book-status" id="stat-${containerId}-${i}">—</span>`;
+        container.appendChild(row);
+      }
+      let idx=0;
+      function animateOne(i){
+        if(i>=count){setTimeout(onDone,500);return;}
+        const bar=document.getElementById(`bar-${containerId}-${i}`);
+        const stat=document.getElementById(`stat-${containerId}-${i}`);
+        let pct=0;
+        const iv=setInterval(()=>{
+          pct+=Math.random()*8+3;
+          if(pct>=100){
+            pct=100;clearInterval(iv);
+            bar.style.width='100%';
+            stat.textContent='✓';stat.className='gen-book-status done';
+            setTimeout(()=>animateOne(i+1),250);
+          } else {
+            bar.style.width=pct+'%';
+            stat.textContent=Math.round(pct)+'%';
+          }
+        },speed);
+      }
+      animateOne(0);
+    }
+
+    function goToReviewBooks(){
+      goToStep(2);
+      const d=T[currentLang]||T.EN;
+      const container=document.getElementById('wf-book-cards');
+      container.innerHTML='';
+      wfBooks.forEach((book,i)=>{
+        const card=document.createElement('div');
+        card.className='book-card';card.id='bcard-'+i;
+        card.innerHTML=
+          `<div class="book-card-num">${d['wf.book']||'BUCH'} ${i+1} / ${wfBooks.length}</div>`+
+          `<div class="book-card-title">${escHtml(book.title)}</div>`+
+          `<div class="book-card-synopsis">${escHtml(book.synopsis)}</div>`+
+          `<div class="book-card-actions">`+
+            `<button class="bc-btn approve" onclick="bookAction(${i},'approve')">${d['btn.keep']||'✓ Behalten'}</button>`+
+            `<button class="bc-btn rewrite" onclick="bookAction(${i},'rewrite')">${d['btn.rewrite']||'↻ Neu schreiben'}</button>`+
+            `<button class="bc-btn discard" onclick="bookAction(${i},'discard')">${d['btn.remove']||'✕ Entfernen'}</button>`+
+          `</div>`+
+          `<div class="bc-rewriting" id="bc-rw-${i}">${d['wf.rewriting']||'Wird neu geschrieben…'}</div>`;
+        container.appendChild(card);
+      });
+      updateContinueBtn();
+    }
+
+    window.bookAction=function(idx,action){
+      const book=wfBooks[idx];
+      const card=document.getElementById('bcard-'+idx);
+      const d=T[currentLang]||T.EN;
+      if(action==='approve'){
+        book.status='approved';card.className='book-card approved';
+        card.querySelector('.bc-btn.approve').classList.add('active');
+      } else if(action==='discard'){
+        book.status='discarded';card.className='book-card discarded';
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+      } else if(action==='rewrite'){
+        book.status='pending';card.className='book-card';
+        const rw=document.getElementById('bc-rw-'+idx);
+        rw.style.display='block';
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+        updateContinueBtn();
+        (async()=>{
+          try{
+            const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang);
+            const langName=LANG_NAMES[currentLang]||'German';
+            const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
+            wfBooks[idx]=qaResult.book;
+          }catch(e){
+            console.error('[Rewrite] Fehler, Fallback wird verwendet:',e);
+            const nb=makeMockBook(wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages);
+            wfBooks[idx]=nb;
+          }
+          const nb=wfBooks[idx];
+          rw.style.display='none';
+          card.querySelector('.book-card-title').textContent=nb.title;
+          card.querySelector('.book-card-synopsis').textContent=nb.synopsis;
+          card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
+          const d2=T[currentLang]||T.EN;
+          const btns=card.querySelectorAll('.bc-btn');
+          if(btns[0])btns[0].textContent=d2['btn.keep']||'✓ Behalten';
+          if(btns[1])btns[1].textContent=d2['btn.rewrite']||'↻ Neu schreiben';
+          if(btns[2])btns[2].textContent=d2['btn.remove']||'✕ Entfernen';
+          updateContinueBtn();
+        })();
+        return; // skip updateContinueBtn below — async handles it
+      }
+      updateContinueBtn();
+    };
+
+    function updateContinueBtn(){
+      const allDecided=wfBooks.every(b=>b.status==='approved'||b.status==='discarded');
+      const anyApproved=wfBooks.some(b=>b.status==='approved');
+      const btn=document.getElementById('wf-to-covers-btn');
+      const ready=allDecided&&anyApproved;
+      btn.style.opacity=ready?'1':'0.4';
+      btn.style.pointerEvents=ready?'auto':'none';
+    }
+
+    /* ── Step 3: Covers ───────────────────────────────────────────── */
+    window.goToCovers=function(){
+      const approved=wfBooks.filter(b=>b.status==='approved');
+      if(!approved.length){goToDownloadStep();return;}
+      wfCovers=approved.map((book,i)=>({
+        bookId:book.id,bookTitle:book.title,
+        gradient:IMG_GRADIENTS[(book.id+i)%IMG_GRADIENTS.length],
+        style:wfCfg.style,status:'pending',imageUrl:null
+      }));
+      goToStep(3);
+      document.getElementById('wf-cover-gen-phase').style.display='block';
+      document.getElementById('wf-cover-review-phase').style.display='none';
+      generateCovers();
+    };
+
+    function buildCoverPrompt(cov,book){
+      const synopsis=(book?.synopsis||'').slice(0,200);
+      const styleHint=(cov.style&&cov.style!=='auto'&&cov.style!=='none')?cov.style:'vibrant picture book illustration';
+      return `Children's book cover illustration for a book titled "${cov.bookTitle}". ${synopsis}. Art style: ${styleHint}. No text, no words, no letters anywhere. Beautiful, colorful, professional book cover artwork.`;
+    }
+
+    async function dalleGenerate(prompt){
+      const resp=await fetch('https://api.openai.com/v1/images/generations',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+wfCfg.apiKey},
+        body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1024x1024',quality:'standard'})
+      });
+      if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error((e.error?.message)||'HTTP '+resp.status);}
+      const data=await resp.json();
+      return data.data?.[0]?.url||null;
+    }
+
+    async function fetchAsDataUrl(url){
+      try{
+        const resp=await fetch(url);
+        const blob=await resp.blob();
+        return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob);});
+      }catch(e){
+        console.warn('[Image] Base64-Konvertierung fehlgeschlagen, verwende URL:',e.message);
+        return url;
+      }
+    }
+
+    async function generateCovers(){
+      const container=document.getElementById('wf-cover-progress');
+      container.innerHTML='';
+      const useDALLE=(wfCfg.provider==='openai'&&wfCfg.apiKey);
+
+      for(let i=0;i<wfCovers.length;i++){
+        const cov=wfCovers[i];
+        const book=wfBooks.find(b=>b.id===cov.bookId);
+
+        const row=document.createElement('div');
+        row.className='gen-book-row';
+        row.innerHTML=
+          `<span class="gen-book-label">${escHtml(cov.bookTitle.slice(0,14))}</span>`+
+          `<div class="gen-book-bar-wrap"><div class="gen-book-bar" id="covbar-${i}"></div></div>`+
+          `<span class="gen-book-status" id="covstat-${i}">—</span>`;
+        container.appendChild(row);
+
+        const bar=document.getElementById('covbar-'+i);
+        const stat=document.getElementById('covstat-'+i);
+
+        let pct=0;
+        const iv=setInterval(()=>{pct=Math.min(pct+1.2,88);bar.style.width=pct+'%';},150);
+
+        if(useDALLE){
+          try{
+            const url=await dalleGenerate(buildCoverPrompt(cov,book));
+            if(url){cov.imageUrl=url;cov.dataUrl=await fetchAsDataUrl(url);}
+          }catch(e){
+            console.error('[Cover] DALL-E Fehler für',cov.bookTitle,e.message||e);
+          }
+        }
+
+        clearInterval(iv);
+        bar.style.width='100%';
+        stat.textContent=cov.imageUrl?'✓':'~';
+        stat.className='gen-book-status '+(cov.imageUrl?'done':'');
+        await new Promise(r=>setTimeout(r,200));
+      }
+
+      document.getElementById('wf-cover-gen-phase').style.display='none';
+      renderCoverReview();
+      document.getElementById('wf-cover-review-phase').style.display='block';
+    }
+
+    function renderCoverReview(){
+      const container=document.getElementById('wf-cover-cards');
+      container.innerHTML='';
+      const d=T[currentLang]||T.EN;
+      updateCoverContinueBtn();
+      wfCovers.forEach((cov,i)=>{
+        const styleName=cov.style!=='auto'?cov.style:(d['style.auto']||'AI-chosen style');
+        const card=document.createElement('div');
+        card.className='img-card';card.id='covcard-'+i;
+        const coverVisual=cov.imageUrl
+          ?`<img class="cover-img" src="${escHtml(cov.imageUrl)}" alt="${escHtml(cov.bookTitle)}">`
+          :`<div class="img-placeholder cover-placeholder" style="background:${escHtml(cov.gradient)}">COVER</div>`;
+        card.innerHTML=
+          coverVisual+
+          `<div class="img-card-body">`+
+            `<div class="img-card-label">COVER · ${escHtml(cov.bookTitle.slice(0,18))}</div>`+
+            `<div class="img-card-desc">${escHtml(styleName)} · ${escHtml(cov.bookTitle)}</div>`+
+            `<div class="book-card-actions">`+
+              `<button class="bc-btn approve" onclick="coverAction(${i},'approve')">${d['btn.keep']||'✓ Keep'}</button>`+
+              `<button class="bc-btn rewrite" onclick="coverAction(${i},'regen')">${d['btn.redo']||'↻ Redo'}</button>`+
+              `<button class="bc-btn discard" onclick="coverAction(${i},'remove')">${d['btn.remove']||'✕ Remove'}</button>`+
+            `</div>`+
+          `</div>`;
+        container.appendChild(card);
+      });
+    }
+
+    window.coverAction=function(idx,action){
+      const cov=wfCovers[idx];
+      const card=document.getElementById('covcard-'+idx);
+      if(action==='approve'){
+        cov.status='approved';card.className='img-card approved';
+        updateCoverContinueBtn();
+      } else if(action==='remove'){
+        cov.status='removed';card.className='img-card skipped';
+        const book=wfBooks.find(b=>b.id===cov.bookId);
+        if(book) book.coverRemoved=true;
+        updateCoverContinueBtn();
+      } else if(action==='regen'){
+        // Reset to pending, re-lock continue button
+        cov.status='pending';card.className='img-card';
+        updateCoverContinueBtn();
+        // Show loading state on current visual
+        const oldVisual=card.querySelector('.cover-img,.img-placeholder');
+        const loadEl=document.createElement('div');
+        loadEl.className='cover-loading';
+        loadEl.style.background=cov.gradient;
+        loadEl.textContent='…';
+        if(oldVisual) oldVisual.replaceWith(loadEl); else card.prepend(loadEl);
+        // Disable action buttons while loading
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+        (async()=>{
+          if(wfCfg.provider==='openai'&&wfCfg.apiKey){
+            try{
+              const book=wfBooks.find(b=>b.id===cov.bookId);
+              const url=await dalleGenerate(buildCoverPrompt(cov,book));
+              if(url){cov.imageUrl=url;cov.dataUrl=await fetchAsDataUrl(url);}
+            }catch(e){
+              console.error('[Cover] Regen Fehler:',e.message||e);
+            }
+          } else {
+            // Fallback: cycle gradient
+            const cur=IMG_GRADIENTS.indexOf(cov.gradient);
+            cov.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
+            cov.imageUrl=null;
+          }
+          // Replace loading indicator with new visual
+          const newVisual=cov.imageUrl
+            ?Object.assign(document.createElement('img'),{className:'cover-img',src:cov.imageUrl,alt:cov.bookTitle})
+            :Object.assign(document.createElement('div'),{className:'img-placeholder cover-placeholder',textContent:'COVER'});
+          if(!cov.imageUrl) newVisual.style.background=cov.gradient;
+          card.querySelector('.cover-loading')?.replaceWith(newVisual);
+          card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
+        })();
+      }
+    };
+
+    function updateCoverContinueBtn(){
+      const allDecided=wfCovers.every(c=>c.status==='approved'||c.status==='removed');
+      const anyKept=wfCovers.some(c=>c.status==='approved');
+      const btn=document.getElementById('wf-to-text-btn');
+      if(!btn)return;
+      const ready=allDecided&&anyKept;
+      btn.style.opacity=ready?'1':'0.4';
+      btn.style.pointerEvents=ready?'auto':'none';
+    }
+
+    /* ── Step 4: Text Review ─────────────────────────────────────── */
+    window.goToTextReview=function(){
+      goToStep(4);
+      const d=T[currentLang]||T.EN;
+      const container=document.getElementById('wf-text-cards');
+      container.innerHTML='';
+      const active=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved);
+      if(!active.length){goToIllustrations();return;}
+      // Reset textRejected so all need a fresh decision
+      active.forEach(b=>{b.textRejected=undefined;});
+      active.forEach(book=>{
+        const card=document.createElement('div');
+        card.className='txt-book-card';card.id='txtcard-'+book.id;
+        const pagesHtml=Array.isArray(book.pages)
+          ?book.pages.map((p,i)=>`<div class="txt-page"><span class="txt-page-num">${d['wf.page']||'Page'} ${i+1}</span>${escHtml(p)}</div>`).join('')
+          :'<div class="txt-page">—</div>';
+        card.innerHTML=
+          `<div class="book-card-num">${d['wf.book']||'BOOK'} ${book.id+1}</div>`+
+          `<div class="book-card-title">${escHtml(book.title)}</div>`+
+          `<div class="book-card-synopsis">${escHtml(book.synopsis)}</div>`+
+          `<div class="txt-pages">${pagesHtml}</div>`+
+          `<div class="book-card-actions">`+
+            `<button class="bc-btn approve" onclick="textAction(${book.id},'accept')">${d['btn.accept']||'✓ Accept'}</button>`+
+            `<button class="bc-btn discard" onclick="textAction(${book.id},'reject')">${d['btn.reject']||'✕ Reject'}</button>`+
+          `</div>`;
+        container.appendChild(card);
+      });
+      updateTextContinueBtn();
+    };
+
+    window.textAction=function(bookId,action){
+      const book=wfBooks.find(b=>b.id===bookId);
+      const card=document.getElementById('txtcard-'+bookId);
+      if(!book||!card)return;
+      if(action==='accept'){book.textRejected=false;card.className='txt-book-card approved';}
+      else{book.textRejected=true;card.className='txt-book-card rejected';}
+      updateTextContinueBtn();
+    };
+
+    function updateTextContinueBtn(){
+      const active=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved);
+      const allDecided=active.every(b=>b.textRejected!==undefined);
+      const anyKept=active.some(b=>b.textRejected===false);
+      const btn=document.getElementById('wf-to-illus-btn');
+      if(!btn)return;
+      const ready=allDecided&&anyKept;
+      btn.style.opacity=ready?'1':'0.4';
+      btn.style.pointerEvents=ready?'auto':'none';
+    }
+
+    /* ── Step 5: Illustrations ────────────────────────────────────── */
+    window.goToIllustrations=function(){
+      goToStep(5);
+      const density=wfCfg.density;
+      // Hide all phases first
+      document.getElementById('wf-illus-gen-phase').style.display='none';
+      document.getElementById('wf-illus-review-phase').style.display='none';
+      document.getElementById('wf-illus-none-phase').style.display='none';
+
+      if(density==='none'){
+        document.getElementById('wf-illus-none-phase').style.display='block';
+        return;
+      }
+      const approved=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved&&!b.textRejected);
+      // For 'full': one image per page per book; for 'occasional': one image per book
+      const imgItems=[];
+      approved.forEach(book=>{
+        const count=density==='full'?Math.min(parseInt(wfCfg.pages)||8,6):1;
+        for(let p=0;p<count;p++){
+          imgItems.push({
+            bookId:book.id,bookTitle:book.title,page:p+1,
+            gradient:IMG_GRADIENTS[(book.id*3+p)%IMG_GRADIENTS.length],
+            style:wfCfg.style,status:'pending'
+          });
+        }
+      });
+      wfImages=imgItems;
+      document.getElementById('wf-illus-gen-phase').style.display='block';
+      runGenerationAnim('wf-img-progress', wfImages.length, 45, ()=>{
+        document.getElementById('wf-illus-gen-phase').style.display='none';
+        renderIllusReview();
+        document.getElementById('wf-illus-review-phase').style.display='block';
+      });
+    };
+
+    function renderIllusReview(){
+      const container=document.getElementById('wf-img-cards');
+      container.innerHTML='';
+      const d=T[currentLang]||T.EN;
+      // Start disabled until all images have a decision
+      updateIllusContinueBtn();
+      wfImages.forEach((img,i)=>{
+        const styleName=img.style!=='auto'?img.style:(d['style.auto']||'KI-Stil');
+        const pageLabel=wfCfg.density==='full'?`${d['wf.page']||'Seite'} ${img.page}`:(d['wf.story.illus']||'Illustration');
+        const card=document.createElement('div');
+        card.className='img-card';card.id='icard-'+i;
+        card.innerHTML=
+          `<div class="img-placeholder" style="background:${img.gradient}">IMG</div>`+
+          `<div class="img-card-body">`+
+            `<div class="img-card-label">${escHtml(pageLabel)} · ${escHtml(img.bookTitle.slice(0,16))}</div>`+
+            `<div class="img-card-desc">${escHtml(styleName)}</div>`+
+            `<div class="book-card-actions">`+
+              `<button class="bc-btn approve" onclick="imgAction(${i},'approve')">${d['btn.keep']||'✓ Behalten'}</button>`+
+              `<button class="bc-btn rewrite" onclick="imgAction(${i},'regen')">${d['btn.redo']||'↻ Neu'}</button>`+
+              `<button class="bc-btn discard" onclick="imgAction(${i},'skip')">${d['btn.skip']||'✕ Überspringen'}</button>`+
+            `</div>`+
+          `</div>`;
+        container.appendChild(card);
+      });
+    }
+
+    window.imgAction=function(idx,action){
+      const img=wfImages[idx];
+      const card=document.getElementById('icard-'+idx);
+      if(action==='approve'){img.status='approved';card.className='img-card approved';}
+      else if(action==='skip'){img.status='skipped';card.className='img-card skipped';}
+      else if(action==='regen'){
+        const cur=IMG_GRADIENTS.indexOf(img.gradient);
+        img.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
+        card.querySelector('.img-placeholder').style.background=img.gradient;
+      }
+      updateIllusContinueBtn();
+    };
+
+    function updateIllusContinueBtn(){
+      const allDecided=wfImages.every(img=>img.status!=='pending');
+      const btn=document.getElementById('wf-to-dl-btn');
+      if(!btn)return;
+      btn.style.opacity=allDecided?'1':'0.4';
+      btn.style.pointerEvents=allDecided?'auto':'none';
+    }
+
+    window.goToDownloadStep=function(){goToStep(6);};
+
+    window.restartWorkflow=function(){
+      wfBooks=[];wfImages=[];wfCovers=[];
+      document.getElementById('wf-panel').style.display='none';
+      document.getElementById('gen-start-section').style.display='block';
+    };
+
+    function downloadableBooks(){
+      return wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved&&!b.textRejected);
+    }
+
+    window.downloadPDF=function(){
+      const approved=downloadableBooks();
+      const d=T[currentLang]||T.EN;
+      if(!approved.length){alert(d['error.no.books']||'Keine freigegebenen Bücher vorhanden.');return;}
+      const pageLabel=d['wf.page']||'Page';
+      const winTitle=d['wf.dl.win.title']||'My Books';
+      const css=`<style>`+
+        `@page{margin:2cm;size:A4}`+
+        `body{font-family:'Times New Roman',serif;color:#111;margin:0}`+
+        `.book-section{page-break-after:always}.book-section:last-child{page-break-after:auto}`+
+        `h1{font-size:22pt;text-align:center;margin:0.5cm 0 0.3cm}`+
+        `p.syn{font-size:10.5pt;color:#555;text-align:center;margin:0 0 0.6cm}`+
+        `.cover-wrap{text-align:center;margin:0.5cm 0 1.2cm}`+
+        `.cover-wrap img{max-width:9cm;max-height:12cm;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.18)}`+
+        `.page-block{overflow:hidden;margin-bottom:0.6cm}`+
+        `h2{font-size:11.5pt;color:#444;margin:0.4cm 0 0.15cm}`+
+        `p.pg{font-size:11pt;line-height:1.7;margin:0}`+
+        `.page-illus{float:right;margin:0 0 0.4cm 0.6cm;max-width:5.5cm;max-height:8cm;border-radius:3px}`+
+        `.cf::after{content:'';display:table;clear:both}`+
+        `</style>`;
+      const body=approved.map(b=>{
+        const cover=wfCovers.find(c=>c.bookId===b.id&&(c.dataUrl||c.imageUrl));
+        const coverHtml=cover?`<div class="cover-wrap"><img src="${cover.dataUrl||cover.imageUrl}" alt="${escHtml(b.title)}"></div>`:'';
+        const pagesHtml=b.pages.map((p,pi)=>{
+          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&(img.dataUrl||img.imageUrl));
+          const illusHtml=illus?`<img class="page-illus" src="${illus.dataUrl||illus.imageUrl}" alt="">`:'';
+          return `<div class="page-block cf">${illusHtml}<h2>${escHtml(pageLabel)} ${pi+1}</h2><p class="pg">${escHtml(p)}</p></div>`;
+        }).join('');
+        return `<div class="book-section"><h1>${escHtml(b.title)}</h1><p class="syn">${escHtml(b.synopsis)}</p>${coverHtml}${pagesHtml}</div>`;
+      }).join('');
+      const win=window.open('','_blank');
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escHtml(winTitle)}</title>${css}</head><body>${body}</body></html>`);
+      win.document.close();win.focus();
+      setTimeout(()=>win.print(),800);
+    };
+
+    window.downloadDocx=function(){
+      const approved=downloadableBooks();
+      const d=T[currentLang]||T.EN;
+      if(!approved.length){alert(d['error.no.books']||'Keine freigegebenen Bücher vorhanden.');return;}
+      const pageLabel=d['wf.page']||'Page';
+      const css=`body{font-family:'Times New Roman',serif;margin:2cm}`+
+        `h1{font-size:24pt;text-align:center;margin-bottom:0.2cm}`+
+        `p.syn{font-size:12pt;color:#555;text-align:center;margin-bottom:0.5cm}`+
+        `.cover-wrap{text-align:center;margin:0.4cm 0 1cm}`+
+        `.cover-wrap img{max-width:9cm;max-height:12cm}`+
+        `.page-block{overflow:hidden;margin-bottom:0.6cm}`+
+        `h2{font-size:13pt;color:#444;margin-bottom:0.1cm}`+
+        `p.pg{font-size:12pt;line-height:1.7;margin:0}`+
+        `.page-illus{float:right;margin:0 0 0.4cm 0.6cm;max-width:5.5cm;max-height:8cm}`+
+        `.cf::after{content:'';display:table;clear:both}`+
+        `hr{margin:1cm 0;border:none;border-top:1px solid #ccc}`;
+      const body=approved.map((b,bi)=>{
+        const cover=wfCovers.find(c=>c.bookId===b.id&&(c.dataUrl||c.imageUrl));
+        const coverHtml=cover?`<div class="cover-wrap"><img src="${cover.dataUrl||cover.imageUrl}" alt="${escHtml(b.title)}"></div>`:'';
+        const pagesHtml=b.pages.map((p,pi)=>{
+          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&(img.dataUrl||img.imageUrl));
+          const illusHtml=illus?`<img class="page-illus" src="${illus.dataUrl||illus.imageUrl}" alt="">`:'';
+          return `<div class="page-block cf">${illusHtml}<h2>${escHtml(pageLabel)} ${pi+1}</h2><p class="pg">${escHtml(p)}</p></div>`;
+        }).join('');
+        return `<h1>${escHtml(b.title)}</h1><p class="syn">${escHtml(b.synopsis)}</p>${coverHtml}${pagesHtml}`+
+          (bi<approved.length-1?'<hr>':'');
+      }).join('');
+      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">`+
+        `<head><meta charset="UTF-8"><style>${css}</style></head><body>${body}</body></html>`;
+      const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-books.doc';
+      a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    };
+
+    /* ── Feedback submit ─────────────────────────────────────────── */
+    document.getElementById('fb-submit').addEventListener('click',()=>{
+      const msg=document.getElementById('fb-msg').value.trim();
+      if(!msg){
+        const f=document.getElementById('fb-msg');
+        f.focus();f.style.borderColor='#c0392b';
+        setTimeout(()=>f.style.borderColor='',2000);
+        return;
+      }
+      document.getElementById('feedback-form').style.display='none';
+      document.getElementById('feedback-success').classList.add('show');
+    });
+
+    // Default language
+    setLang('DE');
+
+  })();
+  </script>
+
+  <!-- Cover lightbox -->
+  <div id="cover-preview">
+    <div id="cover-preview-backdrop"></div>
+    <div id="cover-preview-wrap">
+      <img id="cover-preview-img" src="" alt="">
+      <div id="cover-preview-title"></div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const overlay=document.getElementById('cover-preview');
+      const img=document.getElementById('cover-preview-img');
+      const title=document.getElementById('cover-preview-title');
+      let hideTimer=null;
+
+      function show(src,alt){
+        clearTimeout(hideTimer);
+        img.src=src; img.alt=alt; title.textContent=alt;
+        overlay.classList.add('visible');
+      }
+      function hide(){
+        hideTimer=setTimeout(()=>overlay.classList.remove('visible'),80);
+      }
+
+      // Delegate hover on cover thumbnails (works for dynamically created imgs)
+      document.addEventListener('mouseover',function(e){
+        const t=e.target.closest('.cover-img');
+        if(t) show(t.src, t.alt);
+      });
+      document.addEventListener('mouseout',function(e){
+        if(e.target.closest('.cover-img')) hide();
+      });
+      // Keep visible while hovering over the overlay itself
+      overlay.addEventListener('mouseover',()=>clearTimeout(hideTimer));
+      overlay.addEventListener('mouseout',hide);
+      // Click backdrop or overlay to close
+      document.getElementById('cover-preview-backdrop').addEventListener('click',()=>overlay.classList.remove('visible'));
+    })();
+  </script>
+</body>
+</html>
