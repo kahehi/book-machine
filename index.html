@@ -2342,14 +2342,16 @@ Return JSON in this exact format (raw JSON only, no markdown):
       realistic:'realistic detailed illustration, painterly, nuanced lighting, fine details',
       pencil:'pencil sketch illustration, hand-drawn linework, cross-hatching, monochrome graphite tones',
     };
-    function styleToPromptHint(style){
+    function styleToPromptHint(style, isNovel){
+      if(isNovel) return STYLE_PROMPTS[style]||'cinematic literary cover art, dramatic atmosphere, photorealistic or painterly, professional book cover quality';
       return STYLE_PROMPTS[style]||'vibrant picture book illustration, professional quality';
     }
 
     function buildCoverPrompt(cov,book,extraInstruction){
       const synopsis=(book?.synopsis||'').slice(0,180);
       const title=(book?.title||cov.bookTitle||'').slice(0,60);
-      const styleHint=styleToPromptHint(cov.style);
+      const isNovel=wfCfg.density==='none';
+      const styleHint=styleToPromptHint(cov.style, isNovel);
       const moodRaw=wfCfg.tone||wfCfg.genre||'magical and adventurous';
       const theme=title?(title+(synopsis?'. '+synopsis:'')):synopsis||wfCfg.idea||'children\'s adventure';
       const ideaContext=wfCfg.idea?(wfCfg.idea).slice(0,200):'';
@@ -2357,6 +2359,9 @@ Return JSON in this exact format (raw JSON only, no markdown):
       const charCtx=getCharacterContext(book);
       const charPart=charCtx?`\nProtagonist (keep consistent across all images for this book): ${charCtx}`:'';
       const extra=extraInstruction?`\nAdditional instruction: ${extraInstruction}.`:'';
+      const qualityLine=isNovel
+        ?'Cinematic lighting, dramatic shadows, highly detailed, visually striking composition, portrait orientation (2:3). Suitable for an adult literary novel cover.'
+        :'Professional illustration, cinematic lighting, highly detailed, rich colors, visually striking composition, portrait orientation (2:3).';
       return `Create a vertical illustration intended to be used as a book cover image.
 
 Theme: ${theme}${ideaPart}${charPart}
@@ -2369,7 +2374,7 @@ Important rules:
 - The image must be a pure illustration scene only.
 - Always depict the protagonist with a consistent appearance matching the character description above.
 
-Professional illustration, cinematic lighting, highly detailed, rich colors, visually striking composition, portrait orientation (2:3).`;
+${qualityLine}`;
     }
 
     async function dalleGenerate(prompt,signal,size='1024x1792'){
@@ -2423,17 +2428,46 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
     }
 
     function generateSvgCover(cov, book){
-      const title = escHtml(cov.bookTitle || book?.title || '');
-      const synopsis = escHtml((book?.synopsis || '').slice(0, 160));
+      const rawTitle = (cov.bookTitle || book?.title || '').trim();
+      const rawSynopsis = (book?.synopsis || '').slice(0, 200).trim();
       const grad = cov.gradient || IMG_GRADIENTS[0];
-      // Extract two colours from the gradient string for a stop pair
       const cols = [...grad.matchAll(/#[0-9a-fA-F]{3,6}/g)].map(m=>m[0]);
       const c1 = cols[0] || '#1a1a2e', c2 = cols[cols.length-1] || '#0f3460';
-      const lines = title.match(/.{1,18}(\s|$)/g) || [title];
-      const titleY = 340 - (lines.length - 1) * 22;
-      const titleSvg = lines.map((l,i)=>
-        `<text x="180" y="${titleY + i*44}" font-size="36" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Georgia,serif">${l.trim()}</text>`
-      ).join('');
+
+      // Word-wrap helper (returns array of lines, no foreignObject needed)
+      function wrap(text, maxChars){
+        const words = text.split(' ');
+        const result = [];
+        let line = '';
+        for(const w of words){
+          if((line+' '+w).trim().length > maxChars && line){
+            result.push(line.trim());
+            line = w;
+          } else {
+            line = (line+' '+w).trim();
+          }
+        }
+        if(line) result.push(line.trim());
+        return result;
+      }
+
+      const titleLines = wrap(rawTitle, 18);
+      const synopsisLines = wrap(rawSynopsis, 36).slice(0, 5);
+
+      // Positioning
+      const totalTitleH = titleLines.length * 46;
+      const titleStartY = Math.round(270 - totalTitleH / 2);
+      const dividerY = titleStartY + totalTitleH + 14;
+      const synStartY = dividerY + 22;
+
+      const titleSvg = titleLines.map((l, i) =>
+        `<text x="180" y="${titleStartY + i * 46}" font-size="34" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Georgia,serif">${escHtml(l)}</text>`
+      ).join('\n  ');
+
+      const synSvg = synopsisLines.map((l, i) =>
+        `<text x="180" y="${synStartY + i * 18}" font-size="11" fill="#bbbbbb" text-anchor="middle" font-family="Georgia,serif" font-style="italic">${escHtml(l)}</text>`
+      ).join('\n  ');
+
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="540" viewBox="0 0 360 540">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -2442,14 +2476,12 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
     </linearGradient>
   </defs>
   <rect width="360" height="540" fill="url(#bg)"/>
-  <rect x="30" y="30" width="300" height="480" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-  <rect x="60" y="60" width="240" height="1" fill="rgba(255,255,255,0.3)"/>
-  <rect x="60" y="480" width="240" height="1" fill="rgba(255,255,255,0.3)"/>
+  <rect x="28" y="28" width="304" height="484" fill="none" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.18"/>
+  <rect x="60" y="58" width="240" height="1" fill="#ffffff" fill-opacity="0.25"/>
+  <rect x="60" y="482" width="240" height="1" fill="#ffffff" fill-opacity="0.25"/>
   ${titleSvg}
-  <rect x="140" y="${titleY + lines.length*44 + 8}" width="80" height="1.5" fill="rgba(255,255,255,0.5)"/>
-  <foreignObject x="50" y="${titleY + lines.length*44 + 24}" width="260" height="120">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="color:rgba(255,255,255,0.65);font-size:12px;font-family:Georgia,serif;line-height:1.6;text-align:center">${synopsis}</div>
-  </foreignObject>
+  <rect x="145" y="${dividerY}" width="70" height="1.5" fill="#ffffff" fill-opacity="0.55"/>
+  ${synSvg}
 </svg>`;
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     }
