@@ -2770,24 +2770,28 @@ ${qualityLine}`;
       if(rwRow) rwRow.classList.remove('visible');
       cov.status='pending'; card.className='img-card';
       updateCoverContinueBtn();
-      const oldVisual=card.querySelector('.cover-img,.img-placeholder');
+      const oldVisual=card.querySelector('.cover-img,.img-placeholder,.cover-loading');
       const loadEl=document.createElement('div');
       loadEl.className='cover-loading'; loadEl.style.background=cov.gradient; loadEl.textContent='…';
       if(oldVisual) oldVisual.replaceWith(loadEl); else card.prepend(loadEl);
       card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
       (async()=>{
+        const book=wfBooks.find(b=>b.id===cov.bookId);
         const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
+        // Pick a fresh gradient so SVG fallbacks always look visually different
+        const otherGrads=IMG_GRADIENTS.filter(g=>g!==cov.gradient);
+        cov.gradient=(otherGrads.length?otherGrads[Math.floor(Math.random()*otherGrads.length)]:IMG_GRADIENTS[0]);
+        cov.imageUrl=null; cov.dataUrl=null;
         if(useImgAI){
           try{
-            const book=wfBooks.find(b=>b.id===cov.bookId);
             const result=await generateCoverImage(buildCoverPrompt(cov,book,instruction));
             if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
+            else{ cov.dataUrl=generateSvgCover(cov,book); }
           }catch(e){
             console.error('[Cover] Regen Fehler:',e.message||e);
+            cov.dataUrl=generateSvgCover(cov,book);
           }
         } else {
-          const book=wfBooks.find(b=>b.id===cov.bookId);
-          cov.imageUrl=null;
           cov.dataUrl=generateSvgCover(cov,book);
         }
         const coverSrc=cov.imageUrl||cov.dataUrl||null;
