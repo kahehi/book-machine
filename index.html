@@ -1957,36 +1957,47 @@
         const bar=document.getElementById(`bar-wf-gen-progress-${i}`);
         const stat=document.getElementById(`stat-wf-gen-progress-${i}`);
         const qaEl=document.getElementById(`qa-${i}`);
+        const useChapters=!isChildrensMode(genre,density)&&parseInt(pages)>CHAPTER_PAGES;
         let pct=0, running=true;
         const iv=setInterval(()=>{
           if(!running)return;
           pct+=(90-pct)*0.07;
           bar.style.width=pct+'%';
-          stat.textContent=Math.round(pct)+'%';
+          if(!useChapters)stat.textContent=Math.round(pct)+'%';
         },250);
         try{
-          const book=await callAI(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang,undefined,_genAbort.signal);
-          running=false;clearInterval(iv);
-          bar.style.width='95%';
-          stat.textContent='QA';
           const d2=T[currentLang]||T.EN;
-          qaEl.textContent=d2['wf.qa.running']||'Qualität wird geprüft…';
-
-          const qaResult=await qualityGate(book,pages,provider,apiKey,langName,genre,age,tone);
-
-          bar.style.width='100%';
-          if(qaResult.status==='ok'||qaResult.status==='fixed'){
+          let book;
+          if(useChapters){
+            book=await callAIChaptered(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang,_genAbort.signal,(msg,p)=>{
+              bar.style.width=p+'%';
+              stat.textContent=p+'%';
+              qaEl.textContent=msg;
+            });
+            running=false;clearInterval(iv);
+            bar.style.width='100%';
             stat.textContent='✓';stat.className='gen-book-status done';
             qaEl.textContent=d2['wf.qa.ok']||'✓ OK';qaEl.className='gen-book-qa ok';
-            if(qaResult.status==='fixed'){
-              console.log(`[QA] Buch ${i+1} korrigiert: ${qaResult.was}→${qaResult.book.pages.length}/${pages} Seiten`);
+            wfBooks.push(book);
+          }else{
+            book=await callAI(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang,undefined,_genAbort.signal);
+            running=false;clearInterval(iv);
+            bar.style.width='95%';
+            stat.textContent='QA';
+            qaEl.textContent=d2['wf.qa.running']||'Qualität wird geprüft…';
+
+            const qaResult=await qualityGate(book,pages,provider,apiKey,langName,genre,age,tone);
+
+            bar.style.width='100%';
+            if(qaResult.status==='ok'||qaResult.status==='fixed'){
+              stat.textContent='✓';stat.className='gen-book-status done';
+              qaEl.textContent=d2['wf.qa.ok']||'✓ OK';qaEl.className='gen-book-qa ok';
+            }else{
+              stat.textContent='~';
+              qaEl.textContent=d2['wf.qa.partial']||'⚠ Unvollständig';qaEl.className='gen-book-qa warn';
             }
-          } else {
-            stat.textContent='~';
-            qaEl.textContent=d2['wf.qa.partial']||'⚠ Unvollständig';qaEl.className='gen-book-qa warn';
-            console.warn(`[QA] Buch ${i+1} unvollständig: ${qaResult.book.pages.length}/${pages} Seiten`);
+            wfBooks.push(qaResult.book);
           }
-          wfBooks.push(qaResult.book);
         }catch(err){
           running=false;clearInterval(iv);
           if(err.name==='AbortError'){
@@ -2070,7 +2081,7 @@ Continue the story from page ${good.length+1} to page ${target} (write exactly $
 Last existing page: "${(good[good.length-1]||'').slice(0,300)}"
 
 Return ONLY this JSON (no markdown):
-{"pages":["text of page ${good.length+1}","text of page ${good.length+2}",...exactly ${missing} items, each 2-4 sentences]}`;
+{"pages":["text of page ${good.length+1}","text of page ${good.length+2}",...exactly ${missing} items — ${pageRequirement(genre,wfCfg.density)}]}`;
 
         try{
           let responseText;
@@ -2094,6 +2105,146 @@ Return ONLY this JSON (no markdown):
     }
 
     const LANG_NAMES={EN:'English',DE:'German',FR:'French',IT:'Italian'};
+    const CHAPTER_PAGES=10; // pages per chapter for adult books
+
+    function isChildrensMode(genre,density){
+      return genre==='children'||density==='full';
+    }
+
+    function pageRequirement(genre,density){
+      if(isChildrensMode(genre,density)){
+        return 'Each page: exactly 2-4 short, simple sentences. Easy vocabulary for young children. No long words.';
+      }
+      return 'CRITICAL TEXT REQUIREMENT: Each page must be a full prose paragraph of at least 150 words. Write rich, immersive, literary prose — vivid scene descriptions, authentic dialogue, character interiority, sensory details. Never write fewer than 5 sentences per page. No filler, no placeholders.';
+    }
+
+    /* ── Book planner (adult/chapter mode) ──────────────────── */
+    async function planBook(provider,apiKey,idea,n,total,genre,age,pageCount,tone,lang,numChapters,signal){
+      const langName=LANG_NAMES[lang]||'English';
+      const genreStr=genre!=='auto'?genre:'literary fiction';
+      const ageStr=age!=='auto'?`for readers ${age}`:'adult readers';
+      const systemPrompt=`You are a master story architect. Write exclusively in ${langName}. Return ONLY valid JSON, no markdown.`;
+      const userPrompt=`Plan book ${n+1} of ${total} based on idea: "${idea}"
+Genre: ${genreStr} | Audience: ${ageStr} | Total pages: ${pageCount} | Chapters: ${numChapters}${tone?'\nTone: '+tone:''}
+
+Design a gripping story with a clear arc: setup → rising action → climax → resolution. No filler chapters.
+
+Return JSON:
+{"title":"Compelling title","synopsis":"3-5 sentence synopsis covering the full story arc.","characters":[{"name":"Name","description":"Detailed character description in ${langName}","descriptionEn":"Full name, age, hair color/style, eye color, skin tone, height/build, clothing style, key personality traits — in English for image generation"}],"chapters":[{"title":"Chapter title","summary":"Key events and emotional beats in this chapter — 2-3 sentences","targetPages":${CHAPTER_PAGES}}]}
+Exactly ${numChapters} chapters. 2-4 main characters with full physical and personality descriptions.`;
+      const resp=await callProvider(provider,apiKey,systemPrompt,userPrompt,4000,signal);
+      const json=resp.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+      return safeParseBookJSON(json);
+    }
+
+    /* ── Chapter writer ──────────────────────────────────────── */
+    async function writeChapter(provider,apiKey,plan,chIdx,totalChapters,pagesInChapter,prevSummaries,lang,signal,revisionHint){
+      const langName=LANG_NAMES[lang]||'English';
+      const ch=(plan.chapters||[])[chIdx]||{title:`Chapter ${chIdx+1}`,summary:''};
+      const prevCtx=prevSummaries.length
+        ?'\n\nPrevious chapters (DO NOT repeat these events):\n'+prevSummaries.map((s,i)=>`Ch.${i+1}: ${s}`).join('\n')
+        :'';
+      const revision=revisionHint?`\n\nEDITOR REVISION INSTRUCTION: ${revisionHint}`:'';
+      const systemPrompt=`You are a master literary author. Write exclusively in ${langName}. Return ONLY valid JSON, no markdown.`;
+      const userPrompt=`Write chapter ${chIdx+1} of ${totalChapters} of "${plan.title}".
+
+Book synopsis: ${plan.synopsis}
+This chapter: "${ch.title}" — ${ch.summary}${prevCtx}${revision}
+
+STRICT REQUIREMENTS:
+- Write exactly ${pagesInChapter} pages
+- Each page = a full prose paragraph of at least 150 words
+- Rich narrative: vivid descriptions, authentic dialogue, character interiority
+- No repetition of events from previous chapters — advance the plot
+- Write exclusively in ${langName}
+
+Return JSON:
+{"chapterTitle":"${ch.title.replace(/"/g,"'")}","summary":"Concise 2-sentence summary of what happened — for continuity tracking","pages":["Full page 1 — 150+ words of immersive prose","Full page 2 — 150+ words",...exactly ${pagesInChapter} items]}`;
+      const resp=await callProvider(provider,apiKey,systemPrompt,userPrompt,8000,signal);
+      const json=resp.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+      const parsed=safeParseBookJSON(json);
+      return{
+        pages:Array.isArray(parsed.pages)?parsed.pages.filter(p=>p&&p.trim()||''):[],
+        summary:parsed.summary||ch.summary
+      };
+    }
+
+    /* ── Lector / continuity QA ──────────────────────────────── */
+    async function lectorCheck(provider,apiKey,plan,chIdx,chResult,prevSummaries,lang,signal){
+      if(chIdx===0)return{needsRevision:false,summary:chResult.summary};
+      const langName=LANG_NAMES[lang]||'English';
+      const systemPrompt=`You are a rigorous literary editor. Evaluate chapter quality and narrative continuity. Return ONLY valid JSON.`;
+      const sample=(chResult.pages||[]).slice(0,2).join(' ').slice(0,600);
+      const prevCtx=prevSummaries.map((s,i)=>`Ch.${i+1}: ${s}`).join('\n');
+      const userPrompt=`Evaluate chapter ${chIdx+1} of "${plan.title}".
+
+Previous chapters:\n${prevCtx}
+Chapter ${chIdx+1} summary: ${chResult.summary}
+Chapter ${chIdx+1} sample text: "${sample}"
+
+Check strictly for:
+1. Repetition of events or descriptions already covered in previous chapters
+2. Continuity errors (character names, plot facts, timeline inconsistencies)
+3. Thin prose (less than ~100 words per page, generic filler, placeholder text)
+4. Poor narrative flow (doesn't connect from where previous chapter ended)
+
+Return JSON:
+{"needsRevision":false,"issues":"none","instruction":"","summary":"2-sentence chapter summary for continuity tracking"}
+Set needsRevision=true only for critical issues. instruction must be specific and actionable.`;
+      try{
+        const resp=await callProvider(provider,apiKey,systemPrompt,userPrompt,800,signal);
+        const json=resp.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+        const parsed=safeParseBookJSON(json);
+        return{needsRevision:!!parsed.needsRevision,instruction:parsed.instruction||'',summary:parsed.summary||chResult.summary};
+      }catch(e){
+        console.warn('[Lektor]',e.message);
+        return{needsRevision:false,summary:chResult.summary};
+      }
+    }
+
+    /* ── Chaptered book orchestrator ─────────────────────────── */
+    async function callAIChaptered(provider,apiKey,idea,n,total,genre,age,pages,tone,lang,signal,onProgress){
+      const pageCount=parseInt(pages)||30;
+      const numChapters=Math.ceil(pageCount/CHAPTER_PAGES);
+
+      onProgress('Planung…',5);
+      const plan=await planBook(provider,apiKey,idea,n,total,genre,age,pageCount,tone,lang,numChapters,signal);
+      if(signal?.aborted)throw new DOMException('Aborted','AbortError');
+
+      const allPages=[];
+      const chapterSummaries=[];
+
+      for(let ch=0;ch<numChapters;ch++){
+        if(signal?.aborted)throw new DOMException('Aborted','AbortError');
+        const pagesInChapter=ch===numChapters-1?pageCount-ch*CHAPTER_PAGES:CHAPTER_PAGES;
+        const pct=Math.round(10+(ch/numChapters)*75);
+        onProgress(`Kap. ${ch+1}/${numChapters}…`,pct);
+
+        let chResult=await writeChapter(provider,apiKey,plan,ch,numChapters,pagesInChapter,chapterSummaries,lang,signal);
+        if(signal?.aborted)throw new DOMException('Aborted','AbortError');
+
+        // Lector review from chapter 2 onwards
+        if(ch>0){
+          onProgress(`Lektor Kap. ${ch+1}…`,pct+2);
+          const lector=await lectorCheck(provider,apiKey,plan,ch,chResult,chapterSummaries,lang,signal);
+          if(lector.needsRevision&&lector.instruction){
+            onProgress(`Überarb. Kap. ${ch+1}…`,pct+4);
+            chResult=await writeChapter(provider,apiKey,plan,ch,numChapters,pagesInChapter,chapterSummaries,lang,signal,lector.instruction);
+          }
+          chapterSummaries.push(lector.summary||chResult.summary);
+        }else{
+          chapterSummaries.push(chResult.summary);
+        }
+        allPages.push(...chResult.pages);
+      }
+
+      while(allPages.length<pageCount)allPages.push('…');
+      return{
+        id:n,title:plan.title||`Book ${n+1}`,synopsis:plan.synopsis||'',
+        characters:Array.isArray(plan.characters)?plan.characters:[],
+        pages:allPages.slice(0,pageCount),status:'pending'
+      };
+    }
 
     async function callProvider(provider,apiKey,systemPrompt,userPrompt,maxTokens,signal){
       let responseText;
@@ -2141,7 +2292,8 @@ Return ONLY this JSON (no markdown):
       const toneStr=tone?`Tone: ${tone}.`:'';
       const pageCount=parseInt(pages)||8;
       const langName=LANG_NAMES[lang]||'English';
-      const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Generate a complete short book. Honor ALL requirements stated in the idea — including writing style, narrative voice, sentence length, character names, and any specific stylistic instructions. These are mandatory, not optional. Return ONLY valid JSON with no markdown, no code blocks, no extra text.`;
+      const pageReq=pageRequirement(genre,wfCfg.density);
+      const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Generate a complete book. Honor ALL requirements stated in the idea — including writing style, narrative voice, sentence length, character names, and any specific stylistic instructions. These are mandatory, not optional. Return ONLY valid JSON with no markdown, no code blocks, no extra text.`;
       const rewritePart=rewriteInstruction?`\nSpecial instruction for this rewrite: ${rewriteInstruction}`:'';
       const userPrompt=`Create book ${n+1} of ${total} based on this idea: "${idea}"
 
@@ -2152,13 +2304,15 @@ Audience: ${ageStr}
 Pages: ${pageCount}${toneStr?'\n'+toneStr:''}${rewritePart}
 Language: Write all text (title, synopsis, pages) in ${langName}.
 
+PAGE TEXT REQUIREMENT: ${pageReq}
+
 CRITICAL: For each character provide TWO description fields:
 - "description": written in ${langName} (same language as the book) — for the reader
 - "descriptionEn": written in English only — for AI image generation
 Both must include: full name, age, physical appearance (hair color and style, eye color, skin tone, height/build), clothing style, and key personality traits. Be very specific and detailed so an illustrator can recreate the same person in every scene.
 
 Return JSON in this exact format (raw JSON only, no markdown):
-{"title":"The book title","synopsis":"A 2-3 sentence synopsis.","characters":[{"name":"Character Name","description":"Detailed description in ${langName}...","descriptionEn":"Detailed description in English..."}],"pages":["Full text for page 1 (2-4 sentences)","Full text for page 2",...exactly ${pageCount} items]}`;
+{"title":"The book title","synopsis":"A 2-3 sentence synopsis.","characters":[{"name":"Character Name","description":"Detailed description in ${langName}...","descriptionEn":"Detailed description in English..."}],"pages":["Full page 1 text","Full page 2 text",...exactly ${pageCount} items]}`;
 
       const responseText=await callProvider(provider,apiKey,systemPrompt,userPrompt,8000,signal);
       // Strip possible markdown code fences
@@ -2276,10 +2430,16 @@ Return JSON in this exact format (raw JSON only, no markdown):
       updateContinueBtn();
       (async()=>{
         try{
-          const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang,instruction);
-          const langName=LANG_NAMES[currentLang]||'German';
-          const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
-          wfBooks[idx]=qaResult.book;
+          const useChapters=!isChildrensMode(wfCfg.genre,wfCfg.density)&&parseInt(wfCfg.pages)>CHAPTER_PAGES;
+          if(useChapters){
+            const nb=await callAIChaptered(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang,null,(msg)=>{rw.textContent=msg;});
+            wfBooks[idx]=nb;
+          }else{
+            const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang,instruction);
+            const langName=LANG_NAMES[currentLang]||'German';
+            const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
+            wfBooks[idx]=qaResult.book;
+          }
         }catch(e){
           console.error('[Rewrite] Fehler:',e);
         }
