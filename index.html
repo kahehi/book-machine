@@ -355,6 +355,7 @@
     .dl-btn.pdf .dl-type { background: rgba(201,169,110,0.15); color: var(--accent); }
     .dl-btn.docx .dl-type { background: rgba(74,222,128,0.12); color: var(--green); }
     .dl-btn.md .dl-type { background: rgba(99,179,237,0.12); color: #63b3ed; }
+    .dl-btn.kdp .dl-type { background: rgba(255,153,0,0.15); color: #ff9900; }
     .dl-name { font-size: 0.72rem; color: var(--text-dim); }
     .dl-btn:hover .dl-name { color: #fff; }
     .wf-restart-btn { background: none; border: none; color: var(--text-muted); font-size: 0.62rem; font-family: var(--font-mono); cursor: pointer; letter-spacing: 0.05em; padding: 0; transition: color 0.2s; }
@@ -1215,6 +1216,10 @@
                 <span class="dl-type">MD</span>
                 <span class="dl-name" data-i18n="wf.dl.md">Download Markdown</span>
               </button>
+              <button class="dl-btn kdp" onclick="downloadKDP()">
+                <span class="dl-type">KDP</span>
+                <span class="dl-name" data-i18n="wf.dl.kdp">Amazon KDP Sheet</span>
+              </button>
             </div>
             <button class="wf-restart-btn" onclick="restartWorkflow()" data-i18n="wf.dl.restart">← Start over</button>
           </div>
@@ -1405,7 +1410,14 @@
         'wf.img.title':'Generating illustrations…',
         'wf.revi.title':'Review your illustrations','wf.revi.sub':'Keep, regenerate, or skip each image.','wf.revi.continue':'Continue to Download →','wf.revi.keepall':'✓ Keep all',
         'wf.illus.none.title':'No page illustrations','wf.illus.none.sub':'You selected a pure text book — no page illustrations will be generated.',
-        'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.md':'Download Markdown','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
+        'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.md':'Download Markdown','wf.dl.kdp':'Amazon KDP Sheet','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
+        'kdp.doc.title':'Amazon KDP Publishing Sheet','kdp.doc.book':'Book','kdp.doc.section.meta':'Book Metadata','kdp.doc.section.desc':'Description (KDP)','kdp.doc.section.keywords':'Keywords (up to 7)','kdp.doc.section.categories':'Suggested Browse Categories','kdp.doc.section.print':'Print Settings','kdp.doc.section.pricing':'Pricing Notes','kdp.doc.section.checklist':'Publishing Checklist',
+        'kdp.title':'Title','kdp.subtitle':'Subtitle','kdp.series':'Series Name','kdp.author':'Author Name','kdp.language':'Language','kdp.audience':'Target Audience','kdp.pages':'Page Count (approx.)','kdp.interior':'Interior Type','kdp.trim':'Trim Size (recommended)','kdp.cover.dims':'Cover Image Required','kdp.bleed':'Bleed','kdp.paper':'Paper','kdp.interior.color':'Color (illustrations present)','kdp.interior.bw':'Black & White (text only)','kdp.bleed.yes':'Yes (illustrated)','kdp.bleed.no':'No (text only)','kdp.paper.color':'60# white','kdp.paper.bw':'60# white',
+        'kdp.trim.kids':'8.5 × 8.5 in (children\'s square)','kdp.trim.short':'6 × 9 in (standard)','kdp.trim.long':'5.5 × 8.5 in (novel)',
+        'kdp.price.note':'Pricing depends on page count, interior type, and your target royalty. Use the KDP Pricing Calculator on kdp.amazon.com.',
+        'kdp.checklist.1':'Upload cover image (JPG/PDF, 300 DPI)','kdp.checklist.2':'Upload manuscript (PDF or Word)','kdp.checklist.3':'Set price in all marketplaces','kdp.checklist.4':'Select 2 browse categories in KDP dashboard','kdp.checklist.5':'Enter up to 7 keywords in KDP dashboard','kdp.checklist.6':'Preview book with KDP Previewer','kdp.checklist.7':'Submit for publishing review',
+        'kdp.keywords.genre.adventure':'adventure, quest, journey, hero, exploration, discovery, action','kdp.keywords.genre.romance':'romance, love story, relationship, heartwarming, emotions, couple, tender','kdp.keywords.genre.mystery':'mystery, detective, suspense, thriller, clues, investigation, whodunit','kdp.keywords.genre.fantasy':'fantasy, magic, dragons, enchanted, wizard, fairy tale, mythical','kdp.keywords.genre.educational':'educational, learning, nonfiction, informative, kids learning, school, knowledge','kdp.keywords.genre.biography':'biography, true story, memoir, life story, inspiring, real events, nonfiction','kdp.keywords.genre.children':'children\'s book, picture book, bedtime story, read aloud, family, kids, toddler','kdp.keywords.genre.other':'illustrated book, story, fiction, reading, book for kids, imaginative, creative',
+        'kdp.cat.adventure':'Children\'s Books > Action & Adventure / Children\'s Books > Animals','kdp.cat.romance':'Romance > Contemporary / Fiction > Women\'s Fiction','kdp.cat.mystery':'Mystery, Thriller & Suspense > Mystery / Children\'s Books > Mysteries & Detectives','kdp.cat.fantasy':'Children\'s Books > Fantasy & Magic / Science Fiction & Fantasy > Fantasy','kdp.cat.educational':'Children\'s Books > Education & Reference / Education & Teaching > Schools & Teaching','kdp.cat.biography':'Biographies & Memoirs > True Accounts / Children\'s Books > Biographies','kdp.cat.children':'Children\'s Books > Beginning Readers / Children\'s Books > Picture Books','kdp.cat.other':'Children\'s Books > Literature & Fiction / Fiction > Literary Fiction',
         'btn.keep':'✓ Keep','btn.rewrite':'↻ Rewrite','btn.redo':'↻ Redo','btn.remove':'✕ Remove','btn.accept':'✓ Accept','btn.reject':'✕ Reject',
         'btn.rewrite.hint':'Optional instruction… (e.g. change the protagonist\'s name)','btn.rewrite.go':'Rewrite →',
         'btn.cover.regen.hint':'Optional hint for the new image… (e.g. warmer colors, forest background)','btn.cover.regen.go':'Regenerate →',
@@ -1486,7 +1498,14 @@
         'wf.img.title':'Illustrationen werden generiert…',
         'wf.revi.title':'Illustrationen prüfen','wf.revi.sub':'Behalten, neu generieren oder überspringen.','wf.revi.continue':'Weiter zum Download →','wf.revi.keepall':'✓ Alle behalten',
         'wf.illus.none.title':'Keine Seitenillustrationen','wf.illus.none.sub':'Du hast ein reines Textbuch gewählt — es werden keine Seitenillustrationen erstellt.',
-        'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.md':'Markdown herunterladen','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
+        'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.md':'Markdown herunterladen','wf.dl.kdp':'Amazon KDP Datenblatt','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
+        'kdp.doc.title':'Amazon KDP Veröffentlichungsblatt','kdp.doc.book':'Buch','kdp.doc.section.meta':'Buchmetadaten','kdp.doc.section.desc':'Beschreibung (KDP)','kdp.doc.section.keywords':'Keywords (bis zu 7)','kdp.doc.section.categories':'Empfohlene Browse-Kategorien','kdp.doc.section.print':'Druckeinstellungen','kdp.doc.section.pricing':'Preishinweise','kdp.doc.section.checklist':'Veröffentlichungs-Checkliste',
+        'kdp.title':'Titel','kdp.subtitle':'Untertitel','kdp.series':'Reihenname','kdp.author':'Autorenname','kdp.language':'Sprache','kdp.audience':'Zielgruppe','kdp.pages':'Seitenanzahl (ca.)','kdp.interior':'Innentyp','kdp.trim':'Buchgröße (empfohlen)','kdp.cover.dims':'Cover-Bild erforderlich','kdp.bleed':'Anschnitt','kdp.paper':'Papier','kdp.interior.color':'Farbig (Illustrationen vorhanden)','kdp.interior.bw':'Schwarzweiß (nur Text)','kdp.bleed.yes':'Ja (illustriert)','kdp.bleed.no':'Nein (nur Text)','kdp.paper.color':'60# weiß','kdp.paper.bw':'60# weiß',
+        'kdp.trim.kids':'21,6 × 21,6 cm (quadratisch, Kinderbuch)','kdp.trim.short':'15,2 × 22,9 cm (Standard)','kdp.trim.long':'13,9 × 21,6 cm (Roman)',
+        'kdp.price.note':'Der Preis hängt von Seitenanzahl, Innentyp und gewünschter Tantieme ab. Nutze den KDP-Preisrechner auf kdp.amazon.com.',
+        'kdp.checklist.1':'Cover-Bild hochladen (JPG/PDF, 300 DPI)','kdp.checklist.2':'Manuskript hochladen (PDF oder Word)','kdp.checklist.3':'Preis in allen Marktplätzen festlegen','kdp.checklist.4':'2 Browse-Kategorien im KDP-Dashboard auswählen','kdp.checklist.5':'Bis zu 7 Keywords im KDP-Dashboard eintragen','kdp.checklist.6':'Buch mit KDP Previewer prüfen','kdp.checklist.7':'Zur Veröffentlichung einreichen',
+        'kdp.keywords.genre.adventure':'Abenteuer, Entdeckung, Reise, Held, Expedition, Queste, action','kdp.keywords.genre.romance':'Romantik, Liebesgeschichte, Gefühle, herzerwärmend, Paar, Liebe, Beziehung','kdp.keywords.genre.mystery':'Krimi, Detektiv, Spannung, Thriller, Rätsel, Ermittlung, Geheimnis','kdp.keywords.genre.fantasy':'Fantasy, Magie, Drachen, verzaubert, Zauberer, Märchen, mystisch','kdp.keywords.genre.educational':'Sachbuch, Lernen, Bildung, Wissen, Kinder lernen, Schule, informativ','kdp.keywords.genre.biography':'Biografie, wahre Geschichte, Memoiren, inspirierend, Lebensgeschichte, Sachbuch, real','kdp.keywords.genre.children':'Kinderbuch, Bilderbuch, Gute-Nacht-Geschichte, vorlesen, Familie, Kinder, Kleinkind','kdp.keywords.genre.other':'illustriertes Buch, Geschichte, Fiktion, Lesen, Buch für Kinder, kreativ, fantasievoll',
+        'kdp.cat.adventure':'Kinderbücher > Abenteuer / Kinderbücher > Tiere','kdp.cat.romance':'Liebesromane > Gegenwart / Belletristik > Frauenromane','kdp.cat.mystery':'Krimi & Thriller > Kriminalroman / Kinderbücher > Detektive & Rätsel','kdp.cat.fantasy':'Kinderbücher > Fantasy & Magie / Science-Fiction & Fantasy > Fantasy','kdp.cat.educational':'Kinderbücher > Bildung & Nachschlagewerke / Schule & Pädagogik','kdp.cat.biography':'Biografien & Erinnerungen / Kinderbücher > Biografien','kdp.cat.children':'Kinderbücher > Erstleser / Kinderbücher > Bilderbücher','kdp.cat.other':'Kinderbücher > Literatur & Belletristik / Belletristik > Literaturromane',
         'btn.keep':'✓ Behalten','btn.rewrite':'↻ Neu schreiben','btn.redo':'↻ Neu','btn.remove':'✕ Entfernen','btn.accept':'✓ Annehmen','btn.reject':'✕ Ablehnen',
         'btn.rewrite.hint':'Optionale Anweisung… (z. B. ändere den Namen des Protagonisten)','btn.rewrite.go':'Neu schreiben →',
         'btn.cover.regen.hint':'Optionaler Hinweis für das neue Bild… (z. B. wärmere Farben, Waldmotiv)','btn.cover.regen.go':'Neu generieren →',
@@ -1567,7 +1586,14 @@
         'wf.img.title':'Génération des illustrations…',
         'wf.revi.title':'Vérifiez vos illustrations','wf.revi.sub':'Gardez, régénérez ou ignorez chaque image.','wf.revi.continue':'Continuer vers le téléchargement →','wf.revi.keepall':'✓ Tout garder',
         'wf.illus.none.title':'Aucune illustration de page','wf.illus.none.sub':'Vous avez sélectionné un livre sans illustrations — aucune image ne sera générée.',
-        'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.md':'Télécharger Markdown','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
+        'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.md':'Télécharger Markdown','wf.dl.kdp':'Fiche Amazon KDP','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
+        'kdp.doc.title':'Fiche de publication Amazon KDP','kdp.doc.book':'Livre','kdp.doc.section.meta':'Métadonnées du livre','kdp.doc.section.desc':'Description (KDP)','kdp.doc.section.keywords':'Mots-clés (jusqu\'à 7)','kdp.doc.section.categories':'Catégories suggérées','kdp.doc.section.print':'Paramètres d\'impression','kdp.doc.section.pricing':'Notes tarifaires','kdp.doc.section.checklist':'Liste de contrôle publication',
+        'kdp.title':'Titre','kdp.subtitle':'Sous-titre','kdp.series':'Nom de la série','kdp.author':'Nom de l\'auteur','kdp.language':'Langue','kdp.audience':'Public cible','kdp.pages':'Nombre de pages (approx.)','kdp.interior':'Type d\'intérieur','kdp.trim':'Format (recommandé)','kdp.cover.dims':'Image de couverture requise','kdp.bleed':'Fond perdu','kdp.paper':'Papier','kdp.interior.color':'Couleur (illustrations présentes)','kdp.interior.bw':'Noir & blanc (texte seul)','kdp.bleed.yes':'Oui (illustré)','kdp.bleed.no':'Non (texte seul)','kdp.paper.color':'60# blanc','kdp.paper.bw':'60# blanc',
+        'kdp.trim.kids':'21,6 × 21,6 cm (carré, livre jeunesse)','kdp.trim.short':'15,2 × 22,9 cm (standard)','kdp.trim.long':'13,9 × 21,6 cm (roman)',
+        'kdp.price.note':'Le prix dépend du nombre de pages, du type d\'intérieur et de la redevance souhaitée. Utilisez le calculateur de prix KDP sur kdp.amazon.com.',
+        'kdp.checklist.1':'Télécharger l\'image de couverture (JPG/PDF, 300 DPI)','kdp.checklist.2':'Télécharger le manuscrit (PDF ou Word)','kdp.checklist.3':'Fixer le prix sur tous les marchés','kdp.checklist.4':'Sélectionner 2 catégories dans le tableau de bord KDP','kdp.checklist.5':'Saisir jusqu\'à 7 mots-clés dans KDP','kdp.checklist.6':'Prévisualiser avec KDP Previewer','kdp.checklist.7':'Soumettre pour examen de publication',
+        'kdp.keywords.genre.adventure':'aventure, quête, voyage, héros, exploration, découverte, action','kdp.keywords.genre.romance':'romance, histoire d\'amour, émotions, touchant, couple, amour, relation','kdp.keywords.genre.mystery':'mystère, détective, suspense, thriller, indices, enquête, énigme','kdp.keywords.genre.fantasy':'fantasy, magie, dragons, enchanté, sorcier, conte de fées, mythique','kdp.keywords.genre.educational':'éducatif, apprentissage, documentaire, informatif, enfants apprennent, école, savoir','kdp.keywords.genre.biography':'biographie, histoire vraie, mémoires, inspirant, vie réelle, témoignage, récit','kdp.keywords.genre.children':'livre jeunesse, album illustré, histoire du soir, lecture en famille, enfants, tout-petit','kdp.keywords.genre.other':'livre illustré, histoire, fiction, lecture, livre pour enfants, imaginatif, créatif',
+        'kdp.cat.adventure':'Livres jeunesse > Aventure / Livres jeunesse > Animaux','kdp.cat.romance':'Romans > Romance contemporaine / Littérature > Fiction féminine','kdp.cat.mystery':'Policiers & Thrillers > Romans policiers / Jeunesse > Détectives','kdp.cat.fantasy':'Livres jeunesse > Fantasy & Magie / Science-Fiction & Fantasy > Fantasy','kdp.cat.educational':'Livres jeunesse > Éducation & Référence / Pédagogie','kdp.cat.biography':'Biographies & Mémoires / Livres jeunesse > Biographies','kdp.cat.children':'Livres jeunesse > Premiers lecteurs / Livres jeunesse > Albums','kdp.cat.other':'Livres jeunesse > Littérature / Littérature & Fiction > Romans',
         'btn.keep':'✓ Garder','btn.rewrite':'↻ Réécrire','btn.redo':'↻ Refaire','btn.remove':'✕ Supprimer','btn.accept':'✓ Accepter','btn.reject':'✕ Rejeter',
         'btn.rewrite.hint':'Instruction optionnelle… (ex. changer le nom du protagoniste)','btn.rewrite.go':'Réécrire →',
         'btn.cover.regen.hint':'Indication optionnelle pour la nouvelle image… (ex. tons chauds, forêt)','btn.cover.regen.go':'Régénérer →',
@@ -1648,7 +1674,14 @@
         'wf.img.title':'Generazione illustrazioni…',
         'wf.revi.title':'Rivedi le tue illustrazioni','wf.revi.sub':'Tieni, rigenera o salta ogni immagine.','wf.revi.continue':'Continua al download →','wf.revi.keepall':'✓ Tieni tutto',
         'wf.illus.none.title':'Nessuna illustrazione','wf.illus.none.sub':'Hai selezionato un libro solo testo — nessuna illustrazione verrà generata.',
-        'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.md':'Scarica Markdown','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
+        'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.md':'Scarica Markdown','wf.dl.kdp':'Scheda Amazon KDP','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
+        'kdp.doc.title':'Scheda di pubblicazione Amazon KDP','kdp.doc.book':'Libro','kdp.doc.section.meta':'Metadati del libro','kdp.doc.section.desc':'Descrizione (KDP)','kdp.doc.section.keywords':'Parole chiave (fino a 7)','kdp.doc.section.categories':'Categorie suggerite','kdp.doc.section.print':'Impostazioni di stampa','kdp.doc.section.pricing':'Note sui prezzi','kdp.doc.section.checklist':'Lista di controllo pubblicazione',
+        'kdp.title':'Titolo','kdp.subtitle':'Sottotitolo','kdp.series':'Nome della serie','kdp.author':'Nome dell\'autore','kdp.language':'Lingua','kdp.audience':'Pubblico target','kdp.pages':'Numero di pagine (appross.)','kdp.interior':'Tipo interno','kdp.trim':'Formato (consigliato)','kdp.cover.dims':'Immagine di copertina richiesta','kdp.bleed':'Abbondanza','kdp.paper':'Carta','kdp.interior.color':'Colore (illustrazioni presenti)','kdp.interior.bw':'Bianco & nero (solo testo)','kdp.bleed.yes':'Sì (illustrato)','kdp.bleed.no':'No (solo testo)','kdp.paper.color':'60# bianca','kdp.paper.bw':'60# bianca',
+        'kdp.trim.kids':'21,6 × 21,6 cm (quadrato, libro per bambini)','kdp.trim.short':'15,2 × 22,9 cm (standard)','kdp.trim.long':'13,9 × 21,6 cm (romanzo)',
+        'kdp.price.note':'Il prezzo dipende dal numero di pagine, dal tipo di interno e dalla royalty desiderata. Usa il calcolatore prezzi KDP su kdp.amazon.com.',
+        'kdp.checklist.1':'Carica l\'immagine di copertina (JPG/PDF, 300 DPI)','kdp.checklist.2':'Carica il manoscritto (PDF o Word)','kdp.checklist.3':'Imposta il prezzo su tutti i mercati','kdp.checklist.4':'Seleziona 2 categorie nel pannello KDP','kdp.checklist.5':'Inserisci fino a 7 parole chiave nel pannello KDP','kdp.checklist.6':'Visualizza anteprima con KDP Previewer','kdp.checklist.7':'Invia per revisione e pubblicazione',
+        'kdp.keywords.genre.adventure':'avventura, quest, viaggio, eroe, esplorazione, scoperta, azione','kdp.keywords.genre.romance':'romanzo, storia d\'amore, emozioni, toccante, coppia, amore, relazione','kdp.keywords.genre.mystery':'mistero, detective, suspense, thriller, indizi, indagine, enigma','kdp.keywords.genre.fantasy':'fantasy, magia, draghi, incantato, mago, fiaba, mitico','kdp.keywords.genre.educational':'educativo, apprendimento, saggistica, informativo, bambini imparano, scuola, conoscenza','kdp.keywords.genre.biography':'biografia, storia vera, memorie, ispirazione, vita reale, testimonianza, racconto','kdp.keywords.genre.children':'libro per bambini, libro illustrato, storia della buonanotte, lettura familiare, bambini, piccoli','kdp.keywords.genre.other':'libro illustrato, storia, narrativa, lettura, libro per bambini, creativo, fantasioso',
+        'kdp.cat.adventure':'Libri per bambini > Avventura / Libri per bambini > Animali','kdp.cat.romance':'Romanzi > Romance contemporaneo / Narrativa > Narrativa femminile','kdp.cat.mystery':'Gialli & Thriller > Gialli / Libri per bambini > Detective','kdp.cat.fantasy':'Libri per bambini > Fantasy & Magia / Fantascienza & Fantasy > Fantasy','kdp.cat.educational':'Libri per bambini > Istruzione & Riferimento / Educazione & Insegnamento','kdp.cat.biography':'Biografie & Memorie / Libri per bambini > Biografie','kdp.cat.children':'Libri per bambini > Primi lettori / Libri per bambini > Libri illustrati','kdp.cat.other':'Libri per bambini > Letteratura & Narrativa / Narrativa > Letteratura',
         'btn.keep':'✓ Tieni','btn.rewrite':'↻ Riscrivi','btn.redo':'↻ Rifai','btn.remove':'✕ Rimuovi','btn.accept':'✓ Accetta','btn.reject':'✕ Rifiuta',
         'btn.rewrite.hint':'Istruzione opzionale… (es. cambia il nome del protagonista)','btn.rewrite.go':'Riscrivi →',
         'btn.cover.regen.hint':'Suggerimento opzionale per la nuova immagine… (es. colori caldi, sfondo foresta)','btn.cover.regen.go':'Rigenera →',
@@ -3086,6 +3119,96 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, squ
       }).join('\n\n\n---\n\n\n');
       const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-books.md';
+      a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    };
+
+    /* ── KDP Sheet download ──────────────────────────────────────── */
+    window.downloadKDP=function(){
+      const approved=downloadableBooks();
+      const d=T[currentLang]||T.EN;
+      if(!approved.length){alert(d['error.no.books']||'No approved books available.');return;}
+
+      const hasIllus=wfCfg.density!=='none'&&wfCfg.style!=='none';
+      const pageCount=parseInt(wfCfg.pages)||30;
+      const genre=wfCfg.genre&&wfCfg.genre!=='auto'?wfCfg.genre:'children';
+      const age=wfCfg.age&&wfCfg.age!=='auto'?wfCfg.age:'';
+
+      // Trim size based on page count and illustration density
+      const trimKey=hasIllus&&pageCount<=50?'kdp.trim.kids':pageCount<=150?'kdp.trim.short':'kdp.trim.long';
+      const trim=d[trimKey]||d['kdp.trim.kids'];
+
+      // Language name
+      const langNames={EN:'English',DE:'Deutsch',FR:'Français',IT:'Italiano'};
+      const langName=langNames[currentLang]||currentLang;
+
+      // Cover dimensions (KDP formula: (trim_width * 2 + spine) x trim_height at 300 DPI)
+      const coverNote=hasIllus?'2775 × 2775 px (300 DPI) — square':'2550 × 3300 px (300 DPI) — 8.5×11 in';
+
+      const genreKey='kdp.keywords.genre.'+(genre==='auto'?'other':genre);
+      const keywords=d[genreKey]||d['kdp.keywords.genre.other']||'';
+
+      const catKey='kdp.cat.'+(genre==='auto'?'other':genre);
+      const categories=(d[catKey]||d['kdp.cat.other']||'').split('/').map(s=>s.trim());
+
+      const interior=hasIllus?(d['kdp.interior.color']||'Color'):(d['kdp.interior.bw']||'Black & White');
+      const bleed=hasIllus?(d['kdp.bleed.yes']||'Yes'):(d['kdp.bleed.no']||'No');
+
+      const t=k=>d[k]||k;
+      const sep='─'.repeat(60);
+      const heading=s=>`\n${sep}\n  ${s.toUpperCase()}\n${sep}\n`;
+
+      const booksText=approved.map((b,i)=>{
+        const synopsis=(b.synopsis||'').replace(/\n+/g,' ').trim();
+        const kdpDesc=synopsis.length>4000?synopsis.slice(0,3997)+'...':synopsis;
+
+        return [
+          `\n${'═'.repeat(60)}`,
+          `  ${t('kdp.doc.book')} ${i+1}: ${b.title}`,
+          `${'═'.repeat(60)}`,
+
+          heading(t('kdp.doc.section.meta')),
+          `${t('kdp.title')}:     ${b.title}`,
+          `${t('kdp.subtitle')}:  `,
+          `${t('kdp.series')}:    `,
+          `${t('kdp.author')}:    `,
+          `${t('kdp.language')}:  ${langName}`,
+          `${t('kdp.audience')}:  ${age}`,
+          `${t('kdp.pages')}:     ~${pageCount}`,
+
+          heading(t('kdp.doc.section.desc')),
+          kdpDesc,
+
+          heading(t('kdp.doc.section.keywords')),
+          keywords.split(',').map((kw,n)=>`  ${n+1}. ${kw.trim()}`).slice(0,7).join('\n'),
+
+          heading(t('kdp.doc.section.categories')),
+          categories.map((c,n)=>`  ${n+1}. ${c}`).join('\n'),
+
+          heading(t('kdp.doc.section.print')),
+          `${t('kdp.interior')}:  ${interior}`,
+          `${t('kdp.trim')}:      ${trim}`,
+          `${t('kdp.cover.dims')}: ${coverNote}`,
+          `${t('kdp.bleed')}:     ${bleed}`,
+          `${t('kdp.paper')}:     ${hasIllus?(d['kdp.paper.color']||'60# white'):(d['kdp.paper.bw']||'60# white')}`,
+
+          heading(t('kdp.doc.section.pricing')),
+          t('kdp.price.note'),
+
+          heading(t('kdp.doc.section.checklist')),
+          [1,2,3,4,5,6,7].map(n=>`  ☐  ${t('kdp.checklist.'+n)}`).join('\n'),
+        ].join('\n');
+      }).join('\n\n');
+
+      const header=[
+        t('kdp.doc.title'),
+        '═'.repeat(60),
+        `Generated: ${new Date().toLocaleDateString()} | Language: ${langName}`,
+        '',
+      ].join('\n');
+
+      const blob=new Blob([header+booksText+'\n'],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='amazon-kdp-sheet.txt';
       a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
     };
 
