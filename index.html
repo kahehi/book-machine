@@ -2596,10 +2596,23 @@ ${qualityLine}`;
       }
     }
 
-    function generateSvgCover(cov, book){
+    function pickGradientFromInstruction(instruction){
+      const t=(instruction||'').toLowerCase();
+      if(/warm|orange|gold|gelb|sunset|herbst|autumn|feuer|fire/.test(t)) return IMG_GRADIENTS[5];
+      if(/grün|green|wald|forest|natur|nature|jungle|dschungel/.test(t)) return IMG_GRADIENTS[4];
+      if(/rot|red|action|thriller|blut|blood|danger|gefahr|liebe|love|passion/.test(t)) return IMG_GRADIENTS[2];
+      if(/blau|blue|ozean|ocean|meer|sea|kalt|cold|winter/.test(t)) return IMG_GRADIENTS[0];
+      if(/lila|purple|magie|magic|mystisch|mystical|fantasy/.test(t)) return IMG_GRADIENTS[1];
+      if(/dunkel|dark|noir|schwarz|black|nacht|night|shadow/.test(t)) return IMG_GRADIENTS[3];
+      return null;
+    }
+
+    function generateSvgCover(cov, book, instruction){
       const rawTitle = (cov.bookTitle || book?.title || '').trim();
       const rawSynopsis = (book?.synopsis || '').slice(0, 200).trim();
-      const grad = cov.gradient || IMG_GRADIENTS[0];
+      // If instruction contains color/mood keywords, pick a matching gradient
+      const instrGrad = instruction ? pickGradientFromInstruction(instruction) : null;
+      const grad = instrGrad || cov.gradient || IMG_GRADIENTS[0];
       const cols = [...grad.matchAll(/#[0-9a-fA-F]{3,6}/g)].map(m=>m[0]);
       const c1 = cols[0] || '#1a1a2e', c2 = cols[cols.length-1] || '#0f3460';
 
@@ -2782,21 +2795,22 @@ ${qualityLine}`;
       (async()=>{
         const book=wfBooks.find(b=>b.id===cov.bookId);
         const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
-        // Pick a fresh gradient so SVG fallbacks always look visually different
-        const otherGrads=IMG_GRADIENTS.filter(g=>g!==cov.gradient);
-        cov.gradient=(otherGrads.length?otherGrads[Math.floor(Math.random()*otherGrads.length)]:IMG_GRADIENTS[0]);
+        // Pick gradient: keyword match from instruction, else random different one
+        const instrGrad=instruction?pickGradientFromInstruction(instruction):null;
+        if(instrGrad){ cov.gradient=instrGrad; }
+        else{ const otherGrads=IMG_GRADIENTS.filter(g=>g!==cov.gradient); cov.gradient=(otherGrads.length?otherGrads[Math.floor(Math.random()*otherGrads.length)]:IMG_GRADIENTS[0]); }
         cov.imageUrl=null; cov.dataUrl=null;
         if(useImgAI){
           try{
             const result=await generateCoverImage(buildCoverPrompt(cov,book,instruction));
             if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
-            else{ cov.dataUrl=generateSvgCover(cov,book); }
+            else{ cov.dataUrl=generateSvgCover(cov,book,instruction); }
           }catch(e){
             console.error('[Cover] Regen Fehler:',e.message||e);
-            cov.dataUrl=generateSvgCover(cov,book);
+            cov.dataUrl=generateSvgCover(cov,book,instruction);
           }
         } else {
-          cov.dataUrl=generateSvgCover(cov,book);
+          cov.dataUrl=generateSvgCover(cov,book,instruction);
         }
         const coverSrc=cov.imageUrl||cov.dataUrl||null;
         const newVisual=coverSrc
