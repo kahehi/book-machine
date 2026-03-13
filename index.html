@@ -1782,14 +1782,39 @@
 
     /* ── Sliders ─────────────────────────────────────────────────── */
     const bookCount = document.getElementById('book-count');
+    const pagesSlider = document.getElementById('pages');
+    const illusDensity = document.getElementById('illus-density');
+
+    function updatePagesSliderLimit(){
+      const isNovel = illusDensity.value === 'none';
+      const fewBooks = parseInt(bookCount.value) <= 3;
+      const newMax = (isNovel && fewBooks) ? 300 : 50;
+      const oldMax = parseInt(pagesSlider.max);
+      if(newMax !== oldMax){
+        pagesSlider.max = newMax;
+        if(parseInt(pagesSlider.value) > newMax) {
+          pagesSlider.value = newMax;
+          document.getElementById('pages-val').textContent = newMax;
+        }
+        const ticks = pagesSlider.nextElementSibling;
+        if(ticks && ticks.classList.contains('slider-ticks')){
+          ticks.children[1].textContent = newMax;
+        }
+        syncSummary();
+      }
+    }
+
     bookCount.addEventListener('input',()=>{
       document.getElementById('books-val').textContent=bookCount.value;
+      updatePagesSliderLimit();
       syncSummary();
     });
-    const pagesSlider = document.getElementById('pages');
     pagesSlider.addEventListener('input',()=>{
       document.getElementById('pages-val').textContent=pagesSlider.value;
       syncSummary();
+    });
+    illusDensity.addEventListener('change',()=>{
+      updatePagesSliderLimit();
     });
 
     /* ── Feedback bubble ─────────────────────────────────────────── */
