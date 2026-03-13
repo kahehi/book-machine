@@ -305,7 +305,7 @@
     .txt-book-card { border: 1px solid var(--border); border-radius: 4px; padding: 14px; margin-bottom: 12px; transition: border-color 0.25s, opacity 0.3s; }
     .txt-book-card.approved { border-color: var(--green); }
     .txt-book-card.rejected { opacity: 0.3; pointer-events: none; }
-    .txt-pages { max-height: 220px; overflow-y: auto; margin: 10px 0 12px; padding-right: 4px; }
+    .txt-pages { max-height: 60vh; overflow-y: auto; margin: 10px 0 12px; padding-right: 4px; }
     .txt-pages::-webkit-scrollbar { width: 3px; } .txt-pages::-webkit-scrollbar-thumb { background: var(--border-focus); border-radius: 2px; }
     .txt-page { font-size: 0.7rem; color: var(--text-dim); line-height: 1.6; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .txt-page:last-child { border-bottom: none; }
@@ -1780,8 +1780,10 @@
         if(ticks && ticks.classList.contains('slider-ticks')){
           ticks.children[1].textContent = newMax;
         }
-        syncSummary();
       }
+      // Always sync — max change AND book-count change both affect the display
+      document.getElementById('pages-val').textContent = pagesSlider.value;
+      syncSummary();
     }
 
     bookCount.addEventListener('input',()=>{
@@ -2678,12 +2680,15 @@ ${qualityLine}`;
             const result=await generateCoverImage(buildCoverPrompt(cov,book),_genAbort.signal);
             if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
           }catch(e){
-            clearInterval(iv);
-            bar.style.width='100%';
-            stat.textContent=e.name==='AbortError'?'✕':'✗';
-            stat.className='gen-book-status error';
-            if(e.name==='AbortError') break;
+            if(e.name==='AbortError'){
+              clearInterval(iv);
+              bar.style.width='100%';
+              stat.textContent='✕';stat.className='gen-book-status error';
+              break;
+            }
             console.error('[Cover] Fehler für',cov.bookTitle,e.message||e);
+            // AI failed — fall back to SVG typographic cover
+            cov.dataUrl=generateSvgCover(cov,book);
           }
         } else {
           // No image AI — generate a styled typographic SVG cover
