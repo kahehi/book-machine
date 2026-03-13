@@ -293,6 +293,14 @@
     .book-card-title { font-family: var(--font-display); font-size: 0.98rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
     .book-card-synopsis { font-size: 0.7rem; color: var(--text-dim); line-height: 1.55; margin-bottom: 12px; }
     .book-card-actions { display: flex; gap: 7px; }
+    /* Character descriptions */
+    .book-card-chars { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .book-card-chars summary { cursor: pointer; font-size: 0.62rem; font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); user-select: none; list-style: none; display: flex; align-items: center; gap: 6px; }
+    .book-card-chars summary::-webkit-details-marker { display: none; }
+    .book-card-chars[open] summary { color: var(--accent); }
+    .book-char-item { margin-top: 8px; padding: 8px 10px; background: rgba(255,255,255,0.025); border-radius: 3px; border-left: 2px solid var(--accent-dim); }
+    .book-char-name { font-size: 0.76rem; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 3px; }
+    .book-char-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
     /* Text review */
     .txt-book-card { border: 1px solid var(--border); border-radius: 4px; padding: 14px; margin-bottom: 12px; transition: border-color 0.25s, opacity 0.3s; }
     .txt-book-card.approved { border-color: var(--green); }
@@ -310,6 +318,13 @@
     .bc-btn.discard { border-color: var(--border-focus); color: var(--text-muted); }
     .bc-btn.discard:hover { border-color: #7a1515; color: #e05050; }
     .bc-rewriting { font-size: 0.62rem; font-family: var(--font-mono); color: var(--accent); margin-top: 8px; display: none; }
+    .bc-rewrite-row { margin-top: 8px; display: none; gap: 6px; align-items: center; }
+    .bc-rewrite-row.visible { display: flex; }
+    .bc-rewrite-input { flex: 1; background: var(--surface); border: 1px solid var(--border-focus); border-radius: 3px; padding: 6px 8px; font-size: 0.65rem; color: #fff; font-family: var(--font-sans); }
+    .bc-rewrite-input::placeholder { color: var(--text-muted); }
+    .bc-rewrite-input:focus { outline: none; border-color: var(--accent); }
+    .bc-rewrite-confirm { padding: 6px 10px; font-size: 0.62rem; font-family: var(--font-mono); letter-spacing: 0.05em; border-radius: 3px; cursor: pointer; border: 1px solid var(--accent-dim); color: var(--accent); background: none; transition: all 0.15s; white-space: nowrap; }
+    .bc-rewrite-confirm:hover { background: rgba(201,169,110,0.15); }
 
     /* Image review cards */
     .img-card { display: flex; gap: 12px; border: 1px solid var(--border); border-radius: 4px; padding: 12px; margin-bottom: 10px; transition: border-color 0.25s, opacity 0.3s; }
@@ -390,6 +405,193 @@
     .feedback-success-icon { font-size: 1.8rem; line-height: 1; }
     .feedback-success-title { font-family: var(--font-display); font-size: 1.1rem; color: var(--green); font-weight: 600; }
     .feedback-success-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+
+    /* ── IDEA WORKSHOP ──────────────────────────────────────────── */
+    /* ── IDEA WORKSHOP / CHATBOT ──────────────────────────────── */
+    .workshop-section {
+      padding: 100px 8vw;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .workshop-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 60px;
+      align-items: start;
+    }
+    .workshop-intro { }
+    .workshop-intro .section-tag {
+      font-family: var(--font-mono); font-size: 0.56rem; color: var(--accent);
+      letter-spacing: 0.3em; text-transform: uppercase; display: block; margin-bottom: 14px;
+    }
+    .workshop-intro h2 {
+      font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 3rem);
+      font-weight: 700; color: #fff; line-height: 1.1; margin-bottom: 14px;
+    }
+    .workshop-intro p {
+      font-size: 0.82rem; color: var(--text-dim); line-height: 1.75;
+      font-weight: 300; margin-bottom: 28px;
+    }
+    .ws-key-row {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .ws-key-label {
+      font-family: var(--font-mono); font-size: 0.52rem; color: var(--text-muted);
+      letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap;
+    }
+    .ws-key-input {
+      flex: 1; background: #0a0a0a; border: 1px solid var(--border);
+      color: var(--text-dim); font-family: var(--font-mono); font-size: 0.72rem;
+      padding: 8px 12px; border-radius: 3px; outline: none; transition: border-color 0.2s;
+    }
+    .ws-key-input:focus { border-color: var(--accent-dim); color: #fff; }
+    .ws-key-input::placeholder { color: var(--text-muted); }
+
+    /* Refined idea box (left side) */
+    .ws-refined-box {
+      background: #0a0a0a; border: 1px solid var(--border); border-radius: 3px;
+      padding: 20px; min-height: 100px; display: none;
+    }
+    .ws-refined-box.visible { display: block; }
+    .ws-refined-label {
+      font-family: var(--font-mono); font-size: 0.5rem; color: var(--accent);
+      letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; display: block;
+    }
+    .ws-refined-text {
+      font-size: 0.88rem; color: #e0e0e0; line-height: 1.75; font-weight: 300;
+    }
+    .ws-adopt-row {
+      margin-top: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .ws-adopt-btn {
+      background: transparent; border: 1px solid var(--accent); color: var(--accent);
+      font-family: var(--font-body); font-weight: 600; font-size: 0.82rem;
+      letter-spacing: 0.06em; padding: 12px 26px; border-radius: 3px; cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+    .ws-adopt-btn:hover:not(:disabled) { background: var(--accent); color: #000; transform: translateY(-1px); }
+    .ws-adopt-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .ws-adopt-hint { font-size: 0.68rem; color: var(--text-muted); line-height: 1.5; font-weight: 300; }
+
+    /* Chat window */
+    .ws-chatbot {
+      display: flex; flex-direction: column;
+      background: #060606; border: 1px solid var(--border); border-radius: 4px;
+      overflow: hidden; height: 600px;
+    }
+    .ws-chat-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .ws-chat-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700; color: #000;
+      flex-shrink: 0;
+    }
+    .ws-chat-title {
+      font-family: var(--font-mono); font-size: 0.58rem; color: #fff;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .ws-chat-subtitle {
+      font-size: 0.62rem; color: var(--text-muted); margin-top: 1px;
+    }
+    .ws-chat-status-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
+      margin-left: auto; box-shadow: 0 0 6px #4ade8088;
+      transition: background 0.3s;
+    }
+    .ws-chat-status-dot.thinking { background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: ws-pulse 1s ease-in-out infinite; }
+    @keyframes ws-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .ws-messages {
+      flex: 1; overflow-y: auto; padding: 20px 18px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .ws-messages::-webkit-scrollbar { width: 3px; }
+    .ws-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .ws-msg { display: flex; flex-direction: column; gap: 4px; max-width: 85%; }
+    .ws-msg-ai { align-self: flex-start; }
+    .ws-msg-user { align-self: flex-end; }
+    .ws-msg-name {
+      font-family: var(--font-mono); font-size: 0.48rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .ws-msg-ai .ws-msg-name { color: var(--accent); }
+    .ws-msg-user .ws-msg-name { color: var(--text-muted); text-align: right; }
+    .ws-bubble {
+      padding: 11px 15px; border-radius: 3px;
+      font-size: 0.83rem; line-height: 1.65; font-weight: 300;
+    }
+    .ws-msg-ai .ws-bubble {
+      background: #101010; border: 1px solid var(--border); color: #ddd;
+      border-top-left-radius: 0;
+    }
+    .ws-msg-user .ws-bubble {
+      background: #1c1508; border: 1px solid var(--accent-dim); color: #ccc;
+      border-top-right-radius: 0;
+    }
+    /* Typing indicator */
+    .ws-typing { display: flex; align-items: center; gap: 5px; padding: 12px 15px; }
+    .ws-typing span {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+      animation: ws-bounce 1.2s ease-in-out infinite;
+    }
+    .ws-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .ws-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ws-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+    .ws-input-area {
+      border-top: 1px solid var(--border); flex-shrink: 0;
+    }
+    .ws-input-row {
+      padding: 12px 14px; display: flex; gap: 8px; align-items: flex-end;
+    }
+    .ws-input {
+      flex: 1; background: #0a0a0a; border: 1px solid var(--border);
+      color: #fff; font-family: var(--font-body); font-size: 0.85rem;
+      font-weight: 300; padding: 10px 13px; border-radius: 3px; outline: none;
+      resize: none; line-height: 1.5; max-height: 100px; overflow-y: auto;
+      transition: border-color 0.2s;
+    }
+    .ws-input:focus { border-color: var(--accent-dim); }
+    .ws-input::placeholder { color: var(--text-muted); }
+    .ws-send {
+      background: var(--accent); border: none; color: #000;
+      width: 38px; height: 38px; border-radius: 3px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .ws-send:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .ws-send:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    .ws-input-hint {
+      padding: 0 14px 10px; font-size: 0.62rem; color: var(--text-muted);
+      font-family: var(--font-mono); letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 960px) {
+      .workshop-layout { grid-template-columns: 1fr; }
+      .ws-chatbot { height: 500px; }
+    }
+
+    /* ── COLLAPSIBLE SECTIONS ──────────────────────────────────── */
+    .collapse-toggle {
+      width: 100%; background: none; border: none; border-bottom: 1px solid var(--border);
+      color: var(--text-dim); font-family: var(--font-mono); font-size: 0.56rem;
+      letter-spacing: 0.2em; text-transform: uppercase; padding: 11px 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      transition: color 0.2s, border-color 0.2s; margin-bottom: 0; gap: 8px;
+    }
+    .collapse-toggle:hover { color: #fff; }
+    .collapse-toggle[aria-expanded="true"] { color: var(--accent); border-color: var(--accent-dim); }
+    .collapse-chevron { transition: transform 0.25s; flex-shrink: 0; opacity: 0.5; }
+    .collapse-toggle[aria-expanded="true"] .collapse-chevron { transform: rotate(180deg); opacity: 1; }
+    .collapse-toggle-hint { font-size: 0.5rem; color: var(--text-muted); letter-spacing: 0.1em; font-weight: 300; text-transform: none; font-family: var(--font-body); margin-left: auto; padding-right: 6px; }
+    .collapse-body { overflow: hidden; transition: max-height 0.3s ease; }
+    .collapse-body.is-collapsed { display: none; }
 
     /* ── TECH / FOOTER ─────────────────────────────────────────── */
     .tech-section { padding: 72px 8vw; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 60px; flex-wrap: wrap; }
@@ -487,6 +689,173 @@
     </div>
   </section>
 
+  <!-- ═══ TWO PATHS ═══ -->
+  <section style="padding:0 8vw;border-top:1px solid var(--border);background:#000;">
+    <div style="display:grid;grid-template-columns:1fr 1px 1fr;min-height:220px;">
+
+      <!-- Path A -->
+      <a href="#workshop" style="text-decoration:none;display:flex;flex-direction:column;justify-content:center;padding:52px 48px 52px 0;gap:14px;border-right:none;transition:background 0.2s;" class="path-card" id="path-a">
+        <span style="font-family:var(--font-mono);font-size:0.52rem;color:var(--accent);letter-spacing:0.25em;text-transform:uppercase;">Schritt 1 — Optional</span>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:#fff;line-height:1.15;">Idee zuerst<br>verfeinern</div>
+        <p style="font-size:0.8rem;color:var(--text-dim);line-height:1.65;font-weight:300;max-width:340px;">Noch keine klare Idee? Chatte mit dem KI-Assistenten — er hilft dir, aus Stichworten eine starke Buchidee zu entwickeln.</p>
+        <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent);letter-spacing:0.08em;margin-top:4px;">Zum Ideen-Assistenten &nbsp;↓</span>
+      </a>
+
+      <!-- Divider -->
+      <div style="background:var(--border);"></div>
+
+      <!-- Path B -->
+      <a href="#create" style="text-decoration:none;display:flex;flex-direction:column;justify-content:center;padding:52px 0 52px 48px;gap:14px;transition:background 0.2s;" class="path-card">
+        <span style="font-family:var(--font-mono);font-size:0.52rem;color:var(--text-muted);letter-spacing:0.25em;text-transform:uppercase;">Schritt 1 — Direkt</span>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:#fff;line-height:1.15;">Direkt zum<br>Buchgenerator</div>
+        <p style="font-size:0.8rem;color:var(--text-dim);line-height:1.65;font-weight:300;max-width:340px;">Hast du deine Idee bereits? Füll das Formular aus, wähle deine KI und generiere dein Buch in wenigen Minuten.</p>
+        <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);letter-spacing:0.08em;margin-top:4px;">Zum Generator &nbsp;↓</span>
+      </a>
+
+    </div>
+  </section>
+  <style>
+    .path-card:hover { background: #060606; }
+    .path-card:hover span:last-child { color: var(--accent) !important; }
+    @media(max-width:640px){
+      #path-a ~ div { display:none; }
+      section:has(.path-card) > div { grid-template-columns:1fr !important; }
+      .path-card { padding: 40px 0 !important; border-bottom:1px solid var(--border); }
+    }
+  </style>
+
+  <!-- ═══ IDEA WORKSHOP ═══ -->
+  <section class="workshop-section" id="workshop">
+
+    <!-- Section header (full width) -->
+    <div class="reveal" style="margin-bottom:48px;">
+      <span class="section-tag" data-i18n="ws.tag">Idee entwickeln</span>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.8rem,3vw,3rem);font-weight:700;color:#fff;line-height:1.1;margin-bottom:10px;" data-i18n="ws.title">Deine Idee — verfeinert.</h2>
+      <p style="font-size:0.82rem;color:var(--text-dim);line-height:1.75;font-weight:300;max-width:600px;" data-i18n="ws.subtitle">Schreib dem Assistenten deine rohen Gedanken oder Stichworte. Er stellt Gegenfragen und hilft dir, eine klare Buchidee zu entwickeln. Wenn du zufrieden bist, übernimm die Idee mit einem Klick.</p>
+    </div>
+
+    <div class="workshop-layout">
+
+      <!-- LEFT: Chat window -->
+      <div class="ws-chatbot reveal">
+        <div class="ws-chat-header">
+          <div class="ws-chat-avatar">AI</div>
+          <div>
+            <div class="ws-chat-title" data-i18n="ws.chat.title">Ideen-Assistent</div>
+            <div class="ws-chat-subtitle" data-i18n="ws.chat.subtitle">Powered by GPT-4o-mini</div>
+          </div>
+          <div class="ws-chat-status-dot" id="ws-status-dot"></div>
+        </div>
+
+        <div class="ws-messages" id="ws-messages">
+          <div class="ws-msg ws-msg-ai">
+            <span class="ws-msg-name" data-i18n="ws.msg.name">Assistent</span>
+            <div class="ws-bubble" data-i18n="ws.greeting">Hallo! Ich helfe dir, deine Buchidee zu entwickeln und zu verfeinern. 📚<br><br>Schreib mir einfach deine ersten Gedanken — ein Thema, ein Charakter, eine Situation, oder nur ein paar Stichworte. Ich stelle Fragen, bis wir gemeinsam eine starke Idee haben.</div>
+          </div>
+        </div>
+
+        <div class="ws-input-area">
+          <div class="ws-input-row">
+            <textarea
+              class="ws-input"
+              id="ws-input"
+              data-i18n-ph="ws.input.placeholder"
+              placeholder="Deine Idee oder Stichworte…"
+              rows="1"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();wsSend();}"
+            ></textarea>
+            <button class="ws-send" id="ws-send-btn" onclick="wsSend()" title="Senden">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+            </button>
+          </div>
+          <div class="ws-input-hint" data-i18n="ws.input.hint">Enter zum Senden · Shift+Enter für Zeilenumbruch</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Settings (collapsible) + refined idea -->
+      <div class="reveal" style="transition-delay:0.1s;display:flex;flex-direction:column;gap:20px;">
+
+        <!-- Collapsible: KI-Engine settings -->
+        <div>
+          <button class="collapse-toggle" id="ws-settings-toggle" aria-expanded="false" onclick="toggleCollapse('ws-settings-body','ws-settings-toggle')">
+            <span data-i18n="ws.settings.label">KI-Engine Einstellungen</span>
+            <span class="collapse-toggle-hint" id="ws-settings-hint" data-i18n="collapse.show">Anzeigen</span>
+            <svg class="collapse-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="collapse-body is-collapsed" id="ws-settings-body" style="padding-top:20px;">
+            <div class="form-group" style="margin-bottom:18px;">
+              <label class="form-label" data-i18n="ws.engine.label">KI-Engine für den Assistenten</label>
+              <div class="provider-toggle" style="grid-template-columns:repeat(2,1fr);">
+                <label class="provider-option">
+                  <input type="radio" name="ws-provider" value="openai" id="ws-prov-openai" checked>
+                  <div class="provider-card">
+                    <span class="provider-name">OpenAI</span>
+                    <span class="provider-model">gpt-4o-mini</span>
+                    <span class="provider-desc" data-i18n="prov.openai.desc">Great results — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="ws-provider" value="anthropic" id="ws-prov-claude">
+                  <div class="provider-card">
+                    <span class="provider-name">Claude</span>
+                    <span class="provider-model">haiku-4-5</span>
+                    <span class="provider-desc" data-i18n="prov.anthropic.desc">Best quality — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="ws-provider" value="gemini" id="ws-prov-gemini">
+                  <div class="provider-card">
+                    <span class="provider-name">Gemini</span>
+                    <span class="provider-model">gemini-2.0-flash</span>
+                    <span class="provider-desc" data-i18n="prov.gemini.desc">Google AI — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="ws-provider" value="mistral" id="ws-prov-mistral">
+                  <div class="provider-card">
+                    <span class="provider-name">Mistral</span>
+                    <span class="provider-model">mistral-small-latest</span>
+                    <span class="provider-desc" data-i18n="prov.mistral.desc">European AI — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option" style="grid-column:1/-1">
+                  <input type="radio" name="ws-provider" value="mock" id="ws-prov-mock">
+                  <div class="provider-card">
+                    <span class="provider-name" data-i18n="prov.mock.title">Try it (Offline)</span>
+                    <span class="provider-model">mock</span>
+                    <span class="provider-desc" data-i18n="prov.mock.desc">No account needed — perfect for testing</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" id="ws-key-group">
+              <label class="form-label" for="ws-api-key"><span data-i18n="f.apikey.label">API Key</span> <span class="req">required</span></label>
+              <div class="api-key-wrap">
+                <input type="password" class="form-input" id="ws-api-key" placeholder="sk-…" autocomplete="off">
+                <button type="button" class="api-key-toggle" id="ws-key-toggle" data-i18n="apikey.show">Zeigen</button>
+              </div>
+              <p class="form-hint" data-i18n="f.apikey.hint">Nur in deinem Browser gespeichert. Wird nie an unsere Server gesendet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refined idea (appears after first AI reply) -->
+        <div class="ws-refined-box" id="ws-refined-box">
+          <span class="ws-refined-label" data-i18n="ws.refined.label">✦ Ausgearbeitete Idee</span>
+          <div class="ws-refined-text" id="ws-refined-text"></div>
+        </div>
+
+        <div class="ws-adopt-row" id="ws-adopt-row" style="display:none;">
+          <button class="ws-adopt-btn" id="ws-adopt-btn" onclick="workshopAdopt()" data-i18n="ws.adopt.btn">
+            Idee übernehmen →
+          </button>
+          <span class="ws-adopt-hint" data-i18n="ws.adopt.hint">Übernimmt die Idee ins Buchformular unten.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ═══ CREATE ═══ -->
   <section class="create-section" id="create">
     <div class="create-layout">
@@ -563,7 +932,7 @@
               <label class="form-label" for="illus-density"><span data-i18n="f.density.label">Illustrations</span> <span class="req">required</span></label>
               <select class="form-input" id="illus-density" name="illusDensity">
                 <option value="full" data-i18n-opt="density.full">Every page — Picture book</option>
-                <option value="occasional" selected data-i18n-opt="density.occasional">Occasional — Story support</option>
+                <option value="occasional" selected data-i18n-opt="density.occasional">Occasional — 1 per 5 pages</option>
                 <option value="none" data-i18n-opt="density.none">None — Novel / Pure text</option>
               </select>
             </div>
@@ -583,97 +952,110 @@
 
           <div class="form-section-label reveal" data-i18n="fs.settings">Settings</div>
 
+          <!-- Collapsible: AI Engine -->
           <div class="form-group reveal">
-            <label class="form-label"><span data-i18n="f.provider.label">AI Engine</span></label>
-            <div class="provider-toggle">
-              <label class="provider-option">
-                <input type="radio" name="provider" value="openai" id="prov-openai" checked>
-                <div class="provider-card">
-                  <span class="provider-name">OpenAI</span>
-                  <span class="provider-model">gpt-4o-mini</span>
-                  <span class="provider-desc" data-i18n="prov.openai.desc">Great results — requires an API key</span>
+            <button class="collapse-toggle" id="engine-toggle" aria-expanded="false" onclick="toggleCollapse('engine-body','engine-toggle')">
+              <span data-i18n="f.provider.label">AI Engine</span>
+              <span class="collapse-toggle-hint" id="engine-hint" data-i18n="collapse.show">Show</span>
+              <svg class="collapse-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="collapse-body is-collapsed" id="engine-body" style="padding-top:18px;">
+              <div class="provider-toggle">
+                <label class="provider-option">
+                  <input type="radio" name="provider" value="openai" id="prov-openai" checked>
+                  <div class="provider-card">
+                    <span class="provider-name">OpenAI</span>
+                    <span class="provider-model">gpt-4o-mini</span>
+                    <span class="provider-desc" data-i18n="prov.openai.desc">Great results — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="provider" value="anthropic" id="prov-claude">
+                  <div class="provider-card">
+                    <span class="provider-name">Claude</span>
+                    <span class="provider-model">haiku-4-5</span>
+                    <span class="provider-desc" data-i18n="prov.anthropic.desc">Best quality — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="provider" value="gemini" id="prov-gemini">
+                  <div class="provider-card">
+                    <span class="provider-name">Gemini</span>
+                    <span class="provider-model">gemini-2.0-flash</span>
+                    <span class="provider-desc" data-i18n="prov.gemini.desc">Google AI — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="provider" value="mistral" id="prov-mistral">
+                  <div class="provider-card">
+                    <span class="provider-name">Mistral</span>
+                    <span class="provider-model">mistral-small-latest</span>
+                    <span class="provider-desc" data-i18n="prov.mistral.desc">European AI — requires an API key</span>
+                  </div>
+                </label>
+                <label class="provider-option" style="grid-column:1/-1">
+                  <input type="radio" name="provider" value="mock" id="prov-mock">
+                  <div class="provider-card">
+                    <span class="provider-name" data-i18n="prov.mock.title">Try it (Offline)</span>
+                    <span class="provider-model">mock</span>
+                    <span class="provider-desc" data-i18n="prov.mock.desc">No account needed — perfect for testing</span>
+                  </div>
+                </label>
+              </div>
+              <div class="form-group" id="api-key-group" style="margin-top:18px;">
+                <label class="form-label" for="api-key"><span data-i18n="f.apikey.label">API Key</span> <span class="req">required</span></label>
+                <div class="api-key-wrap">
+                  <input type="password" class="form-input" id="api-key" placeholder="sk-..." autocomplete="off">
+                  <button type="button" class="api-key-toggle" id="api-key-toggle" data-i18n="apikey.show">Show</button>
                 </div>
-              </label>
-              <label class="provider-option">
-                <input type="radio" name="provider" value="anthropic" id="prov-claude">
-                <div class="provider-card">
-                  <span class="provider-name">Claude</span>
-                  <span class="provider-model">haiku-4-5</span>
-                  <span class="provider-desc" data-i18n="prov.anthropic.desc">Best quality — requires an API key</span>
-                </div>
-              </label>
-              <label class="provider-option">
-                <input type="radio" name="provider" value="gemini" id="prov-gemini">
-                <div class="provider-card">
-                  <span class="provider-name">Gemini</span>
-                  <span class="provider-model">gemini-2.0-flash</span>
-                  <span class="provider-desc" data-i18n="prov.gemini.desc">Google AI — requires an API key</span>
-                </div>
-              </label>
-              <label class="provider-option">
-                <input type="radio" name="provider" value="mistral" id="prov-mistral">
-                <div class="provider-card">
-                  <span class="provider-name">Mistral</span>
-                  <span class="provider-model">mistral-small-latest</span>
-                  <span class="provider-desc" data-i18n="prov.mistral.desc">European AI — requires an API key</span>
-                </div>
-              </label>
-              <label class="provider-option" style="grid-column:1/-1">
-                <input type="radio" name="provider" value="mock" id="prov-mock">
-                <div class="provider-card">
-                  <span class="provider-name" data-i18n="prov.mock.title">Try it (Offline)</span>
-                  <span class="provider-model">mock</span>
-                  <span class="provider-desc" data-i18n="prov.mock.desc">No account needed — perfect for testing</span>
-                </div>
-              </label>
+                <p class="form-hint" data-i18n="f.apikey.hint">Stored only in your browser. Never sent to our servers.</p>
+              </div>
             </div>
           </div>
 
-          <div class="form-group reveal" id="api-key-group">
-            <label class="form-label" for="api-key"><span data-i18n="f.apikey.label">API Key</span> <span class="req">required</span></label>
-            <div class="api-key-wrap">
-              <input type="password" class="form-input" id="api-key" placeholder="sk-..." autocomplete="off">
-              <button type="button" class="api-key-toggle" id="api-key-toggle" data-i18n="apikey.show">Show</button>
-            </div>
-            <p class="form-hint" data-i18n="f.apikey.hint">Stored only in your browser. Never sent to our servers.</p>
-          </div>
-
+          <!-- Collapsible: Image AI -->
           <div class="form-group reveal">
-            <label class="form-label"><span data-i18n="f.imgprov.label">Image AI</span></label>
-            <div class="provider-toggle">
-              <label class="provider-option">
-                <input type="radio" name="img-provider" value="dalle" id="imgprov-dalle" checked>
-                <div class="provider-card">
-                  <span class="provider-name">DALL-E 3</span>
-                  <span class="provider-model">OpenAI</span>
-                  <span class="provider-desc" data-i18n="imgprov.dalle.desc">High-quality AI images — requires OpenAI key</span>
+            <button class="collapse-toggle" id="imgai-toggle" aria-expanded="false" onclick="toggleCollapse('imgai-body','imgai-toggle')">
+              <span data-i18n="f.imgprov.label">Image AI</span>
+              <span class="collapse-toggle-hint" id="imgai-hint" data-i18n="collapse.show">Show</span>
+              <svg class="collapse-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="collapse-body is-collapsed" id="imgai-body" style="padding-top:18px;">
+              <div class="provider-toggle">
+                <label class="provider-option">
+                  <input type="radio" name="img-provider" value="dalle" id="imgprov-dalle" checked>
+                  <div class="provider-card">
+                    <span class="provider-name">DALL-E 3</span>
+                    <span class="provider-model">OpenAI</span>
+                    <span class="provider-desc" data-i18n="imgprov.dalle.desc">High-quality AI images — requires OpenAI key</span>
+                  </div>
+                </label>
+                <label class="provider-option">
+                  <input type="radio" name="img-provider" value="sd" id="imgprov-sd">
+                  <div class="provider-card">
+                    <span class="provider-name">Stable Diffusion</span>
+                    <span class="provider-model">Stability AI</span>
+                    <span class="provider-desc" data-i18n="imgprov.sd.desc">Photorealistic images — requires Stability key</span>
+                  </div>
+                </label>
+                <label class="provider-option" style="grid-column:1/-1">
+                  <input type="radio" name="img-provider" value="none" id="imgprov-none">
+                  <div class="provider-card">
+                    <span class="provider-name" data-i18n="imgprov.none.title">None</span>
+                    <span class="provider-model">—</span>
+                    <span class="provider-desc" data-i18n="imgprov.none.desc">No image generation</span>
+                  </div>
+                </label>
+              </div>
+              <div class="form-group" id="img-api-key-group" style="margin-top:18px;">
+                <label class="form-label" for="img-api-key"><span data-i18n="f.imgkey.label">Image API Key</span> <span class="req">required</span></label>
+                <div class="api-key-wrap">
+                  <input type="password" class="form-input" id="img-api-key" placeholder="sk-..." autocomplete="off">
+                  <button type="button" class="api-key-toggle" id="img-api-key-toggle" data-i18n="apikey.show">Show</button>
                 </div>
-              </label>
-              <label class="provider-option">
-                <input type="radio" name="img-provider" value="sd" id="imgprov-sd">
-                <div class="provider-card">
-                  <span class="provider-name">Stable Diffusion</span>
-                  <span class="provider-model">Stability AI</span>
-                  <span class="provider-desc" data-i18n="imgprov.sd.desc">Photorealistic images — requires Stability key</span>
-                </div>
-              </label>
-              <label class="provider-option" style="grid-column:1/-1">
-                <input type="radio" name="img-provider" value="none" id="imgprov-none">
-                <div class="provider-card">
-                  <span class="provider-name" data-i18n="imgprov.none.title">None</span>
-                  <span class="provider-model">—</span>
-                  <span class="provider-desc" data-i18n="imgprov.none.desc">No image generation</span>
-                </div>
-              </label>
+                <p class="form-hint" data-i18n="f.imgkey.hint">Stored only in your browser. Never sent to our servers.</p>
+              </div>
             </div>
-          </div>
-          <div class="form-group reveal" id="img-api-key-group">
-            <label class="form-label" for="img-api-key"><span data-i18n="f.imgkey.label">Image API Key</span> <span class="req">required</span></label>
-            <div class="api-key-wrap">
-              <input type="password" class="form-input" id="img-api-key" placeholder="sk-..." autocomplete="off">
-              <button type="button" class="api-key-toggle" id="img-api-key-toggle" data-i18n="apikey.show">Show</button>
-            </div>
-            <p class="form-hint" data-i18n="f.imgkey.hint">OpenAI key for DALL-E 3. Stored only in your browser.</p>
           </div>
           <div class="form-group reveal">
             <label class="form-label" for="tone"><span data-i18n="f.tone.label">Tone</span> <span class="opt" data-i18n="f.optional">optional</span></label>
@@ -710,6 +1092,19 @@
           <div class="summary-item"><span class="summary-key" data-i18n="s.books">Books</span><span class="summary-val" id="s-books">1</span></div>
           <div class="summary-item"><span class="summary-key" data-i18n="s.pages">Pages each</span><span class="summary-val" id="s-pages">12</span></div>
           <div class="summary-item"><span class="summary-key" data-i18n="s.style">Illustrations</span><span class="summary-val" id="s-style">Digital Art</span></div>
+          <div class="summary-item"><span class="summary-key" data-i18n="s.tone">Tone</span><span class="summary-val" id="s-tone">—</span></div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button onclick="exportSummaryTxt()" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.1em;padding:9px 12px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--accent-dim)';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-i18n="summary.export">Exportieren</span>
+          </button>
+          <button onclick="document.getElementById('summary-import-file').click()" style="flex:1;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.1em;padding:9px 12px;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--accent-dim)';this.style.color='#fff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/><polyline points="17 8 12 3 7 8" style="transform:scaleY(-1);transform-origin:center 7.5px"/></svg>
+            <span data-i18n="summary.import">Importieren</span>
+          </button>
+          <input type="file" id="summary-import-file" accept=".txt" style="display:none" onchange="importSummaryTxt(this)">
         </div>
 
         <!-- ── WORKFLOW PANEL ─────────────────────────────────────── -->
@@ -737,6 +1132,7 @@
           <div id="wf-1" class="wf-content" style="display:none">
             <p class="wf-title" data-i18n="wf.gen.title">Creating your books…</p>
             <div id="wf-gen-progress"></div>
+            <div style="margin-top:14px;"><button id="wf-cancel-gen-btn" class="bc-btn discard" style="display:none" onclick="cancelGen()" data-i18n="btn.cancel">✕ Abbrechen</button></div>
           </div>
 
           <!-- Step 2: Review books -->
@@ -744,6 +1140,9 @@
             <p class="wf-title" data-i18n="wf.rev.title">Review your books</p>
             <p class="wf-subtitle" data-i18n="wf.rev.sub">Keep, rewrite, or remove each book.</p>
             <div id="wf-book-cards"></div>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+              <button class="bc-btn approve" style="flex:none;padding:8px 16px;" onclick="keepAllBooks()" data-i18n="wf.rev.keepall">✓ Alle behalten</button>
+            </div>
             <button id="wf-to-covers-btn" class="submit-btn wf-continue-btn" style="opacity:0.4;pointer-events:none" onclick="goToCovers()" data-i18n="wf.rev.continue">Continue to Covers &nbsp;→</button>
           </div>
 
@@ -752,11 +1151,15 @@
             <div id="wf-cover-gen-phase">
               <p class="wf-title" data-i18n="wf.cov.gen.title">Generating covers…</p>
               <div id="wf-cover-progress"></div>
+              <div style="margin-top:14px;"><button id="wf-cancel-cov-btn" class="bc-btn discard" style="display:none" onclick="cancelGen()" data-i18n="btn.cancel">✕ Abbrechen</button></div>
             </div>
             <div id="wf-cover-review-phase" style="display:none">
               <p class="wf-title" data-i18n="wf.cov.rev.title">Review your covers</p>
               <p class="wf-subtitle" data-i18n="wf.cov.rev.sub">Keep, regenerate, or remove each cover.</p>
               <div id="wf-cover-cards"></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+                <button class="bc-btn approve" style="flex:none;padding:8px 16px;" onclick="keepAllCovers()" data-i18n="wf.cov.keepall">✓ Alle behalten</button>
+              </div>
               <button id="wf-to-text-btn" class="submit-btn wf-continue-btn" onclick="goToTextReview()" data-i18n="wf.cov.continue">Continue &nbsp;→</button>
             </div>
           </div>
@@ -766,7 +1169,10 @@
             <p class="wf-title" data-i18n="wf.txt.title">Read your books</p>
             <p class="wf-subtitle" data-i18n="wf.txt.sub">Read the full text of each book and accept or reject it.</p>
             <div id="wf-text-cards"></div>
-            <button id="wf-to-illus-btn" class="submit-btn wf-continue-btn" onclick="goToIllustrations()" data-i18n="wf.txt.continue">Continue to Illustrations &nbsp;→</button>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+              <button class="bc-btn approve" style="flex:none;padding:8px 16px;" onclick="acceptAllTexts()" data-i18n="wf.txt.keepall">✓ Alle annehmen</button>
+            </div>
+            <button id="wf-to-illus-btn" class="submit-btn wf-continue-btn" style="opacity:0.4;pointer-events:none" onclick="goToIllustrations()" data-i18n="wf.txt.continue">Continue to Illustrations &nbsp;→</button>
           </div>
 
           <!-- Step 5: Page illustration generation + review (inline) / or skip message -->
@@ -774,11 +1180,15 @@
             <div id="wf-illus-gen-phase">
               <p class="wf-title" data-i18n="wf.img.title">Generating illustrations…</p>
               <div id="wf-img-progress"></div>
+              <div style="margin-top:14px;"><button id="wf-cancel-illus-btn" class="bc-btn discard" style="display:none" onclick="cancelGen()" data-i18n="btn.cancel">✕ Abbrechen</button></div>
             </div>
             <div id="wf-illus-review-phase" style="display:none">
               <p class="wf-title" data-i18n="wf.revi.title">Review your illustrations</p>
               <p class="wf-subtitle" data-i18n="wf.revi.sub">Keep, regenerate, or skip each image.</p>
               <div id="wf-img-cards"></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+                <button class="bc-btn approve" style="flex:none;padding:8px 16px;" onclick="approveAllIllus()" data-i18n="wf.revi.keepall">✓ Alle behalten</button>
+              </div>
               <button id="wf-to-dl-btn" class="submit-btn wf-continue-btn" onclick="goToDownloadStep()" data-i18n="wf.revi.continue">Continue to Download &nbsp;→</button>
             </div>
             <div id="wf-illus-none-phase" style="display:none">
@@ -954,6 +1364,14 @@
         'f3.title':'You decide\nwhat gets published.','f3.body':'At key moments, you review the result and say go ahead — or not. Your vision always has the final word.',
         'create.tag':'Create your book','create.title':'Tell us your story.','create.subtitle':'Fill in a few details and we\'ll generate a ready-to-run setup for you — no technical knowledge needed.',
         'fs.story':'Your Story','fs.series':'The Series','fs.settings':'Settings',
+        'collapse.show':'Show','collapse.hide':'Hide',
+        'summary.export':'Export .txt','summary.import':'Import .txt',
+        'ws.tag':'Develop Idea','ws.title':'Your idea — refined.','ws.subtitle':'Write your raw thoughts or keywords to the assistant. It asks counter-questions and helps you develop a clear book idea. When satisfied, adopt it with one click.',
+        'ws.chat.title':'Idea Assistant','ws.chat.subtitle':'Powered by GPT-4o-mini','ws.msg.name':'Assistant',
+        'ws.greeting':'Hello! I\'ll help you develop and refine your book idea. 📚<br><br>Just write your first thoughts — a theme, a character, a situation, or just a few keywords. I\'ll ask questions until we have a strong idea together.',
+        'ws.input.placeholder':'Your idea or keywords…','ws.input.hint':'Enter to send · Shift+Enter for line break',
+        'ws.settings.label':'AI Engine Settings','ws.engine.label':'AI Engine for the Assistant',
+        'ws.refined.label':'✦ Refined Idea','ws.adopt.btn':'Adopt Idea →','ws.adopt.hint':'Copies the idea into the book form below.',
         'f.idea.label':'Your idea','f.idea.placeholder':'A retired sailor who finds a message in a bottle that takes him on one last great adventure…','f.idea.hint':'Describe your story, topic, or the message you\'d like the book to carry. Any genre, any age.',
         'f.genre.label':'Genre','f.age.label':'Audience age','f.books.label':'Number of books',
         'f.pages.label':'Pages per book','f.style.label':'Illustration style','f.title.label':'Series name','f.title.placeholder':'Leave blank — we\'ll come up with one for you',
@@ -965,29 +1383,33 @@
         'prov.anthropic.desc':'Best quality — requires an API key','prov.openai.desc':'Great results — requires an API key','prov.gemini.desc':'Google AI — requires an API key','prov.mistral.desc':'European AI — requires an API key',
         'prov.mock.title':'Try it (Offline)','prov.mock.desc':'No account needed — perfect for testing',
         'f.imgprov.label':'Image AI','imgprov.dalle.desc':'High-quality AI images — requires OpenAI key','imgprov.sd.desc':'Photorealistic images — requires Stability key','imgprov.none.title':'None','imgprov.none.desc':'No image generation',
-        'f.imgkey.label':'Image API Key','f.imgkey.hint':'OpenAI key for DALL-E 3. Stored only in your browser.',
+        'f.imgkey.label':'Image API Key','f.imgkey.hint':'Stored only in your browser. Never sent to our servers.',
         'tone.auto':'Let the AI decide','tone.warm':'Warm & heartfelt','tone.funny':'Funny & playful','tone.epic':'Epic & dramatic','tone.calm':'Calm & reflective','tone.educational':'Clear & educational',
         'genre.auto':'Let the AI decide','genre.adventure':'Adventure','genre.romance':'Romance','genre.mystery':'Mystery','genre.fantasy':'Fantasy','genre.educational':'Educational','genre.biography':'Biography / True Story','genre.children':'Children\'s Story','genre.other':'Other',
         'age.auto':'Let the AI decide','age.kids':'Kids (4 – 8)','age.young':'Young Readers (9 – 13)','age.teens':'Teens (14 – 17)','age.adults':'Adults (18+)','age.all':'All Ages',
         'pages.8':'8 pages','pages.12':'12 pages','pages.20':'20 pages','pages.32':'32 pages','pages.50':'50 pages',
         'style.auto':'Let the AI decide','style.none':'No illustrations','style.watercolor':'Watercolor','style.digital':'Digital Art','style.cartoon':'Cartoon','style.realistic':'Realistic','style.pencil':'Pencil Sketch',
-        'f.density.label':'Illustrations','density.full':'Every page — Picture book','density.occasional':'Occasional — Story support','density.none':'None — Novel / Pure text',
+        'f.density.label':'Illustrations','density.full':'Every page — Picture book','density.occasional':'Occasional — 1 per 5 pages','density.none':'None — Novel / Pure text',
         'f.submit':'Generate My Books →','f.submit.note':'Your books will be created step by step — you review and decide at each stage.',
         'out.label':'Your setup','out.title':'Your book\nat a glance.','out.desc':'Fill in the form and click Generate to start.',
-        's.idea':'Idea','s.genre':'Genre','s.age':'Audience','s.books':'Books','s.pages':'Pages each','s.style':'Illustrations',
+        's.idea':'Idea','s.genre':'Genre','s.age':'Audience','s.books':'Books','s.pages':'Pages each','s.style':'Illustrations','s.tone':'Tone',
         'wf.hint':'Fill in the form on the left, then click <strong>Generate My Books</strong> to start.',
         'wf.book':'BOOK','wf.rewriting':'Rewriting…','wf.qa.running':'Checking quality…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incomplete','wf.qa.error':'Error','error.api':'API error','error.no.books':'No approved books available.','wf.story.illus':'Story illustration','btn.skip':'✕ Skip',
+        'wf.char.title':'Characters','wf.char.none':'No character descriptions available.',
         'wf.nav.gen':'Generate','wf.nav.review':'Review','wf.nav.covers':'Covers','wf.nav.text':'Text','wf.nav.illus':'Illustrations','wf.nav.dl':'Download',
         'wf.gen.title':'Creating your books…',
-        'wf.rev.title':'Review your books','wf.rev.sub':'Keep, rewrite, or remove each book.','wf.rev.continue':'Continue to Covers →',
-        'wf.cov.gen.title':'Generating covers…','wf.cov.rev.title':'Review your covers','wf.cov.rev.sub':'Keep, regenerate, or remove each cover.','wf.cov.continue':'Continue →',
-        'wf.txt.title':'Read your books','wf.txt.sub':'Read the full text and accept or reject each book.','wf.txt.continue':'Continue to Illustrations →',
+        'wf.rev.title':'Review your books','wf.rev.sub':'Keep, rewrite, or remove each book.','wf.rev.continue':'Continue to Covers →','wf.rev.keepall':'✓ Keep all',
+        'wf.cov.gen.title':'Generating covers…','wf.cov.rev.title':'Review your covers','wf.cov.rev.sub':'Keep, regenerate, or remove each cover.','wf.cov.continue':'Continue →','wf.cov.keepall':'✓ Keep all',
+        'wf.txt.title':'Read your books','wf.txt.sub':'Read the full text and accept or reject each book.','wf.txt.continue':'Continue to Illustrations →','wf.txt.keepall':'✓ Accept all',
         'wf.page':'Page',
         'wf.img.title':'Generating illustrations…',
-        'wf.revi.title':'Review your illustrations','wf.revi.sub':'Keep, regenerate, or skip each image.','wf.revi.continue':'Continue to Download →',
+        'wf.revi.title':'Review your illustrations','wf.revi.sub':'Keep, regenerate, or skip each image.','wf.revi.continue':'Continue to Download →','wf.revi.keepall':'✓ Keep all',
         'wf.illus.none.title':'No page illustrations','wf.illus.none.sub':'You selected a pure text book — no page illustrations will be generated.',
         'wf.dl.title':'Your books are ready!','wf.dl.sub':'Download in your preferred format.','wf.dl.pdf':'Download PDF','wf.dl.doc':'Download Word','wf.dl.md':'Download Markdown','wf.dl.restart':'← Start over','wf.dl.win.title':'My Books',
         'btn.keep':'✓ Keep','btn.rewrite':'↻ Rewrite','btn.redo':'↻ Redo','btn.remove':'✕ Remove','btn.accept':'✓ Accept','btn.reject':'✕ Reject',
+        'btn.rewrite.hint':'Optional instruction… (e.g. change the protagonist\'s name)','btn.rewrite.go':'Rewrite →',
+        'btn.cover.regen.hint':'Optional hint for the new image… (e.g. warmer colors, forest background)','btn.cover.regen.go':'Regenerate →',
+        'btn.cancel':'✕ Cancel','btn.illus.regen.hint':'Optional instruction for new illustration… (e.g. more dramatic lighting)','btn.illus.regen.go':'Regenerate →',
         'how.tag':'How it works','how.title':'From idea to finished book.','how.subtitle':'A smart, step-by-step process with two moments where you stay in control.',
         'hw.s1.name':'You share your idea','hw.s1.desc':'A few words or a detailed description — whatever you have.',
         'hw.s2.name':'AI builds the plan','hw.s2.desc':'Titles, characters, plot arcs — the full blueprint for your series.',
@@ -1023,6 +1445,14 @@
         'f3.title':'Du entscheidest,\nwas veröffentlicht wird.','f3.body':'An wichtigen Momenten überprüfst du das Ergebnis und sagst, ob es weitergehen soll. Deine Vision hat immer das letzte Wort.',
         'create.tag':'Dein Buch erstellen','create.title':'Erzähl uns deine Geschichte.','create.subtitle':'Füll ein paar Details aus und wir erstellen eine fertige Konfiguration für dich — kein technisches Wissen nötig.',
         'fs.story':'Deine Geschichte','fs.series':'Die Reihe','fs.settings':'Einstellungen',
+        'collapse.show':'Anzeigen','collapse.hide':'Ausblenden',
+        'summary.export':'Exportieren','summary.import':'Importieren',
+        'ws.tag':'Idee entwickeln','ws.title':'Deine Idee — verfeinert.','ws.subtitle':'Schreib dem Assistenten deine rohen Gedanken oder Stichworte. Er stellt Gegenfragen und hilft dir, eine klare Buchidee zu entwickeln. Wenn du zufrieden bist, übernimm die Idee mit einem Klick.',
+        'ws.chat.title':'Ideen-Assistent','ws.chat.subtitle':'Powered by GPT-4o-mini','ws.msg.name':'Assistent',
+        'ws.greeting':'Hallo! Ich helfe dir, deine Buchidee zu entwickeln und zu verfeinern. 📚<br><br>Schreib mir einfach deine ersten Gedanken — ein Thema, ein Charakter, eine Situation, oder nur ein paar Stichworte. Ich stelle Fragen, bis wir gemeinsam eine starke Idee haben.',
+        'ws.input.placeholder':'Deine Idee oder Stichworte…','ws.input.hint':'Enter zum Senden · Shift+Enter für Zeilenumbruch',
+        'ws.settings.label':'KI-Engine Einstellungen','ws.engine.label':'KI-Engine für den Assistenten',
+        'ws.refined.label':'✦ Ausgearbeitete Idee','ws.adopt.btn':'Idee übernehmen →','ws.adopt.hint':'Übernimmt die Idee ins Buchformular unten.',
         'f.idea.label':'Deine Idee','f.idea.placeholder':'Ein pensionierter Seemann, der eine Flaschenpost findet, die ihn auf sein letztes großes Abenteuer führt…','f.idea.hint':'Beschreibe deine Geschichte, dein Thema oder die Botschaft, die das Buch vermitteln soll. Jedes Genre, jedes Alter.',
         'f.genre.label':'Genre','f.age.label':'Zielgruppe','f.books.label':'Anzahl Bücher',
         'f.pages.label':'Seiten pro Buch','f.style.label':'Illustrationsstil','f.title.label':'Reihenname','f.title.placeholder':'Freilassen — wir denken uns einen aus',
@@ -1034,29 +1464,33 @@
         'prov.anthropic.desc':'Beste Qualität — API-Schlüssel erforderlich','prov.openai.desc':'Tolle Ergebnisse — API-Schlüssel erforderlich','prov.gemini.desc':'Google KI — API-Schlüssel erforderlich','prov.mistral.desc':'Europäische KI — API-Schlüssel erforderlich',
         'prov.mock.title':'Ausprobieren (Offline)','prov.mock.desc':'Kein Konto nötig — perfekt zum Testen',
         'f.imgprov.label':'Bild-KI','imgprov.dalle.desc':'Hochwertige KI-Bilder — OpenAI-Schlüssel erforderlich','imgprov.sd.desc':'Fotorealistische Bilder — Stability-Schlüssel erforderlich','imgprov.none.title':'Keine','imgprov.none.desc':'Ohne Bildgenerierung',
-        'f.imgkey.label':'Bild-API-Schlüssel','f.imgkey.hint':'OpenAI-Schlüssel für DALL-E 3. Nur in deinem Browser gespeichert.',
+        'f.imgkey.label':'Bild-API-Schlüssel','f.imgkey.hint':'Nur in deinem Browser gespeichert. Wird nie an unsere Server gesendet.',
         'tone.auto':'KI entscheiden lassen','tone.warm':'Warm & herzlich','tone.funny':'Lustig & verspielt','tone.epic':'Episch & dramatisch','tone.calm':'Ruhig & nachdenklich','tone.educational':'Klar & lehrreich',
         'genre.auto':'KI entscheiden lassen','genre.adventure':'Abenteuer','genre.romance':'Romantik','genre.mystery':'Krimi','genre.fantasy':'Fantasy','genre.educational':'Sachbuch','genre.biography':'Biografie / Wahre Geschichte','genre.children':'Kinderbuch','genre.other':'Sonstiges',
         'age.auto':'KI entscheiden lassen','age.kids':'Kinder (4 – 8)','age.young':'Junge Leser (9 – 13)','age.teens':'Teenager (14 – 17)','age.adults':'Erwachsene (18+)','age.all':'Alle Altersgruppen',
         'pages.8':'8 Seiten','pages.12':'12 Seiten','pages.20':'20 Seiten','pages.32':'32 Seiten','pages.50':'50 Seiten',
         'style.auto':'KI entscheiden lassen','style.none':'Keine Illustrationen','style.watercolor':'Aquarell','style.digital':'Digitale Kunst','style.cartoon':'Cartoon','style.realistic':'Realistisch','style.pencil':'Bleistiftskizze',
-        'f.density.label':'Illustrationen','density.full':'Jede Seite — Bilderbuch','density.occasional':'Gelegentlich — zur Unterstützung','density.none':'Keine — Roman / Reiner Text',
+        'f.density.label':'Illustrationen','density.full':'Jede Seite — Bilderbuch','density.occasional':'Gelegentlich — 1 pro 5 Seiten','density.none':'Keine — Roman / Reiner Text',
         'f.submit':'Bücher generieren →','f.submit.note':'Deine Bücher werden Schritt für Schritt erstellt — du prüfst und entscheidest.',
         'out.label':'Deine Konfiguration','out.title':'Dein Buch\nauf einen Blick.','out.desc':'Füll das Formular aus und klicke Generieren.',
-        's.idea':'Idee','s.genre':'Genre','s.age':'Zielgruppe','s.books':'Bücher','s.pages':'Seiten','s.style':'Illustrationen',
+        's.idea':'Idee','s.genre':'Genre','s.age':'Zielgruppe','s.books':'Bücher','s.pages':'Seiten','s.style':'Illustrationen','s.tone':'Tonalität',
         'wf.hint':'Füll das Formular aus, dann klicke <strong>Bücher generieren</strong>.',
         'wf.book':'BUCH','wf.rewriting':'Wird neu geschrieben…','wf.qa.running':'Qualität wird geprüft…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Unvollständig','wf.qa.error':'Fehler','error.api':'API-Fehler','error.no.books':'Keine freigegebenen Bücher vorhanden.','wf.story.illus':'Illustration','btn.skip':'✕ Überspringen',
+        'wf.char.title':'Figuren','wf.char.none':'Keine Figurenbeschreibungen vorhanden.',
         'wf.nav.gen':'Generieren','wf.nav.review':'Prüfen','wf.nav.covers':'Cover','wf.nav.text':'Text','wf.nav.illus':'Illustrationen','wf.nav.dl':'Download',
         'wf.gen.title':'Bücher werden erstellt…',
-        'wf.rev.title':'Bücher prüfen','wf.rev.sub':'Behalten, neu schreiben oder entfernen.','wf.rev.continue':'Weiter zu Covern →',
-        'wf.cov.gen.title':'Cover werden generiert…','wf.cov.rev.title':'Cover prüfen','wf.cov.rev.sub':'Behalten, neu generieren oder entfernen.','wf.cov.continue':'Weiter →',
-        'wf.txt.title':'Texte lesen','wf.txt.sub':'Lies den vollständigen Text und entscheide für jedes Buch.','wf.txt.continue':'Weiter zu Illustrationen →',
+        'wf.rev.title':'Bücher prüfen','wf.rev.sub':'Behalten, neu schreiben oder entfernen.','wf.rev.continue':'Weiter zu Covern →','wf.rev.keepall':'✓ Alle behalten',
+        'wf.cov.gen.title':'Cover werden generiert…','wf.cov.rev.title':'Cover prüfen','wf.cov.rev.sub':'Behalten, neu generieren oder entfernen.','wf.cov.continue':'Weiter →','wf.cov.keepall':'✓ Alle behalten',
+        'wf.txt.title':'Texte lesen','wf.txt.sub':'Lies den vollständigen Text und entscheide für jedes Buch.','wf.txt.continue':'Weiter zu Illustrationen →','wf.txt.keepall':'✓ Alle annehmen',
         'wf.page':'Seite',
         'wf.img.title':'Illustrationen werden generiert…',
-        'wf.revi.title':'Illustrationen prüfen','wf.revi.sub':'Behalten, neu generieren oder überspringen.','wf.revi.continue':'Weiter zum Download →',
+        'wf.revi.title':'Illustrationen prüfen','wf.revi.sub':'Behalten, neu generieren oder überspringen.','wf.revi.continue':'Weiter zum Download →','wf.revi.keepall':'✓ Alle behalten',
         'wf.illus.none.title':'Keine Seitenillustrationen','wf.illus.none.sub':'Du hast ein reines Textbuch gewählt — es werden keine Seitenillustrationen erstellt.',
         'wf.dl.title':'Deine Bücher sind fertig!','wf.dl.sub':'Wähle dein bevorzugtes Format.','wf.dl.pdf':'PDF herunterladen','wf.dl.doc':'Word herunterladen','wf.dl.md':'Markdown herunterladen','wf.dl.restart':'← Neu starten','wf.dl.win.title':'Meine Bücher',
         'btn.keep':'✓ Behalten','btn.rewrite':'↻ Neu schreiben','btn.redo':'↻ Neu','btn.remove':'✕ Entfernen','btn.accept':'✓ Annehmen','btn.reject':'✕ Ablehnen',
+        'btn.rewrite.hint':'Optionale Anweisung… (z. B. ändere den Namen des Protagonisten)','btn.rewrite.go':'Neu schreiben →',
+        'btn.cover.regen.hint':'Optionaler Hinweis für das neue Bild… (z. B. wärmere Farben, Waldmotiv)','btn.cover.regen.go':'Neu generieren →',
+        'btn.cancel':'✕ Abbrechen','btn.illus.regen.hint':'Optionale Anweisung für neue Illustration… (z. B. dramatischeres Licht)','btn.illus.regen.go':'Neu generieren →',
         'how.tag':'So funktioniert\'s','how.title':'Von der Idee zum fertigen Buch.','how.subtitle':'Ein intelligenter, schrittweiser Prozess — du behältst immer die Kontrolle.',
         'hw.s1.name':'Du teilst deine Idee','hw.s1.desc':'Ein paar Worte oder eine detaillierte Beschreibung — was auch immer du hast.',
         'hw.s2.name':'KI erstellt den Plan','hw.s2.desc':'Titel, Charaktere, Handlungsbögen — der komplette Entwurf für deine Reihe.',
@@ -1092,6 +1526,14 @@
         'f3.title':'Vous décidez\nce qui est publié.','f3.body':'À des moments clés, vous examinez le résultat et décidez de la suite. Votre vision a toujours le dernier mot.',
         'create.tag':'Créer votre livre','create.title':'Parlez-nous de votre histoire.','create.subtitle':'Remplissez quelques détails et nous générerons une configuration prête à l\'emploi — aucune connaissance technique requise.',
         'fs.story':'Votre Histoire','fs.series':'La Série','fs.settings':'Paramètres',
+        'collapse.show':'Afficher','collapse.hide':'Masquer',
+        'summary.export':'Exporter .txt','summary.import':'Importer .txt',
+        'ws.tag':'Développer une idée','ws.title':'Votre idée — affinée.','ws.subtitle':'Écrivez vos pensées brutes ou mots-clés à l\'assistant. Il pose des questions et vous aide à développer une idée de livre claire. Quand vous êtes satisfait, adoptez-la en un clic.',
+        'ws.chat.title':'Assistant d\'idées','ws.chat.subtitle':'Propulsé par GPT-4o-mini','ws.msg.name':'Assistant',
+        'ws.greeting':'Bonjour ! Je vais vous aider à développer et affiner votre idée de livre. 📚<br><br>Écrivez simplement vos premières pensées — un thème, un personnage, une situation, ou juste quelques mots-clés. Je poserai des questions jusqu\'à ce que nous ayons une idée solide ensemble.',
+        'ws.input.placeholder':'Votre idée ou mots-clés…','ws.input.hint':'Entrée pour envoyer · Maj+Entrée pour saut de ligne',
+        'ws.settings.label':'Paramètres du moteur IA','ws.engine.label':'Moteur IA pour l\'assistant',
+        'ws.refined.label':'✦ Idée affinée','ws.adopt.btn':'Adopter l\'idée →','ws.adopt.hint':'Copie l\'idée dans le formulaire de livre ci-dessous.',
         'f.idea.label':'Votre idée','f.idea.placeholder':'Un marin retraité qui trouve un message dans une bouteille et se lance dans une dernière grande aventure…','f.idea.hint':'Décrivez votre histoire, votre sujet ou le message que vous souhaitez transmettre. Tout genre, tout âge.',
         'f.genre.label':'Genre','f.age.label':'Public cible','f.books.label':'Nombre de livres',
         'f.pages.label':'Pages par livre','f.style.label':'Style d\'illustration','f.title.label':'Nom de la série','f.title.placeholder':'Laissez vide — nous trouverons un nom',
@@ -1103,29 +1545,33 @@
         'prov.anthropic.desc':'Meilleure qualité — clé API requise','prov.openai.desc':'Excellents résultats — clé API requise','prov.gemini.desc':'IA Google — clé API requise','prov.mistral.desc':'IA européenne — clé API requise',
         'prov.mock.title':'Essayer (Hors ligne)','prov.mock.desc':'Aucun compte nécessaire — idéal pour tester',
         'f.imgprov.label':'IA Image','imgprov.dalle.desc':'Images IA haute qualité — clé OpenAI requise','imgprov.sd.desc':'Images photoréalistes — clé Stability requise','imgprov.none.title':'Aucune','imgprov.none.desc':'Sans génération d\'images',
-        'f.imgkey.label':'Clé API Image','f.imgkey.hint':'Clé OpenAI pour DALL-E 3. Stockée uniquement dans votre navigateur.',
+        'f.imgkey.label':'Clé API Image','f.imgkey.hint':'Stockée uniquement dans votre navigateur. Jamais envoyée à nos serveurs.',
         'tone.auto':'Laisser l\'IA décider','tone.warm':'Chaleureux & sincère','tone.funny':'Drôle & enjoué','tone.epic':'Épique & dramatique','tone.calm':'Calme & contemplatif','tone.educational':'Clair & éducatif',
         'genre.auto':'Laisser l\'IA décider','genre.adventure':'Aventure','genre.romance':'Romance','genre.mystery':'Mystère','genre.fantasy':'Fantasy','genre.educational':'Éducatif','genre.biography':'Biographie / Histoire vraie','genre.children':'Livre pour enfants','genre.other':'Autre',
         'age.auto':'Laisser l\'IA décider','age.kids':'Enfants (4 – 8)','age.young':'Jeunes lecteurs (9 – 13)','age.teens':'Ados (14 – 17)','age.adults':'Adultes (18+)','age.all':'Tous âges',
         'pages.8':'8 pages','pages.12':'12 pages','pages.20':'20 pages','pages.32':'32 pages','pages.50':'50 pages',
         'style.auto':'Laisser l\'IA décider','style.none':'Sans illustrations','style.watercolor':'Aquarelle','style.digital':'Art numérique','style.cartoon':'Dessin animé','style.realistic':'Réaliste','style.pencil':'Croquis au crayon',
-        'f.density.label':'Illustrations','density.full':'Chaque page — Livre illustré','density.occasional':'Occasionnelles — Support narratif','density.none':'Aucune — Roman / Texte pur',
+        'f.density.label':'Illustrations','density.full':'Chaque page — Livre illustré','density.occasional':'Occasionnelles — 1 toutes les 5 pages','density.none':'Aucune — Roman / Texte pur',
         'f.submit':'Générer mes livres →','f.submit.note':'Vos livres seront créés étape par étape — vous vérifiez et décidez à chaque étape.',
         'out.label':'Votre configuration','out.title':'Votre livre\nen un coup d\'œil.','out.desc':'Remplissez le formulaire et cliquez sur Générer.',
-        's.idea':'Idée','s.genre':'Genre','s.age':'Public','s.books':'Livres','s.pages':'Pages','s.style':'Illustrations',
+        's.idea':'Idée','s.genre':'Genre','s.age':'Public','s.books':'Livres','s.pages':'Pages','s.style':'Illustrations','s.tone':'Tonalité',
         'wf.hint':'Remplissez le formulaire, puis cliquez sur <strong>Générer mes livres</strong>.',
         'wf.book':'LIVRE','wf.rewriting':'Réécriture…','wf.qa.running':'Vérification qualité…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incomplet','wf.qa.error':'Erreur','error.api':'Erreur API','error.no.books':'Aucun livre approuvé disponible.','wf.story.illus':'Illustration narrative','btn.skip':'✕ Ignorer',
+        'wf.char.title':'Personnages','wf.char.none':'Aucune description de personnage disponible.',
         'wf.nav.gen':'Générer','wf.nav.review':'Vérifier','wf.nav.covers':'Couvertures','wf.nav.text':'Texte','wf.nav.illus':'Illustrations','wf.nav.dl':'Télécharger',
         'wf.gen.title':'Création de vos livres…',
-        'wf.rev.title':'Vérifiez vos livres','wf.rev.sub':'Gardez, réécrivez ou supprimez chaque livre.','wf.rev.continue':'Continuer vers les couvertures →',
-        'wf.cov.gen.title':'Génération des couvertures…','wf.cov.rev.title':'Vérifiez vos couvertures','wf.cov.rev.sub':'Gardez, régénérez ou supprimez chaque couverture.','wf.cov.continue':'Continuer →',
-        'wf.txt.title':'Lire vos livres','wf.txt.sub':'Lisez le texte complet et acceptez ou rejetez chaque livre.','wf.txt.continue':'Continuer vers les illustrations →',
+        'wf.rev.title':'Vérifiez vos livres','wf.rev.sub':'Gardez, réécrivez ou supprimez chaque livre.','wf.rev.continue':'Continuer vers les couvertures →','wf.rev.keepall':'✓ Tout garder',
+        'wf.cov.gen.title':'Génération des couvertures…','wf.cov.rev.title':'Vérifiez vos couvertures','wf.cov.rev.sub':'Gardez, régénérez ou supprimez chaque couverture.','wf.cov.continue':'Continuer →','wf.cov.keepall':'✓ Tout garder',
+        'wf.txt.title':'Lire vos livres','wf.txt.sub':'Lisez le texte complet et acceptez ou rejetez chaque livre.','wf.txt.continue':'Continuer vers les illustrations →','wf.txt.keepall':'✓ Tout accepter',
         'wf.page':'Page',
         'wf.img.title':'Génération des illustrations…',
-        'wf.revi.title':'Vérifiez vos illustrations','wf.revi.sub':'Gardez, régénérez ou ignorez chaque image.','wf.revi.continue':'Continuer vers le téléchargement →',
+        'wf.revi.title':'Vérifiez vos illustrations','wf.revi.sub':'Gardez, régénérez ou ignorez chaque image.','wf.revi.continue':'Continuer vers le téléchargement →','wf.revi.keepall':'✓ Tout garder',
         'wf.illus.none.title':'Aucune illustration de page','wf.illus.none.sub':'Vous avez sélectionné un livre sans illustrations — aucune image ne sera générée.',
         'wf.dl.title':'Vos livres sont prêts !','wf.dl.sub':'Choisissez votre format préféré.','wf.dl.pdf':'Télécharger PDF','wf.dl.doc':'Télécharger Word','wf.dl.md':'Télécharger Markdown','wf.dl.restart':'← Recommencer','wf.dl.win.title':'Mes livres',
         'btn.keep':'✓ Garder','btn.rewrite':'↻ Réécrire','btn.redo':'↻ Refaire','btn.remove':'✕ Supprimer','btn.accept':'✓ Accepter','btn.reject':'✕ Rejeter',
+        'btn.rewrite.hint':'Instruction optionnelle… (ex. changer le nom du protagoniste)','btn.rewrite.go':'Réécrire →',
+        'btn.cover.regen.hint':'Indication optionnelle pour la nouvelle image… (ex. tons chauds, forêt)','btn.cover.regen.go':'Régénérer →',
+        'btn.cancel':'✕ Annuler','btn.illus.regen.hint':'Instruction optionnelle pour la nouvelle illustration… (ex. éclairage dramatique)','btn.illus.regen.go':'Régénérer →',
         'how.tag':'Comment ça marche','how.title':'De l\'idée au livre fini.','how.subtitle':'Un processus intelligent, étape par étape, avec deux moments où vous gardez le contrôle.',
         'hw.s1.name':'Vous partagez votre idée','hw.s1.desc':'Quelques mots ou une description détaillée — ce que vous avez.',
         'hw.s2.name':'L\'IA construit le plan','hw.s2.desc':'Titres, personnages, arcs narratifs — le plan complet de votre série.',
@@ -1161,6 +1607,14 @@
         'f3.title':'Sei tu a decidere\ncosa viene pubblicato.','f3.body':'In momenti chiave, esamini il risultato e decidi se andare avanti. La tua visione ha sempre l\'ultima parola.',
         'create.tag':'Crea il tuo libro','create.title':'Raccontaci la tua storia.','create.subtitle':'Compila alcuni dettagli e genereremo una configurazione pronta all\'uso — nessuna conoscenza tecnica richiesta.',
         'fs.story':'La Tua Storia','fs.series':'La Serie','fs.settings':'Impostazioni',
+        'collapse.show':'Mostra','collapse.hide':'Nascondi',
+        'summary.export':'Esporta .txt','summary.import':'Importa .txt',
+        'ws.tag':'Sviluppa un\'idea','ws.title':'La tua idea — raffinata.','ws.subtitle':'Scrivi all\'assistente i tuoi pensieri grezzi o parole chiave. Pone domande e ti aiuta a sviluppare un\'idea di libro chiara. Quando sei soddisfatto, adottala con un clic.',
+        'ws.chat.title':'Assistente idee','ws.chat.subtitle':'Powered by GPT-4o-mini','ws.msg.name':'Assistente',
+        'ws.greeting':'Ciao! Ti aiuterò a sviluppare e affinare la tua idea di libro. 📚<br><br>Scrivi semplicemente i tuoi primi pensieri — un tema, un personaggio, una situazione, o solo qualche parola chiave. Farò domande finché non avremo un\'idea solida insieme.',
+        'ws.input.placeholder':'La tua idea o parole chiave…','ws.input.hint':'Invio per inviare · Shift+Invio per a capo',
+        'ws.settings.label':'Impostazioni motore IA','ws.engine.label':'Motore IA per l\'assistente',
+        'ws.refined.label':'✦ Idea affinata','ws.adopt.btn':'Adotta l\'idea →','ws.adopt.hint':'Copia l\'idea nel modulo libro qui sotto.',
         'f.idea.label':'La tua idea','f.idea.placeholder':'Un marinaio in pensione che trova un messaggio in una bottiglia che lo porta in un\'ultima grande avventura…','f.idea.hint':'Descrivi la tua storia, l\'argomento o il messaggio che vuoi trasmettere. Qualsiasi genere, qualsiasi età.',
         'f.genre.label':'Genere','f.age.label':'Pubblico target','f.books.label':'Numero di libri',
         'f.pages.label':'Pagine per libro','f.style.label':'Stile illustrazioni','f.title.label':'Nome della serie','f.title.placeholder':'Lascia vuoto — ne troveremo uno noi',
@@ -1172,29 +1626,33 @@
         'prov.anthropic.desc':'Migliore qualità — richiede una chiave API','prov.openai.desc':'Ottimi risultati — richiede una chiave API','prov.gemini.desc':'IA Google — richiede una chiave API','prov.mistral.desc':'IA europea — richiede una chiave API',
         'prov.mock.title':'Prova (Offline)','prov.mock.desc':'Nessun account necessario — perfetto per testare',
         'f.imgprov.label':'IA Immagini','imgprov.dalle.desc':'Immagini AI di alta qualità — chiave OpenAI richiesta','imgprov.sd.desc':'Immagini fotorealistiche — chiave Stability richiesta','imgprov.none.title':'Nessuna','imgprov.none.desc':'Senza generazione di immagini',
-        'f.imgkey.label':'Chiave API Immagini','f.imgkey.hint':'Chiave OpenAI per DALL-E 3. Salvata solo nel tuo browser.',
+        'f.imgkey.label':'Chiave API Immagini','f.imgkey.hint':'Salvata solo nel tuo browser. Non viene mai inviata ai nostri server.',
         'tone.auto':'Lascia decidere all\'IA','tone.warm':'Caldo & sincero','tone.funny':'Divertente & giocoso','tone.epic':'Epico & drammatico','tone.calm':'Calmo & riflessivo','tone.educational':'Chiaro & educativo',
         'genre.auto':'Lascia decidere all\'IA','genre.adventure':'Avventura','genre.romance':'Romanzo','genre.mystery':'Giallo','genre.fantasy':'Fantasy','genre.educational':'Educativo','genre.biography':'Biografia / Storia vera','genre.children':'Libro per bambini','genre.other':'Altro',
         'age.auto':'Lascia decidere all\'IA','age.kids':'Bambini (4 – 8)','age.young':'Giovani lettori (9 – 13)','age.teens':'Adolescenti (14 – 17)','age.adults':'Adulti (18+)','age.all':'Tutte le età',
         'pages.8':'8 pagine','pages.12':'12 pagine','pages.20':'20 pagine','pages.32':'32 pagine','pages.50':'50 pagine',
         'style.auto':'Lascia decidere all\'IA','style.none':'Senza illustrazioni','style.watercolor':'Acquerello','style.digital':'Arte digitale','style.cartoon':'Cartone animato','style.realistic':'Realistico','style.pencil':'Schizzo a matita',
-        'f.density.label':'Illustrazioni','density.full':'Ogni pagina — Libro illustrato','density.occasional':'Occasionali — Supporto narrativo','density.none':'Nessuna — Romanzo / Solo testo',
+        'f.density.label':'Illustrazioni','density.full':'Ogni pagina — Libro illustrato','density.occasional':'Occasionali — 1 ogni 5 pagine','density.none':'Nessuna — Romanzo / Solo testo',
         'f.submit':'Genera i miei libri →','f.submit.note':'I tuoi libri verranno creati passo dopo passo — rivedi e decidi ad ogni fase.',
         'out.label':'La tua configurazione','out.title':'Il tuo libro\nin sintesi.','out.desc':'Compila il modulo e clicca Genera.',
-        's.idea':'Idea','s.genre':'Genere','s.age':'Pubblico','s.books':'Libri','s.pages':'Pagine','s.style':'Illustrazioni',
+        's.idea':'Idea','s.genre':'Genere','s.age':'Pubblico','s.books':'Libri','s.pages':'Pagine','s.style':'Illustrazioni','s.tone':'Tono',
         'wf.hint':'Compila il modulo, poi clicca <strong>Genera i miei libri</strong>.',
         'wf.book':'LIBRO','wf.rewriting':'Riscrittura…','wf.qa.running':'Controllo qualità…','wf.qa.ok':'✓ OK','wf.qa.partial':'⚠ Incompleto','wf.qa.error':'Errore','error.api':'Errore API','error.no.books':'Nessun libro approvato disponibile.','wf.story.illus':'Illustrazione narrativa','btn.skip':'✕ Salta',
+        'wf.char.title':'Personaggi','wf.char.none':'Nessuna descrizione di personaggio disponibile.',
         'wf.nav.gen':'Genera','wf.nav.review':'Rivedi','wf.nav.covers':'Copertine','wf.nav.text':'Testo','wf.nav.illus':'Illustrazioni','wf.nav.dl':'Download',
         'wf.gen.title':'Creazione dei tuoi libri…',
-        'wf.rev.title':'Rivedi i tuoi libri','wf.rev.sub':'Tieni, riscrivi o rimuovi ogni libro.','wf.rev.continue':'Continua alle copertine →',
-        'wf.cov.gen.title':'Generazione copertine…','wf.cov.rev.title':'Rivedi le tue copertine','wf.cov.rev.sub':'Tieni, rigenera o rimuovi ogni copertina.','wf.cov.continue':'Continua →',
-        'wf.txt.title':'Leggi i tuoi libri','wf.txt.sub':'Leggi il testo completo e accetta o rifiuta ogni libro.','wf.txt.continue':'Continua alle illustrazioni →',
+        'wf.rev.title':'Rivedi i tuoi libri','wf.rev.sub':'Tieni, riscrivi o rimuovi ogni libro.','wf.rev.continue':'Continua alle copertine →','wf.rev.keepall':'✓ Tieni tutto',
+        'wf.cov.gen.title':'Generazione copertine…','wf.cov.rev.title':'Rivedi le tue copertine','wf.cov.rev.sub':'Tieni, rigenera o rimuovi ogni copertina.','wf.cov.continue':'Continua →','wf.cov.keepall':'✓ Tieni tutto',
+        'wf.txt.title':'Leggi i tuoi libri','wf.txt.sub':'Leggi il testo completo e accetta o rifiuta ogni libro.','wf.txt.continue':'Continua alle illustrazioni →','wf.txt.keepall':'✓ Accetta tutto',
         'wf.page':'Pagina',
         'wf.img.title':'Generazione illustrazioni…',
-        'wf.revi.title':'Rivedi le tue illustrazioni','wf.revi.sub':'Tieni, rigenera o salta ogni immagine.','wf.revi.continue':'Continua al download →',
+        'wf.revi.title':'Rivedi le tue illustrazioni','wf.revi.sub':'Tieni, rigenera o salta ogni immagine.','wf.revi.continue':'Continua al download →','wf.revi.keepall':'✓ Tieni tutto',
         'wf.illus.none.title':'Nessuna illustrazione','wf.illus.none.sub':'Hai selezionato un libro solo testo — nessuna illustrazione verrà generata.',
         'wf.dl.title':'I tuoi libri sono pronti!','wf.dl.sub':'Scegli il formato preferito.','wf.dl.pdf':'Scarica PDF','wf.dl.doc':'Scarica Word','wf.dl.md':'Scarica Markdown','wf.dl.restart':'← Ricomincia','wf.dl.win.title':'I miei libri',
         'btn.keep':'✓ Tieni','btn.rewrite':'↻ Riscrivi','btn.redo':'↻ Rifai','btn.remove':'✕ Rimuovi','btn.accept':'✓ Accetta','btn.reject':'✕ Rifiuta',
+        'btn.rewrite.hint':'Istruzione opzionale… (es. cambia il nome del protagonista)','btn.rewrite.go':'Riscrivi →',
+        'btn.cover.regen.hint':'Suggerimento opzionale per la nuova immagine… (es. colori caldi, sfondo foresta)','btn.cover.regen.go':'Rigenera →',
+        'btn.cancel':'✕ Annulla','btn.illus.regen.hint':'Istruzione opzionale per la nuova illustrazione… (es. illuminazione drammatica)','btn.illus.regen.go':'Rigenera →',
         'how.tag':'Come funziona','how.title':'Dall\'idea al libro finito.','how.subtitle':'Un processo intelligente, passo dopo passo, con due momenti in cui mantieni il controllo.',
         'hw.s1.name':'Condividi la tua idea','hw.s1.desc':'Poche parole o una descrizione dettagliata — qualunque cosa tu abbia.',
         'hw.s2.name':'L\'IA costruisce il piano','hw.s2.desc':'Titoli, personaggi, archi narrativi — il progetto completo per la tua serie.',
@@ -1253,6 +1711,13 @@
       document.getElementById('w2').textContent = 'Creator';
 
       syncSummary();
+
+      // Update all collapse toggle hint texts to match new language
+      document.querySelectorAll('.collapse-toggle').forEach(toggle => {
+        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+        const hint = toggle.querySelector('.collapse-toggle-hint');
+        if (hint) hint.textContent = isOpen ? (d['collapse.hide'] || 'Hide') : (d['collapse.show'] || 'Show');
+      });
     };
 
     /* ── Lenis ───────────────────────────────────────────────────── */
@@ -1333,6 +1798,7 @@
       const age=document.getElementById('age').value;
       const pages=document.getElementById('pages').value;
       const density=document.getElementById('illus-density').value;
+      const tone=(document.getElementById('tone').value||'').trim();
       const d=T[currentLang];
 
       document.getElementById('s-idea').textContent=idea?(idea.length>38?idea.slice(0,38)+'…':idea):'—';
@@ -1342,6 +1808,7 @@
       document.getElementById('s-books').textContent=bookCount.value;
       document.getElementById('s-pages').textContent=pages+' '+(d['f.pages.unit']||'Seiten');
       document.getElementById('s-style').textContent=d['density.'+density]||densityNames[density]||density;
+      document.getElementById('s-tone').textContent=d['tone.'+(tone||'auto')]||tone||'—';
     }
 
     document.getElementById('book-form').addEventListener('input',syncSummary);
@@ -1351,6 +1818,8 @@
     function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
     let wfBooks=[], wfImages=[], wfCovers=[], wfCfg={};
+    let _genAbort=null;
+    window.cancelGen=function(){ if(_genAbort)_genAbort.abort(); };
 
     const IMG_GRADIENTS=[
       'linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)',
@@ -1388,7 +1857,7 @@
         starters[(n+i)%starters.length]+
         ' The narrative unfolds with care, drawing readers into a world that feels both familiar and extraordinary, page after page.'
       );
-      return {id:n,title,synopsis,pages,status:'pending'};
+      return {id:n,title,synopsis,characters:[],pages,status:'pending'};
     }
 
     function goToStep(n){
@@ -1470,8 +1939,12 @@
       const btn=document.getElementById('generate-btn');
       btn.disabled=true;
       const langName=LANG_NAMES[currentLang]||'German';
+      _genAbort=new AbortController();
+      const cancelGenBtn=document.getElementById('wf-cancel-gen-btn');
+      if(cancelGenBtn) cancelGenBtn.style.display='inline-block';
 
       for(let i=0;i<cnt;i++){
+        if(_genAbort.signal.aborted) break;
         const bar=document.getElementById(`bar-wf-gen-progress-${i}`);
         const stat=document.getElementById(`stat-wf-gen-progress-${i}`);
         const qaEl=document.getElementById(`qa-${i}`);
@@ -1483,7 +1956,7 @@
           stat.textContent=Math.round(pct)+'%';
         },250);
         try{
-          const book=await callAI(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang);
+          const book=await callAI(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang,undefined,_genAbort.signal);
           running=false;clearInterval(iv);
           bar.style.width='95%';
           stat.textContent='QA';
@@ -1507,6 +1980,10 @@
           wfBooks.push(qaResult.book);
         }catch(err){
           running=false;clearInterval(iv);
+          if(err.name==='AbortError'){
+            stat.textContent='✕';stat.className='gen-book-status error';
+            break;
+          }
           const d2=T[currentLang]||T.EN;
           stat.textContent='✗';stat.className='gen-book-status error';
           qaEl.textContent=d2['wf.qa.error']||'Fehler';qaEl.className='gen-book-qa warn';
@@ -1520,6 +1997,7 @@
         await new Promise(r=>setTimeout(r,300));
       }
 
+      if(cancelGenBtn) cancelGenBtn.style.display='none';
       btn.disabled=false;
       setTimeout(()=>goToReviewBooks(),600);
     });
@@ -1613,11 +2091,11 @@ Return ONLY this JSON (no markdown):
 
     const LANG_NAMES={EN:'English',DE:'German',FR:'French',IT:'Italian'};
 
-    async function callProvider(provider,apiKey,systemPrompt,userPrompt,maxTokens){
+    async function callProvider(provider,apiKey,systemPrompt,userPrompt,maxTokens,signal){
       let responseText;
       if(provider==='openai'){
         const resp=await fetch('https://api.openai.com/v1/chat/completions',{
-          method:'POST',
+          method:'POST',signal,
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
           body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],temperature:0.8,max_tokens:maxTokens})
         });
@@ -1625,7 +2103,7 @@ Return ONLY this JSON (no markdown):
         responseText=(await resp.json()).choices[0].message.content;
       } else if(provider==='anthropic'){
         const resp=await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
+          method:'POST',signal,
           headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
           body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:maxTokens,system:systemPrompt,messages:[{role:'user',content:userPrompt}]})
         });
@@ -1633,7 +2111,7 @@ Return ONLY this JSON (no markdown):
         responseText=(await resp.json()).content[0].text;
       } else if(provider==='gemini'){
         const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
-          method:'POST',
+          method:'POST',signal,
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({contents:[{role:'user',parts:[{text:userPrompt}]}],systemInstruction:{parts:[{text:systemPrompt}]},generationConfig:{maxOutputTokens:maxTokens,temperature:0.8}})
         });
@@ -1641,7 +2119,7 @@ Return ONLY this JSON (no markdown):
         responseText=(await resp.json()).candidates?.[0]?.content?.parts?.[0]?.text||'';
       } else if(provider==='mistral'){
         const resp=await fetch('https://api.mistral.ai/v1/chat/completions',{
-          method:'POST',
+          method:'POST',signal,
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
           body:JSON.stringify({model:'mistral-small-latest',messages:[{role:'system',content:systemPrompt},{role:'user',content:userPrompt}],max_tokens:maxTokens,temperature:0.8})
         });
@@ -1653,29 +2131,39 @@ Return ONLY this JSON (no markdown):
       return responseText;
     }
 
-    async function callAI(provider,apiKey,idea,n,total,genre,age,pages,tone,lang){
+    async function callAI(provider,apiKey,idea,n,total,genre,age,pages,tone,lang,rewriteInstruction,signal){
       const genreStr=genre!=='auto'?genre:'any genre';
       const ageStr=age!=='auto'?`for readers ${age}`:'suitable for all ages';
       const toneStr=tone?`Tone: ${tone}.`:'';
       const pageCount=parseInt(pages)||8;
       const langName=LANG_NAMES[lang]||'English';
-      const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Generate a complete short book. Return ONLY valid JSON with no markdown, no code blocks, no extra text.`;
+      const systemPrompt=`You are an expert book author. Write exclusively in ${langName}. Generate a complete short book. Honor ALL requirements stated in the idea — including writing style, narrative voice, sentence length, character names, and any specific stylistic instructions. These are mandatory, not optional. Return ONLY valid JSON with no markdown, no code blocks, no extra text.`;
+      const rewritePart=rewriteInstruction?`\nSpecial instruction for this rewrite: ${rewriteInstruction}`:'';
       const userPrompt=`Create book ${n+1} of ${total} based on this idea: "${idea}"
+
+IMPORTANT: The idea above may contain specific instructions about writing style, narrative voice, tone, sentence structure, character names, or other requirements. You MUST apply ALL of them throughout the entire text.
+
 Genre: ${genreStr}
 Audience: ${ageStr}
-Pages: ${pageCount}${toneStr?'\n'+toneStr:''}
+Pages: ${pageCount}${toneStr?'\n'+toneStr:''}${rewritePart}
 Language: Write all text (title, synopsis, pages) in ${langName}.
 
-Return JSON in this exact format (raw JSON only, no markdown):
-{"title":"The book title","synopsis":"A 2-3 sentence synopsis.","pages":["Full text for page 1 (2-4 sentences)","Full text for page 2",...exactly ${pageCount} items]}`;
+CRITICAL: For each character provide TWO description fields:
+- "description": written in ${langName} (same language as the book) — for the reader
+- "descriptionEn": written in English only — for AI image generation
+Both must include: full name, age, physical appearance (hair color and style, eye color, skin tone, height/build), clothing style, and key personality traits. Be very specific and detailed so an illustrator can recreate the same person in every scene.
 
-      const responseText=await callProvider(provider,apiKey,systemPrompt,userPrompt,8000);
+Return JSON in this exact format (raw JSON only, no markdown):
+{"title":"The book title","synopsis":"A 2-3 sentence synopsis.","characters":[{"name":"Character Name","description":"Detailed description in ${langName}...","descriptionEn":"Detailed description in English..."}],"pages":["Full text for page 1 (2-4 sentences)","Full text for page 2",...exactly ${pageCount} items]}`;
+
+      const responseText=await callProvider(provider,apiKey,systemPrompt,userPrompt,8000,signal);
       // Strip possible markdown code fences
       const jsonStr=responseText.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
       const parsed=safeParseBookJSON(jsonStr);
       const pageTexts=Array.isArray(parsed.pages)?parsed.pages:[];
       while(pageTexts.length<pageCount) pageTexts.push('...');
-      return {id:n,title:parsed.title||'Book '+(n+1),synopsis:parsed.synopsis||'',pages:pageTexts.slice(0,pageCount),status:'pending'};
+      const characters=Array.isArray(parsed.characters)?parsed.characters:[];
+      return {id:n,title:parsed.title||'Book '+(n+1),synopsis:parsed.synopsis||'',characters,pages:pageTexts.slice(0,pageCount),status:'pending'};
     }
 
     function runGenerationAnim(containerId, count, speed, onDone){
@@ -1714,6 +2202,16 @@ Return JSON in this exact format (raw JSON only, no markdown):
       animateOne(0);
     }
 
+    function renderCharacters(book, d){
+      const chars=Array.isArray(book.characters)?book.characters:[];
+      const label=(d['wf.char.title']||'Characters')+' ('+chars.length+')';
+      const noneText=d['wf.char.none']||'No character descriptions available.';
+      const items=chars.length
+        ?chars.map(c=>`<div class="book-char-item"><span class="book-char-name">${escHtml(c.name||'—')}</span><p class="book-char-desc">${escHtml(c.description||'')}</p></div>`).join('')
+        :`<p class="book-char-desc" style="margin-top:8px">${escHtml(noneText)}</p>`;
+      return `<details class="book-card-chars"><summary>👤 ${escHtml(label)}</summary>${items}</details>`;
+    }
+
     function goToReviewBooks(){
       goToStep(2);
       const d=T[currentLang]||T.EN;
@@ -1726,10 +2224,15 @@ Return JSON in this exact format (raw JSON only, no markdown):
           `<div class="book-card-num">${d['wf.book']||'BUCH'} ${i+1} / ${wfBooks.length}</div>`+
           `<div class="book-card-title">${escHtml(book.title)}</div>`+
           `<div class="book-card-synopsis">${escHtml(book.synopsis)}</div>`+
-          `<div class="book-card-actions">`+
+          renderCharacters(book,d)+
+          `<div class="book-card-actions" style="margin-top:12px">`+
             `<button class="bc-btn approve" onclick="bookAction(${i},'approve')">${d['btn.keep']||'✓ Behalten'}</button>`+
             `<button class="bc-btn rewrite" onclick="bookAction(${i},'rewrite')">${d['btn.rewrite']||'↻ Neu schreiben'}</button>`+
             `<button class="bc-btn discard" onclick="bookAction(${i},'discard')">${d['btn.remove']||'✕ Entfernen'}</button>`+
+          `</div>`+
+          `<div class="bc-rewrite-row" id="bc-rw-row-${i}">`+
+            `<input class="bc-rewrite-input" id="bc-rw-input-${i}" type="text" placeholder="${escHtml(d['btn.rewrite.hint']||'Optional: Anweisung… (z. B. ändere den Namen des Protagonisten)')}" maxlength="300">`+
+            `<button class="bc-rewrite-confirm" onclick="bookRewrite(${i})">${d['btn.rewrite.go']||'Neu schreiben →'}</button>`+
           `</div>`+
           `<div class="bc-rewriting" id="bc-rw-${i}">${d['wf.rewriting']||'Wird neu geschrieben…'}</div>`;
         container.appendChild(card);
@@ -1748,37 +2251,51 @@ Return JSON in this exact format (raw JSON only, no markdown):
         book.status='discarded';card.className='book-card discarded';
         card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
       } else if(action==='rewrite'){
-        book.status='pending';card.className='book-card';
-        const rw=document.getElementById('bc-rw-'+idx);
-        rw.style.display='block';
-        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
-        updateContinueBtn();
-        (async()=>{
-          try{
-            const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang);
-            const langName=LANG_NAMES[currentLang]||'German';
-            const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
-            wfBooks[idx]=qaResult.book;
-          }catch(e){
-            console.error('[Rewrite] Fehler, Fallback wird verwendet:',e);
-            const nb=makeMockBook(wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages);
-            wfBooks[idx]=nb;
-          }
-          const nb=wfBooks[idx];
-          rw.style.display='none';
-          card.querySelector('.book-card-title').textContent=nb.title;
-          card.querySelector('.book-card-synopsis').textContent=nb.synopsis;
-          card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
-          const d2=T[currentLang]||T.EN;
-          const btns=card.querySelectorAll('.bc-btn');
-          if(btns[0])btns[0].textContent=d2['btn.keep']||'✓ Behalten';
-          if(btns[1])btns[1].textContent=d2['btn.rewrite']||'↻ Neu schreiben';
-          if(btns[2])btns[2].textContent=d2['btn.remove']||'✕ Entfernen';
-          updateContinueBtn();
-        })();
-        return; // skip updateContinueBtn below — async handles it
+        const rwRow=document.getElementById('bc-rw-row-'+idx);
+        if(rwRow){ rwRow.classList.add('visible'); const inp=document.getElementById('bc-rw-input-'+idx); if(inp) setTimeout(()=>inp.focus(),50); }
+        return;
       }
       updateContinueBtn();
+    };
+
+    window.bookRewrite=function(idx){
+      const instruction=((document.getElementById('bc-rw-input-'+idx)||{}).value||'').trim();
+      const book=wfBooks[idx];
+      const card=document.getElementById('bcard-'+idx);
+      const d=T[currentLang]||T.EN;
+      book.status='pending'; card.className='book-card';
+      const rwRow=document.getElementById('bc-rw-row-'+idx);
+      if(rwRow) rwRow.classList.remove('visible');
+      const rw=document.getElementById('bc-rw-'+idx);
+      rw.style.display='block';
+      card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+      updateContinueBtn();
+      (async()=>{
+        try{
+          const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang,instruction);
+          const langName=LANG_NAMES[currentLang]||'German';
+          const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
+          wfBooks[idx]=qaResult.book;
+        }catch(e){
+          console.error('[Rewrite] Fehler, Fallback wird verwendet:',e);
+          wfBooks[idx]=makeMockBook(wfCfg.idea,idx,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages);
+        }
+        const nb=wfBooks[idx];
+        rw.style.display='none';
+        card.querySelector('.book-card-title').textContent=nb.title;
+        card.querySelector('.book-card-synopsis').textContent=nb.synopsis;
+        // Refresh character section
+        const d2=T[currentLang]||T.EN;
+        const oldChars=card.querySelector('.book-card-chars');
+        if(oldChars) oldChars.outerHTML=renderCharacters(nb,d2);
+        else{const charsHtml=document.createElement('div');charsHtml.innerHTML=renderCharacters(nb,d2);card.querySelector('.book-card-synopsis').after(charsHtml.firstChild);}
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
+        const btns=card.querySelectorAll('.bc-btn');
+        if(btns[0])btns[0].textContent=d2['btn.keep']||'✓ Behalten';
+        if(btns[1])btns[1].textContent=d2['btn.rewrite']||'↻ Neu schreiben';
+        if(btns[2])btns[2].textContent=d2['btn.remove']||'✕ Entfernen';
+        updateContinueBtn();
+      })();
     };
 
     function updateContinueBtn(){
@@ -1805,30 +2322,71 @@ Return JSON in this exact format (raw JSON only, no markdown):
       generateCovers();
     };
 
-    function buildCoverPrompt(cov,book){
-      const synopsis=(book?.synopsis||'').slice(0,200);
-      const styleHint=(cov.style&&cov.style!=='auto'&&cov.style!=='none')?cov.style:'vibrant picture book illustration';
-      return `Children's book cover illustration for a book titled "${cov.bookTitle}". ${synopsis}. Art style: ${styleHint}. No text, no words, no letters anywhere. Beautiful, colorful, professional book cover artwork.`;
+    function getCharacterContext(book){
+      // Use the structured character descriptions generated by the AI
+      if(Array.isArray(book?.characters)&&book.characters.length){
+        return book.characters.map(c=>`${c.name}: ${c.descriptionEn||c.description}`).join(' | ');
+      }
+      // Fallback: extract from synopsis + first page
+      const text=((book?.synopsis||'')+' '+((Array.isArray(book?.pages)&&book.pages[0])||'')).trim();
+      return text.slice(0,300);
     }
 
-    async function dalleGenerate(prompt){
+    const STYLE_PROMPTS={
+      watercolor:'watercolor painting style, soft edges, flowing washes of color, gentle textures',
+      digital:'digital art illustration, clean crisp lines, vibrant saturated colors, smooth shading',
+      cartoon:'cartoon illustration style, bold black outlines, flat cel-shaded colors, expressive characters',
+      realistic:'realistic detailed illustration, painterly, nuanced lighting, fine details',
+      pencil:'pencil sketch illustration, hand-drawn linework, cross-hatching, monochrome graphite tones',
+    };
+    function styleToPromptHint(style){
+      return STYLE_PROMPTS[style]||'vibrant picture book illustration, professional quality';
+    }
+
+    function buildCoverPrompt(cov,book,extraInstruction){
+      const synopsis=(book?.synopsis||'').slice(0,180);
+      const title=(book?.title||cov.bookTitle||'').slice(0,60);
+      const styleHint=styleToPromptHint(cov.style);
+      const moodRaw=wfCfg.tone||wfCfg.genre||'magical and adventurous';
+      const theme=title?(title+(synopsis?'. '+synopsis:'')):synopsis||wfCfg.idea||'children\'s adventure';
+      const ideaContext=wfCfg.idea?(wfCfg.idea).slice(0,200):'';
+      const ideaPart=ideaContext?`\nOriginal concept: ${ideaContext}`:'';
+      const charCtx=getCharacterContext(book);
+      const charPart=charCtx?`\nProtagonist (keep consistent across all images for this book): ${charCtx}`:'';
+      const extra=extraInstruction?`\nAdditional instruction: ${extraInstruction}.`:'';
+      return `Create a vertical illustration intended to be used as a book cover image.
+
+Theme: ${theme}${ideaPart}${charPart}
+Mood: ${moodRaw}
+Style: ${styleHint}${extra}
+
+Important rules:
+- Do NOT show any book, book mockup, or pages.
+- Do NOT include any text or typography.
+- The image must be a pure illustration scene only.
+- Always depict the protagonist with a consistent appearance matching the character description above.
+
+Professional illustration, cinematic lighting, highly detailed, rich colors, visually striking composition, portrait orientation (2:3).`;
+    }
+
+    async function dalleGenerate(prompt,signal,size='1024x1792'){
       const resp=await fetch('https://api.openai.com/v1/images/generations',{
-        method:'POST',
+        method:'POST',signal,
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+wfCfg.imgApiKey},
-        body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1024x1024',quality:'standard'})
+        body:JSON.stringify({model:'dall-e-3',prompt,n:1,size,quality:'standard'})
       });
       if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error((e.error?.message)||'HTTP '+resp.status);}
       const data=await resp.json();
       return data.data?.[0]?.url||null;
     }
 
-    async function stabilityGenerate(prompt){
+    async function stabilityGenerate(prompt,signal,aspect='2:3'){
       const form=new FormData();
       form.append('prompt',prompt);
       form.append('output_format','webp');
-      form.append('aspect_ratio','1:1');
+      form.append('aspect_ratio',aspect);
       const resp=await fetch('https://api.stability.ai/v2beta/stable-image/generate/core',{
-        method:'POST',
+        method:'POST',signal,
         headers:{'Authorization':'Bearer '+wfCfg.imgApiKey,'Accept':'application/json'},
         body:form
       });
@@ -1839,12 +2397,12 @@ Return JSON in this exact format (raw JSON only, no markdown):
     }
 
     // Unified image generator — returns {imageUrl, dataUrl} or null
-    async function generateCoverImage(prompt){
+    async function generateCoverImage(prompt,signal){
       if(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey){
-        const url=await dalleGenerate(prompt);
+        const url=await dalleGenerate(prompt,signal,'1024x1792');
         if(url) return{imageUrl:url,dataUrl:await fetchAsDataUrl(url)};
       } else if(wfCfg.imgProvider==='sd'&&wfCfg.imgApiKey){
-        const dataUrl=await stabilityGenerate(prompt);
+        const dataUrl=await stabilityGenerate(prompt,signal,'2:3');
         if(dataUrl) return{imageUrl:dataUrl,dataUrl};
       }
       return null;
@@ -1865,8 +2423,12 @@ Return JSON in this exact format (raw JSON only, no markdown):
       const container=document.getElementById('wf-cover-progress');
       container.innerHTML='';
       const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
+      _genAbort=new AbortController();
+      const cancelCovBtn=document.getElementById('wf-cancel-cov-btn');
+      if(cancelCovBtn&&useImgAI) cancelCovBtn.style.display='inline-block';
 
       for(let i=0;i<wfCovers.length;i++){
+        if(_genAbort.signal.aborted) break;
         const cov=wfCovers[i];
         const book=wfBooks.find(b=>b.id===cov.bookId);
 
@@ -1886,9 +2448,14 @@ Return JSON in this exact format (raw JSON only, no markdown):
 
         if(useImgAI){
           try{
-            const result=await generateCoverImage(buildCoverPrompt(cov,book));
+            const result=await generateCoverImage(buildCoverPrompt(cov,book),_genAbort.signal);
             if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
           }catch(e){
+            clearInterval(iv);
+            bar.style.width='100%';
+            stat.textContent=e.name==='AbortError'?'✕':'✗';
+            stat.className='gen-book-status error';
+            if(e.name==='AbortError') break;
             console.error('[Cover] Fehler für',cov.bookTitle,e.message||e);
           }
         }
@@ -1900,6 +2467,7 @@ Return JSON in this exact format (raw JSON only, no markdown):
         await new Promise(r=>setTimeout(r,200));
       }
 
+      if(cancelCovBtn) cancelCovBtn.style.display='none';
       document.getElementById('wf-cover-gen-phase').style.display='none';
       renderCoverReview();
       document.getElementById('wf-cover-review-phase').style.display='block';
@@ -1911,21 +2479,26 @@ Return JSON in this exact format (raw JSON only, no markdown):
       const d=T[currentLang]||T.EN;
       updateCoverContinueBtn();
       wfCovers.forEach((cov,i)=>{
-        const styleName=cov.style!=='auto'?cov.style:(d['style.auto']||'AI-chosen style');
+        const styleName=d['style.'+(cov.style||'auto')]||cov.style||d['style.auto']||'Auto';
         const card=document.createElement('div');
         card.className='img-card';card.id='covcard-'+i;
+        const coverLabel=d['wf.nav.covers']||'Cover';
         const coverVisual=cov.imageUrl
           ?`<img class="cover-img" src="${escHtml(cov.imageUrl)}" alt="${escHtml(cov.bookTitle)}">`
-          :`<div class="img-placeholder cover-placeholder" style="background:${escHtml(cov.gradient)}">COVER</div>`;
+          :`<div class="img-placeholder cover-placeholder" style="background:${escHtml(cov.gradient)}">${escHtml(coverLabel)}</div>`;
         card.innerHTML=
           coverVisual+
           `<div class="img-card-body">`+
-            `<div class="img-card-label">COVER · ${escHtml(cov.bookTitle.slice(0,18))}</div>`+
+            `<div class="img-card-label">${escHtml(coverLabel)} · ${escHtml(cov.bookTitle)}</div>`+
             `<div class="img-card-desc">${escHtml(styleName)} · ${escHtml(cov.bookTitle)}</div>`+
             `<div class="book-card-actions">`+
               `<button class="bc-btn approve" onclick="coverAction(${i},'approve')">${d['btn.keep']||'✓ Keep'}</button>`+
               `<button class="bc-btn rewrite" onclick="coverAction(${i},'regen')">${d['btn.redo']||'↻ Redo'}</button>`+
               `<button class="bc-btn discard" onclick="coverAction(${i},'remove')">${d['btn.remove']||'✕ Remove'}</button>`+
+            `</div>`+
+            `<div class="bc-rewrite-row" id="cov-rw-row-${i}">`+
+              `<input class="bc-rewrite-input" id="cov-rw-input-${i}" type="text" placeholder="${escHtml(d['btn.cover.regen.hint']||'Optional: Hinweis für das neue Bild…')}" maxlength="200">`+
+              `<button class="bc-rewrite-confirm" onclick="coverRegen(${i})">${d['btn.cover.regen.go']||'Neu generieren →'}</button>`+
             `</div>`+
           `</div>`;
         container.appendChild(card);
@@ -1944,43 +2517,49 @@ Return JSON in this exact format (raw JSON only, no markdown):
         if(book) book.coverRemoved=true;
         updateCoverContinueBtn();
       } else if(action==='regen'){
-        // Reset to pending, re-lock continue button
-        cov.status='pending';card.className='img-card';
-        updateCoverContinueBtn();
-        // Show loading state on current visual
-        const oldVisual=card.querySelector('.cover-img,.img-placeholder');
-        const loadEl=document.createElement('div');
-        loadEl.className='cover-loading';
-        loadEl.style.background=cov.gradient;
-        loadEl.textContent='…';
-        if(oldVisual) oldVisual.replaceWith(loadEl); else card.prepend(loadEl);
-        // Disable action buttons while loading
-        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
-        (async()=>{
-          const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
-          if(useImgAI){
-            try{
-              const book=wfBooks.find(b=>b.id===cov.bookId);
-              const result=await generateCoverImage(buildCoverPrompt(cov,book));
-              if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
-            }catch(e){
-              console.error('[Cover] Regen Fehler:',e.message||e);
-            }
-          } else {
-            // Fallback: cycle gradient
-            const cur=IMG_GRADIENTS.indexOf(cov.gradient);
-            cov.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
-            cov.imageUrl=null;
-          }
-          // Replace loading indicator with new visual
-          const newVisual=cov.imageUrl
-            ?Object.assign(document.createElement('img'),{className:'cover-img',src:cov.imageUrl,alt:cov.bookTitle})
-            :Object.assign(document.createElement('div'),{className:'img-placeholder cover-placeholder',textContent:'COVER'});
-          if(!cov.imageUrl) newVisual.style.background=cov.gradient;
-          card.querySelector('.cover-loading')?.replaceWith(newVisual);
-          card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
-        })();
+        const rwRow=document.getElementById('cov-rw-row-'+idx);
+        if(rwRow){ rwRow.classList.add('visible'); const inp=document.getElementById('cov-rw-input-'+idx); if(inp) setTimeout(()=>inp.focus(),50); }
+        return;
       }
+    };
+
+    window.coverRegen=function(idx){
+      const instruction=((document.getElementById('cov-rw-input-'+idx)||{}).value||'').trim();
+      const cov=wfCovers[idx];
+      const card=document.getElementById('covcard-'+idx);
+      const rwRow=document.getElementById('cov-rw-row-'+idx);
+      if(rwRow) rwRow.classList.remove('visible');
+      cov.status='pending'; card.className='img-card';
+      updateCoverContinueBtn();
+      const oldVisual=card.querySelector('.cover-img,.img-placeholder');
+      const loadEl=document.createElement('div');
+      loadEl.className='cover-loading'; loadEl.style.background=cov.gradient; loadEl.textContent='…';
+      if(oldVisual) oldVisual.replaceWith(loadEl); else card.prepend(loadEl);
+      card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+      (async()=>{
+        const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
+        if(useImgAI){
+          try{
+            const book=wfBooks.find(b=>b.id===cov.bookId);
+            const result=await generateCoverImage(buildCoverPrompt(cov,book,instruction));
+            if(result){cov.imageUrl=result.imageUrl;cov.dataUrl=result.dataUrl;}
+          }catch(e){
+            console.error('[Cover] Regen Fehler:',e.message||e);
+          }
+        } else {
+          const cur=IMG_GRADIENTS.indexOf(cov.gradient);
+          cov.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
+          cov.imageUrl=null;
+        }
+        const newVisual=cov.imageUrl
+          ?Object.assign(document.createElement('img'),{className:'cover-img',src:cov.imageUrl,alt:cov.bookTitle})
+          :Object.assign(document.createElement('div'),{className:'img-placeholder cover-placeholder',textContent:'COVER'});
+        if(!cov.imageUrl) newVisual.style.background=cov.gradient;
+        card.querySelector('.cover-loading')?.replaceWith(newVisual);
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
+        cov.status='pending';
+        updateCoverContinueBtn();
+      })();
     };
 
     function updateCoverContinueBtn(){
@@ -1993,17 +2572,64 @@ Return JSON in this exact format (raw JSON only, no markdown):
       btn.style.pointerEvents=ready?'auto':'none';
     }
 
+    // Books currently shown in the text-review step (set by goToTextReview)
+    let wfTextActive=[];
+
+    window.acceptAllTexts=function(){
+      wfTextActive.forEach(book=>{
+        if(book.textRejected!==true){
+          book.textRejected=false;
+          const card=document.getElementById('txtcard-'+book.id);
+          if(card)card.className='txt-book-card approved';
+        }
+      });
+      updateTextContinueBtn();
+    };
+
+    window.approveAllIllus=function(){
+      wfImages.forEach((img,i)=>{
+        if(img.status!=='skipped'){
+          img.status='approved';
+          const card=document.getElementById('icard-'+i);
+          if(card)card.className='img-card approved';
+        }
+      });
+      updateIllusContinueBtn();
+    };
+
+    window.keepAllBooks=function(){
+      wfBooks.forEach((book,i)=>{
+        if(book.status!=='discarded'){
+          book.status='approved';
+          const card=document.getElementById('bcard-'+i);
+          if(card){ card.className='book-card approved'; card.querySelector('.bc-btn.approve')?.classList.add('active'); }
+        }
+      });
+      updateContinueBtn();
+    };
+
+    window.keepAllCovers=function(){
+      wfCovers.forEach((cov,i)=>{
+        if(cov.status==='pending'||cov.status===''){
+          cov.status='approved';
+          const card=document.getElementById('covcard-'+i);
+          if(card) card.className='img-card approved';
+        }
+      });
+      updateCoverContinueBtn();
+    };
+
     /* ── Step 4: Text Review ─────────────────────────────────────── */
     window.goToTextReview=function(){
       goToStep(4);
       const d=T[currentLang]||T.EN;
       const container=document.getElementById('wf-text-cards');
       container.innerHTML='';
-      const active=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved);
-      if(!active.length){goToIllustrations();return;}
+      wfTextActive=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved);
+      if(!wfTextActive.length){goToIllustrations();return;}
       // Reset textRejected so all need a fresh decision
-      active.forEach(b=>{b.textRejected=undefined;});
-      active.forEach(book=>{
+      wfTextActive.forEach(b=>{b.textRejected=undefined;});
+      wfTextActive.forEach(book=>{
         const card=document.createElement('div');
         card.className='txt-book-card';card.id='txtcard-'+book.id;
         const pagesHtml=Array.isArray(book.pages)
@@ -2013,11 +2639,17 @@ Return JSON in this exact format (raw JSON only, no markdown):
           `<div class="book-card-num">${d['wf.book']||'BOOK'} ${book.id+1}</div>`+
           `<div class="book-card-title">${escHtml(book.title)}</div>`+
           `<div class="book-card-synopsis">${escHtml(book.synopsis)}</div>`+
-          `<div class="txt-pages">${pagesHtml}</div>`+
+          `<div class="txt-pages" id="txt-pages-${book.id}">${pagesHtml}</div>`+
           `<div class="book-card-actions">`+
             `<button class="bc-btn approve" onclick="textAction(${book.id},'accept')">${d['btn.accept']||'✓ Accept'}</button>`+
+            `<button class="bc-btn rewrite" onclick="textAction(${book.id},'rewrite')">${d['btn.rewrite']||'↻ Neu schreiben'}</button>`+
             `<button class="bc-btn discard" onclick="textAction(${book.id},'reject')">${d['btn.reject']||'✕ Reject'}</button>`+
-          `</div>`;
+          `</div>`+
+          `<div class="bc-rewrite-row" id="txt-rw-row-${book.id}">`+
+            `<input class="bc-rewrite-input" id="txt-rw-input-${book.id}" type="text" placeholder="${escHtml(d['btn.rewrite.hint']||'Optionale Anweisung…')}" maxlength="300">`+
+            `<button class="bc-rewrite-confirm" onclick="textRewrite(${book.id})">${d['btn.rewrite.go']||'Neu schreiben →'}</button>`+
+          `</div>`+
+          `<div class="bc-rewriting" id="txt-rw-${book.id}">${d['wf.rewriting']||'Wird neu geschrieben…'}</div>`;
         container.appendChild(card);
       });
       updateTextContinueBtn();
@@ -2028,14 +2660,53 @@ Return JSON in this exact format (raw JSON only, no markdown):
       const card=document.getElementById('txtcard-'+bookId);
       if(!book||!card)return;
       if(action==='accept'){book.textRejected=false;card.className='txt-book-card approved';}
-      else{book.textRejected=true;card.className='txt-book-card rejected';}
+      else if(action==='reject'){book.textRejected=true;card.className='txt-book-card rejected';}
+      else if(action==='rewrite'){
+        const rwRow=document.getElementById('txt-rw-row-'+bookId);
+        if(rwRow){rwRow.classList.add('visible');const inp=document.getElementById('txt-rw-input-'+bookId);if(inp)setTimeout(()=>inp.focus(),50);}
+        return;
+      }
       updateTextContinueBtn();
     };
 
+    window.textRewrite=function(bookId){
+      const instruction=((document.getElementById('txt-rw-input-'+bookId)||{}).value||'').trim();
+      const book=wfBooks.find(b=>b.id===bookId);
+      const card=document.getElementById('txtcard-'+bookId);
+      if(!book||!card)return;
+      const rwRow=document.getElementById('txt-rw-row-'+bookId);
+      if(rwRow)rwRow.classList.remove('visible');
+      book.textRejected=undefined;
+      card.className='txt-book-card';
+      const rw=document.getElementById('txt-rw-'+bookId);
+      if(rw)rw.style.display='block';
+      card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=true);
+      updateTextContinueBtn();
+      (async()=>{
+        try{
+          const nb=await callAI(wfCfg.provider,wfCfg.apiKey,wfCfg.idea,book.id,wfBooks.length,wfCfg.genre,wfCfg.age,wfCfg.pages,wfCfg.tone,currentLang,instruction);
+          const langName=LANG_NAMES[currentLang]||'German';
+          const qaResult=await qualityGate(nb,wfCfg.pages,wfCfg.provider,wfCfg.apiKey,langName,wfCfg.genre,wfCfg.age,wfCfg.tone);
+          Object.assign(book,qaResult.book);
+        }catch(e){
+          console.error('[TextRewrite] Fehler:',e);
+        }
+        if(rw)rw.style.display='none';
+        card.querySelector('.book-card-title').textContent=book.title;
+        card.querySelector('.book-card-synopsis').textContent=book.synopsis;
+        const d=T[currentLang]||T.EN;
+        const pagesEl=document.getElementById('txt-pages-'+bookId);
+        if(pagesEl&&Array.isArray(book.pages)){
+          pagesEl.innerHTML=book.pages.map((p,i)=>`<div class="txt-page"><span class="txt-page-num">${d['wf.page']||'Page'} ${i+1}</span>${escHtml(p)}</div>`).join('');
+        }
+        card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
+        updateTextContinueBtn();
+      })();
+    };
+
     function updateTextContinueBtn(){
-      const active=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved);
-      const allDecided=active.every(b=>b.textRejected!==undefined);
-      const anyKept=active.some(b=>b.textRejected===false);
+      const allDecided=wfTextActive.every(b=>b.textRejected!==undefined);
+      const anyKept=wfTextActive.some(b=>b.textRejected===false);
       const btn=document.getElementById('wf-to-illus-btn');
       if(!btn)return;
       const ready=allDecided&&anyKept;
@@ -2044,10 +2715,43 @@ Return JSON in this exact format (raw JSON only, no markdown):
     }
 
     /* ── Step 5: Illustrations ────────────────────────────────────── */
+    function buildIllusPrompt(img, book, extraInstruction){
+      const pageText=(Array.isArray(book.pages)&&book.pages[img.page-1])?book.pages[img.page-1].slice(0,300):'';
+      const styleHint=styleToPromptHint(img.style);
+      const moodRaw=wfCfg.tone||wfCfg.genre||'magical and adventurous';
+      const ideaContext=wfCfg.idea?(wfCfg.idea).slice(0,150):'';
+      const ideaPart=ideaContext?`\nOriginal concept: ${ideaContext}`:'';
+      const charCtx=getCharacterContext(book);
+      const charPart=charCtx?`\nProtagonist (keep consistent across all images for this book): ${charCtx}`:'';
+      const extra=extraInstruction?`\nAdditional instruction: ${extraInstruction}.`:'';
+      return `Create a square illustration for a children's book page.
+
+Scene: ${pageText||book.synopsis||book.title}${ideaPart}${charPart}
+Mood: ${moodRaw}
+Style: ${styleHint}${extra}
+
+Important rules:
+- Do NOT include any text, letters, words, or numbers.
+- Pure illustration scene only, no book mockups.
+- Always depict the protagonist with a consistent appearance matching the character description above.
+
+Professional illustration, cinematic lighting, highly detailed, rich colors, square format (1:1).`;
+    }
+
+    async function generateIllusImage(prompt,signal){
+      if(wfCfg.imgProvider==='dalle'&&wfCfg.imgApiKey){
+        const url=await dalleGenerate(prompt,signal,'1024x1024');
+        if(url){const dataUrl=await fetchAsDataUrl(url);return{imageUrl:url,dataUrl};}
+      } else if(wfCfg.imgProvider==='sd'&&wfCfg.imgApiKey){
+        const dataUrl=await stabilityGenerate(prompt,signal,'1:1');
+        if(dataUrl) return{imageUrl:dataUrl,dataUrl};
+      }
+      return null;
+    }
+
     window.goToIllustrations=function(){
       goToStep(5);
       const density=wfCfg.density;
-      // Hide all phases first
       document.getElementById('wf-illus-gen-phase').style.display='none';
       document.getElementById('wf-illus-review-phase').style.display='none';
       document.getElementById('wf-illus-none-phase').style.display='none';
@@ -2057,47 +2761,105 @@ Return JSON in this exact format (raw JSON only, no markdown):
         return;
       }
       const approved=wfBooks.filter(b=>b.status==='approved'&&!b.coverRemoved&&!b.textRejected);
-      // For 'full': one image per page per book; for 'occasional': one image per book
       const imgItems=[];
+      const totalIllusPages=parseInt(wfCfg.pages)||8;
       approved.forEach(book=>{
-        const count=density==='full'?Math.min(parseInt(wfCfg.pages)||8,6):1;
-        for(let p=0;p<count;p++){
-          imgItems.push({
-            bookId:book.id,bookTitle:book.title,page:p+1,
-            gradient:IMG_GRADIENTS[(book.id*3+p)%IMG_GRADIENTS.length],
-            style:wfCfg.style,status:'pending'
-          });
+        let pageNums=[];
+        if(density==='full'){
+          pageNums=Array.from({length:totalIllusPages},(_,i)=>i+1);
+        } else if(density==='occasional'){
+          const count=Math.max(1,Math.round(totalIllusPages/5));
+          pageNums=Array.from({length:count},(_,i)=>Math.round((i+0.5)*totalIllusPages/count));
         }
+        pageNums.forEach((pageNum,p)=>{
+          imgItems.push({
+            bookId:book.id,bookTitle:book.title,page:pageNum,
+            gradient:IMG_GRADIENTS[(book.id*3+p)%IMG_GRADIENTS.length],
+            style:wfCfg.style,status:'pending',imageUrl:null,dataUrl:null
+          });
+        });
       });
       wfImages=imgItems;
+      const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
       document.getElementById('wf-illus-gen-phase').style.display='block';
-      runGenerationAnim('wf-img-progress', wfImages.length, 45, ()=>{
-        document.getElementById('wf-illus-gen-phase').style.display='none';
-        renderIllusReview();
-        document.getElementById('wf-illus-review-phase').style.display='block';
-      });
+
+      if(useImgAI){
+        // Real AI generation: generate all images, then show review
+        const container=document.getElementById('wf-img-progress');
+        container.innerHTML='';
+        _genAbort=new AbortController();
+        const cancelIllusBtn=document.getElementById('wf-cancel-illus-btn');
+        if(cancelIllusBtn) cancelIllusBtn.style.display='inline-block';
+        (async()=>{
+          for(let i=0;i<wfImages.length;i++){
+            if(_genAbort.signal.aborted) break;
+            const img=wfImages[i];
+            const book=wfBooks.find(b=>b.id===img.bookId);
+            const row=document.createElement('div');
+            row.className='gen-book-row';
+            const d=T[currentLang]||T.EN;
+            const pageLabel=`${d['wf.page']||'Seite'} ${img.page}`;
+            row.innerHTML=`<span class="gen-book-label">${escHtml(pageLabel)} — ${escHtml(img.bookTitle.slice(0,14))}</span>`+
+              `<div class="gen-book-bar-wrap"><div class="gen-book-bar" id="ibar-${i}" style="width:30%;animation:pulse 1.4s ease-in-out infinite"></div></div>`+
+              `<span class="gen-book-status" id="istat-${i}">…</span>`;
+            container.appendChild(row);
+            try{
+              const result=await generateIllusImage(buildIllusPrompt(img,book),_genAbort.signal);
+              if(result){img.imageUrl=result.imageUrl;img.dataUrl=result.dataUrl;}
+              document.getElementById('ibar-'+i).style.cssText='width:100%';
+              document.getElementById('istat-'+i).textContent='✓';
+              document.getElementById('istat-'+i).className='gen-book-status done';
+            }catch(e){
+              if(e.name==='AbortError'){
+                document.getElementById('ibar-'+i).style.cssText='width:100%;background:#7a1515';
+                document.getElementById('istat-'+i).textContent='✕';
+                break;
+              }
+              console.error('[Illus] Fehler:',e.message||e);
+              document.getElementById('ibar-'+i).style.cssText='width:100%;background:#7a1515';
+              document.getElementById('istat-'+i).textContent='✗';
+            }
+          }
+          if(cancelIllusBtn) cancelIllusBtn.style.display='none';
+          document.getElementById('wf-illus-gen-phase').style.display='none';
+          renderIllusReview();
+          document.getElementById('wf-illus-review-phase').style.display='block';
+        })();
+      } else {
+        runGenerationAnim('wf-img-progress', wfImages.length, 45, ()=>{
+          document.getElementById('wf-illus-gen-phase').style.display='none';
+          renderIllusReview();
+          document.getElementById('wf-illus-review-phase').style.display='block';
+        });
+      }
     };
 
     function renderIllusReview(){
       const container=document.getElementById('wf-img-cards');
       container.innerHTML='';
       const d=T[currentLang]||T.EN;
-      // Start disabled until all images have a decision
       updateIllusContinueBtn();
       wfImages.forEach((img,i)=>{
-        const styleName=img.style!=='auto'?img.style:(d['style.auto']||'KI-Stil');
-        const pageLabel=wfCfg.density==='full'?`${d['wf.page']||'Seite'} ${img.page}`:(d['wf.story.illus']||'Illustration');
+        const styleName=d['style.'+(img.style||'auto')]||img.style||d['style.auto']||'Auto';
+        const pageLabel=`${d['wf.page']||'Seite'} ${img.page}`;
         const card=document.createElement('div');
         card.className='img-card';card.id='icard-'+i;
+        const imgVisual=img.imageUrl
+          ?`<img class="cover-img" src="${escHtml(img.imageUrl)}" alt="${escHtml(pageLabel)}" style="width:72px;height:72px;object-fit:cover;border-radius:3px;">`
+          :`<div class="img-placeholder" style="background:${escHtml(img.gradient)}">IMG</div>`;
         card.innerHTML=
-          `<div class="img-placeholder" style="background:${img.gradient}">IMG</div>`+
+          imgVisual+
           `<div class="img-card-body">`+
-            `<div class="img-card-label">${escHtml(pageLabel)} · ${escHtml(img.bookTitle.slice(0,16))}</div>`+
+            `<div class="img-card-label">${escHtml(pageLabel)} · ${escHtml(img.bookTitle)}</div>`+
             `<div class="img-card-desc">${escHtml(styleName)}</div>`+
             `<div class="book-card-actions">`+
               `<button class="bc-btn approve" onclick="imgAction(${i},'approve')">${d['btn.keep']||'✓ Behalten'}</button>`+
               `<button class="bc-btn rewrite" onclick="imgAction(${i},'regen')">${d['btn.redo']||'↻ Neu'}</button>`+
               `<button class="bc-btn discard" onclick="imgAction(${i},'skip')">${d['btn.skip']||'✕ Überspringen'}</button>`+
+            `</div>`+
+            `<div class="bc-rewrite-row" id="illus-rw-row-${i}" style="display:none">`+
+              `<input class="bc-rewrite-input" id="illus-rw-input-${i}" type="text" placeholder="${escHtml(d['btn.illus.regen.hint']||'Optional: Anweisung…')}" maxlength="300">`+
+              `<button class="bc-rewrite-confirm" onclick="illusRegen(${i})">${d['btn.illus.regen.go']||'Neu generieren →'}</button>`+
             `</div>`+
           `</div>`;
         container.appendChild(card);
@@ -2110,11 +2872,49 @@ Return JSON in this exact format (raw JSON only, no markdown):
       if(action==='approve'){img.status='approved';card.className='img-card approved';}
       else if(action==='skip'){img.status='skipped';card.className='img-card skipped';}
       else if(action==='regen'){
-        const cur=IMG_GRADIENTS.indexOf(img.gradient);
-        img.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
-        card.querySelector('.img-placeholder').style.background=img.gradient;
+        const useImgAI=(wfCfg.imgProvider!=='none'&&wfCfg.imgApiKey);
+        if(useImgAI){
+          // Show instruction input row; actual regen happens via illusRegen()
+          const row=document.getElementById('illus-rw-row-'+idx);
+          if(row){ row.style.display=row.style.display==='none'?'flex':'none'; }
+          return;
+        } else {
+          const cur=IMG_GRADIENTS.indexOf(img.gradient);
+          img.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
+          card.querySelector('.img-placeholder').style.background=img.gradient;
+        }
       }
       updateIllusContinueBtn();
+    };
+
+    window.illusRegen=function(idx){
+      const img=wfImages[idx];
+      const card=document.getElementById('icard-'+idx);
+      const row=document.getElementById('illus-rw-row-'+idx);
+      const instruction=(document.getElementById('illus-rw-input-'+idx)?.value||'').trim();
+      if(row) row.style.display='none';
+      img.status='pending';card.className='img-card';
+      updateIllusContinueBtn();
+      const oldVisual=card.querySelector('img,.img-placeholder');
+      const loadEl=document.createElement('div');
+      loadEl.className='img-placeholder';loadEl.style.background=img.gradient;loadEl.textContent='…';
+      loadEl.style.animation='pulse 1.4s ease-in-out infinite';
+      if(oldVisual)oldVisual.replaceWith(loadEl);else card.prepend(loadEl);
+      card.querySelectorAll('.bc-btn,.bc-rewrite-confirm').forEach(b=>b.disabled=true);
+      (async()=>{
+        try{
+          const book=wfBooks.find(b=>b.id===img.bookId);
+          const result=await generateIllusImage(buildIllusPrompt(img,book,instruction));
+          if(result){img.imageUrl=result.imageUrl;img.dataUrl=result.dataUrl;}
+        }catch(e){console.error('[Illus Regen]',e.message||e);}
+        const newVisual=img.imageUrl
+          ?Object.assign(document.createElement('img'),{className:'cover-img',src:img.imageUrl,alt:'',style:'width:72px;height:72px;object-fit:cover;border-radius:3px;'})
+          :Object.assign(document.createElement('div'),{className:'img-placeholder',textContent:'IMG'});
+        if(!img.imageUrl)newVisual.style.background=img.gradient;
+        card.querySelector('.img-placeholder,.cover-img')?.replaceWith(newVisual);
+        card.querySelectorAll('.bc-btn,.bc-rewrite-confirm').forEach(b=>b.disabled=false);
+        updateIllusContinueBtn();
+      })();
     };
 
     function updateIllusContinueBtn(){
@@ -2143,30 +2943,69 @@ Return JSON in this exact format (raw JSON only, no markdown):
       if(!approved.length){alert(d['error.no.books']||'Keine freigegebenen Bücher vorhanden.');return;}
       const pageLabel=d['wf.page']||'Page';
       const winTitle=d['wf.dl.win.title']||'My Books';
-      const css=`<style>`+
-        `@page{margin:2cm;size:A4}`+
-        `body{font-family:'Times New Roman',serif;color:#111;margin:0}`+
-        `.book-section{page-break-after:always}.book-section:last-child{page-break-after:auto}`+
-        `h1{font-size:22pt;text-align:center;margin:0.5cm 0 0.3cm}`+
-        `p.syn{font-size:10.5pt;color:#555;text-align:center;margin:0 0 0.6cm}`+
-        `.cover-wrap{text-align:center;margin:0.5cm 0 1.2cm}`+
-        `.cover-wrap img{max-width:9cm;max-height:12cm;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,0.18)}`+
-        `.page-block{overflow:hidden;margin-bottom:0.6cm}`+
-        `h2{font-size:11.5pt;color:#444;margin:0.4cm 0 0.15cm}`+
-        `p.pg{font-size:11pt;line-height:1.7;margin:0}`+
-        `.page-illus{float:right;margin:0 0 0.4cm 0.6cm;max-width:5.5cm;max-height:8cm;border-radius:3px}`+
-        `.cf::after{content:'';display:table;clear:both}`+
-        `</style>`;
+      const genreLabel=wfCfg.genre&&wfCfg.genre!=='auto'?wfCfg.genre:'';
+      const ageLabel=wfCfg.age&&wfCfg.age!=='auto'?wfCfg.age:'';
+      const genreMeta=[genreLabel,ageLabel].filter(Boolean).join(' · ');
+
+      const css=`<style>
+        @page{size:A4;margin:0}
+        *{box-sizing:border-box}
+        body{font-family:Georgia,'Times New Roman',serif;margin:0;padding:0;color:#1a1a1a;background:#fff}
+
+        /* ── Cover page ── */
+        .bk-cover{width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;background:#0d1b35}
+        .bk-cover-img{width:100%;height:100%;object-fit:cover;display:block}
+        .bk-cover-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent 0%,rgba(0,0,0,0.55) 30%,rgba(0,0,0,0.92) 100%);padding:6cm 1.8cm 1.8cm;color:#fff}
+        .bk-cover-title{font-size:30pt;font-weight:bold;line-height:1.15;margin:0 0 0.4cm}
+        .bk-cover-meta{font-size:9pt;letter-spacing:0.12em;text-transform:uppercase;opacity:0.65;margin:0}
+        .bk-cover-noimg{width:100%;height:100%;background:linear-gradient(160deg,#1a2a4a 0%,#0d1b35 100%);display:flex;align-items:flex-end}
+        .bk-cover-noimg .bk-cover-overlay{position:static;width:100%}
+
+        /* ── Title page ── */
+        .bk-titlepage{width:210mm;height:297mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3cm 3cm;page-break-after:always}
+        .bk-titlepage h1{font-size:26pt;margin:0 0 0.5cm;line-height:1.2}
+        .bk-titlepage .rule{width:5cm;border:none;border-top:1.5pt solid #bbb;margin:0.9cm auto}
+        .bk-titlepage .syn{font-size:12.5pt;line-height:1.8;color:#444;font-style:italic;margin:0}
+        .bk-titlepage .meta{font-size:8.5pt;color:#aaa;margin-top:2cm;letter-spacing:0.08em;text-transform:uppercase}
+
+        /* ── Content page with illustration ── */
+        .bk-page{width:210mm;height:297mm;overflow:hidden;page-break-after:always;display:flex;flex-direction:column}
+        .bk-page:last-child{page-break-after:auto}
+        .bk-pg-illus{flex:0 0 58%;overflow:hidden}
+        .bk-pg-illus img{width:100%;height:100%;object-fit:cover;display:block}
+        .bk-pg-body{flex:1;padding:0.8cm 1.8cm 1.1cm;display:flex;flex-direction:column;justify-content:center;border-top:0.5pt solid #e4e4e4}
+        .bk-pg-body.text-only{flex:1;padding:2.5cm 2.3cm;justify-content:flex-start;border-top:none}
+        .bk-pg-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.45cm}
+        .bk-pg-num{font-size:7.5pt;color:#bbb;letter-spacing:0.07em;text-transform:uppercase;font-family:Arial,sans-serif}
+        .bk-pg-booktitle{font-size:7pt;color:#ccc;letter-spacing:0.04em;font-family:Arial,sans-serif;font-style:italic}
+        .bk-pg-text{font-size:13pt;line-height:1.95;margin:0}
+      </style>`;
+
       const body=approved.map(b=>{
         const cover=wfCovers.find(c=>c.bookId===b.id&&(c.dataUrl||c.imageUrl));
-        const coverHtml=cover?`<div class="cover-wrap"><img src="${cover.dataUrl||cover.imageUrl}" alt="${escHtml(b.title)}"></div>`:'';
+
+        // Cover page
+        const coverPage=cover
+          ?`<div class="bk-cover"><img class="bk-cover-img" src="${escHtml(cover.dataUrl||cover.imageUrl)}" alt=""><div class="bk-cover-overlay"><p class="bk-cover-title">${escHtml(b.title)}</p>${genreMeta?`<p class="bk-cover-meta">${escHtml(genreMeta)}</p>`:''}</div></div>`
+          :`<div class="bk-cover"><div class="bk-cover-noimg"><div class="bk-cover-overlay"><p class="bk-cover-title">${escHtml(b.title)}</p>${genreMeta?`<p class="bk-cover-meta">${escHtml(genreMeta)}</p>`:''}</div></div></div>`;
+
+        // Title page
+        const titlePage=`<div class="bk-titlepage"><h1>${escHtml(b.title)}</h1><div class="rule"></div><p class="syn">${escHtml(b.synopsis)}</p>${genreMeta?`<p class="meta">${escHtml(genreMeta)}</p>`:''}</div>`;
+
+        // Content pages
         const pagesHtml=b.pages.map((p,pi)=>{
-          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&(img.dataUrl||img.imageUrl));
-          const illusHtml=illus?`<img class="page-illus" src="${illus.dataUrl||illus.imageUrl}" alt="">`:'';
-          return `<div class="page-block cf">${illusHtml}<h2>${escHtml(pageLabel)} ${pi+1}</h2><p class="pg">${escHtml(p)}</p></div>`;
+          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&img.status!=='skipped'&&(img.dataUrl||img.imageUrl));
+          const header=`<div class="bk-pg-header"><span class="bk-pg-num">${escHtml(pageLabel)} ${pi+1}</span><span class="bk-pg-booktitle">${escHtml(b.title)}</span></div>`;
+          if(illus){
+            return `<div class="bk-page"><div class="bk-pg-illus"><img src="${escHtml(illus.dataUrl||illus.imageUrl)}" alt=""></div><div class="bk-pg-body">${header}<p class="bk-pg-text">${escHtml(p)}</p></div></div>`;
+          }else{
+            return `<div class="bk-page"><div class="bk-pg-body text-only">${header}<p class="bk-pg-text">${escHtml(p)}</p></div></div>`;
+          }
         }).join('');
-        return `<div class="book-section"><h1>${escHtml(b.title)}</h1><p class="syn">${escHtml(b.synopsis)}</p>${coverHtml}${pagesHtml}</div>`;
+
+        return coverPage+titlePage+pagesHtml;
       }).join('');
+
       const win=window.open('','_blank');
       win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escHtml(winTitle)}</title>${css}</head><body>${body}</body></html>`);
       win.document.close();win.focus();
@@ -2178,28 +3017,57 @@ Return JSON in this exact format (raw JSON only, no markdown):
       const d=T[currentLang]||T.EN;
       if(!approved.length){alert(d['error.no.books']||'Keine freigegebenen Bücher vorhanden.');return;}
       const pageLabel=d['wf.page']||'Page';
-      const css=`body{font-family:'Times New Roman',serif;margin:2cm}`+
-        `h1{font-size:24pt;text-align:center;margin-bottom:0.2cm}`+
-        `p.syn{font-size:12pt;color:#555;text-align:center;margin-bottom:0.5cm}`+
-        `.cover-wrap{text-align:center;margin:0.4cm 0 1cm}`+
-        `.cover-wrap img{max-width:9cm;max-height:12cm}`+
-        `.page-block{overflow:hidden;margin-bottom:0.6cm}`+
-        `h2{font-size:13pt;color:#444;margin-bottom:0.1cm}`+
-        `p.pg{font-size:12pt;line-height:1.7;margin:0}`+
-        `.page-illus{float:right;margin:0 0 0.4cm 0.6cm;max-width:5.5cm;max-height:8cm}`+
-        `.cf::after{content:'';display:table;clear:both}`+
-        `hr{margin:1cm 0;border:none;border-top:1px solid #ccc}`;
+      const genreLabel=wfCfg.genre&&wfCfg.genre!=='auto'?wfCfg.genre:'';
+      const ageLabel=wfCfg.age&&wfCfg.age!=='auto'?wfCfg.age:'';
+      const genreMeta=[genreLabel,ageLabel].filter(Boolean).join(' · ');
+
+      const css=
+        `body{font-family:'Times New Roman',serif;margin:2.5cm;color:#1a1a1a}`+
+        /* Cover area */
+        `.bk-cover-img-wrap{text-align:center;margin:0 -1.5cm 0.8cm;line-height:0}`+
+        `.bk-cover-img-wrap img{width:calc(100% + 3cm);max-height:14cm;object-fit:cover}`+
+        `.bk-cover-titleblock{text-align:center;padding:0.2cm 0 1.2cm}`+
+        `.bk-cover-titleblock h1{font-size:26pt;margin:0 0 0.3cm;line-height:1.15}`+
+        `.bk-cover-titleblock .meta{font-size:9pt;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin:0}`+
+        /* Title / synopsis page */
+        `.bk-titlepage{text-align:center;padding:2cm 1cm 1.5cm}`+
+        `.bk-titlepage h2{font-size:20pt;margin:0 0 0.4cm}`+
+        `.bk-titlepage .rule{width:5cm;border:none;border-top:1.5pt solid #bbb;margin:0.8cm auto}`+
+        `.bk-titlepage .syn{font-size:12pt;line-height:1.8;color:#444;font-style:italic;margin:0}`+
+        `.bk-titlepage .meta2{font-size:8pt;color:#aaa;margin-top:1.5cm;letter-spacing:0.08em;text-transform:uppercase}`+
+        /* Content pages */
+        `.bk-page{margin-bottom:0.5cm}`+
+        `.bk-pg-illus{text-align:center;margin:0 -1.5cm 0.7cm;line-height:0}`+
+        `.bk-pg-illus img{width:calc(100% + 3cm);max-height:11cm;object-fit:cover}`+
+        `.bk-pg-hdr{display:table;width:100%;margin-bottom:0.35cm}`+
+        `.bk-pg-hdr-l{display:table-cell;font-size:8pt;color:#bbb;letter-spacing:0.06em;text-transform:uppercase}`+
+        `.bk-pg-hdr-r{display:table-cell;text-align:right;font-size:7.5pt;color:#ccc;font-style:italic}`+
+        `.bk-pg-text{font-size:13pt;line-height:2;margin:0}`+
+        `hr.bk-sep{page-break-before:always;border:none;margin:0}`;
+
       const body=approved.map((b,bi)=>{
         const cover=wfCovers.find(c=>c.bookId===b.id&&(c.dataUrl||c.imageUrl));
-        const coverHtml=cover?`<div class="cover-wrap"><img src="${cover.dataUrl||cover.imageUrl}" alt="${escHtml(b.title)}"></div>`:'';
+
+        // Cover section
+        const coverSec=cover
+          ?`<div class="bk-cover-img-wrap"><img src="${escHtml(cover.dataUrl||cover.imageUrl)}" alt=""></div>`+
+            `<div class="bk-cover-titleblock"><h1>${escHtml(b.title)}</h1>${genreMeta?`<p class="meta">${escHtml(genreMeta)}</p>`:''}</div>`
+          :`<div class="bk-cover-titleblock" style="padding-top:1.5cm"><h1>${escHtml(b.title)}</h1>${genreMeta?`<p class="meta">${escHtml(genreMeta)}</p>`:''}</div>`;
+
+        // Title/synopsis section
+        const titleSec=`<div class="bk-titlepage"><h2>${escHtml(b.title)}</h2><div class="rule"></div><p class="syn">${escHtml(b.synopsis)}</p>${genreMeta?`<p class="meta2">${escHtml(genreMeta)}</p>`:''}</div>`;
+
+        // Content pages
         const pagesHtml=b.pages.map((p,pi)=>{
-          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&(img.dataUrl||img.imageUrl));
-          const illusHtml=illus?`<img class="page-illus" src="${illus.dataUrl||illus.imageUrl}" alt="">`:'';
-          return `<div class="page-block cf">${illusHtml}<h2>${escHtml(pageLabel)} ${pi+1}</h2><p class="pg">${escHtml(p)}</p></div>`;
-        }).join('');
-        return `<h1>${escHtml(b.title)}</h1><p class="syn">${escHtml(b.synopsis)}</p>${coverHtml}${pagesHtml}`+
-          (bi<approved.length-1?'<hr>':'');
+          const illus=wfImages.find(img=>img.bookId===b.id&&img.page===(pi+1)&&img.status!=='skipped'&&(img.dataUrl||img.imageUrl));
+          const illusHtml=illus?`<div class="bk-pg-illus"><img src="${escHtml(illus.dataUrl||illus.imageUrl)}" alt=""></div>`:'';
+          const hdr=`<div class="bk-pg-hdr"><span class="bk-pg-hdr-l">${escHtml(pageLabel)} ${pi+1}</span><span class="bk-pg-hdr-r">${escHtml(b.title)}</span></div>`;
+          return `<div class="bk-page">${illusHtml}${hdr}<p class="bk-pg-text">${escHtml(p)}</p></div>`;
+        }).join('<hr class="bk-sep">');
+
+        return (bi>0?'<hr class="bk-sep">':'')+coverSec+titleSec+pagesHtml;
       }).join('');
+
       const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">`+
         `<head><meta charset="UTF-8"><style>${css}</style></head><body>${body}</body></html>`;
       const blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
@@ -2234,6 +3102,394 @@ Return JSON in this exact format (raw JSON only, no markdown):
       document.getElementById('feedback-success').classList.add('show');
     });
 
+    /* ── SUMMARY EXPORT / IMPORT ────────────────────────────────── */
+    window.exportSummaryTxt = function() {
+      const d = T[currentLang] || T.EN;
+      const idea  = document.getElementById('idea')?.value.trim()  || '';
+      const genre = document.getElementById('genre')?.value        || '';
+      const age   = document.getElementById('age')?.value          || '';
+      const books = document.getElementById('book-count')?.value   || '1';
+      const pages = document.getElementById('pages')?.value        || '30';
+      const dens  = document.getElementById('illus-density')?.value|| '';
+      const style = document.getElementById('illustration-style')?.value || '';
+      const tone  = document.getElementById('tone')?.value         || '';
+
+      const label = (k) => d[k] || k;
+      const lines = [
+        '# Book Creator — ' + (d['out.title'] || 'Konfiguration').replace(/<br>/g,' '),
+        '# ' + new Date().toLocaleDateString(),
+        '',
+        label('s.idea')  + ': ' + idea,
+        label('s.genre') + ': ' + (d['genre.'+(genre||'auto')]||genre),
+        label('s.age')   + ': ' + (d['age.'+(({'auto':'auto','4-8':'kids','9-13':'young','14-17':'teens','18+':'adults','all':'all'})[age]||age)]||age),
+        label('s.books') + ': ' + books,
+        label('s.pages') + ': ' + pages,
+        (d['f.density.label'] || 'Illustrations') + ': ' + (d['density.'+(dens||'auto')]||dens),
+        (d['f.style.label'] || 'Style')           + ': ' + style,
+        label('s.tone')  + ': ' + (d['tone.'+(tone||'auto')]||tone),
+        '',
+        '# --- raw values (for import) ---',
+        'idea='   + idea,
+        'genre='  + genre,
+        'age='    + age,
+        'books='  + books,
+        'pages='  + pages,
+        'illusDensity='      + dens,
+        'illustrationStyle=' + style,
+        'tone='   + tone,
+      ];
+      const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'book-config.txt';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    };
+
+    window.importSummaryTxt = function(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const vals = {};
+        text.split('\n').forEach(line => {
+          const m = line.match(/^([a-zA-Z]+)=(.*)$/);
+          if (m) vals[m[1].trim()] = m[2].trim();
+        });
+
+        if (vals.idea !== undefined) {
+          const ideaEl = document.getElementById('idea');
+          if (ideaEl) ideaEl.value = vals.idea;
+        }
+        if (vals.genre) {
+          const genreEl = document.getElementById('genre');
+          if (genreEl && [...genreEl.options].some(o => o.value === vals.genre))
+            genreEl.value = vals.genre;
+        }
+        if (vals.age) {
+          const ageEl = document.getElementById('age');
+          if (ageEl && [...ageEl.options].some(o => o.value === vals.age))
+            ageEl.value = vals.age;
+        }
+        if (vals.books) {
+          const booksEl = document.getElementById('book-count');
+          if (booksEl) { booksEl.value = vals.books; document.getElementById('books-val').textContent = vals.books; }
+        }
+        if (vals.pages) {
+          const pagesEl = document.getElementById('pages');
+          if (pagesEl) { pagesEl.value = vals.pages; document.getElementById('pages-val').textContent = vals.pages; }
+        }
+        if (vals.illusDensity) {
+          const densEl = document.getElementById('illus-density');
+          if (densEl && [...densEl.options].some(o => o.value === vals.illusDensity))
+            densEl.value = vals.illusDensity;
+        }
+        if (vals.illustrationStyle) {
+          const styleEl = document.getElementById('illustration-style');
+          if (styleEl && [...styleEl.options].some(o => o.value === vals.illustrationStyle))
+            styleEl.value = vals.illustrationStyle;
+        }
+        if (vals.tone !== undefined) {
+          const toneEl = document.getElementById('tone');
+          if (toneEl && [...toneEl.options].some(o => o.value === vals.tone))
+            toneEl.value = vals.tone;
+        }
+
+        // Trigger sync
+        document.getElementById('book-form')?.dispatchEvent(new Event('input', { bubbles: true }));
+        syncSummary();
+        syncDensityVisibility();
+
+        // Flash import button
+        const btn = input.previousElementSibling;
+        if (btn) {
+          const span = btn.querySelector('[data-i18n]');
+          const orig = span?.textContent;
+          if (span) span.textContent = '✓';
+          btn.style.borderColor = 'var(--accent-dim)';
+          btn.style.color = 'var(--accent)';
+          setTimeout(() => {
+            if (span && orig) span.textContent = orig;
+            btn.style.borderColor = '';
+            btn.style.color = '';
+          }, 1800);
+        }
+        input.value = ''; // reset so same file can be re-imported
+      };
+      reader.readAsText(file);
+    };
+
+    /* ── COLLAPSIBLE TOGGLE ─────────────────────────────────────── */
+    window.toggleCollapse = function(bodyId, toggleId) {
+      const body   = document.getElementById(bodyId);
+      const toggle = document.getElementById(toggleId);
+      if (!body || !toggle) return;
+      const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!isOpen));
+      body.classList.toggle('is-collapsed', isOpen);
+      // update hint text using current language
+      const d = T[currentLang] || T.EN;
+      const hint = toggle.querySelector('.collapse-toggle-hint');
+      if (hint) hint.textContent = isOpen ? (d['collapse.show'] || 'Show') : (d['collapse.hide'] || 'Hide');
+    };
+
+    /* ── IDEA WORKSHOP CHATBOT ──────────────────────────────────── */
+    (function(){
+      const SYSTEM_PROMPT =
+        'Du bist ein einfühlsamer, kreativer Buchassistent. Deine Aufgabe:\n' +
+        '- Hilf dem Benutzer, seine Buchidee zu entwickeln und zu verfeinern\n' +
+        '- Stelle jeweils NUR EINE konkrete Frage, um die Idee zu schärfen (z.B. zur Zielgruppe, zum Ton, zum Protagonisten, zum Konflikt)\n' +
+        '- Fass nach jeder Antwort die aktuelle Idee kurz zusammen, bevor du die nächste Frage stellst\n' +
+        '- Wenn die Idee klar genug ist (nach 3–5 Austauschen), schreibe am Ende deiner Antwort einen Block:\n' +
+        '  [IDEE] Die Idee hier ausformuliert (2–4 Sätze, klar und packend) [/IDEE]\n' +
+        '- Antworte auf Deutsch, locker und motivierend\n' +
+        '- Halte Antworten kurz (2–4 Sätze + eine Frage)';
+
+      const MOCK_REPLIES = [
+        'Interessant! Das klingt nach einer spannenden Geschichte. Für wen soll das Buch sein — Kinder, Jugendliche oder Erwachsene?',
+        'Gut! Und was ist der zentrale Konflikt oder die größte Herausforderung für die Hauptfigur?',
+        'Super. Welchen Ton soll das Buch haben — eher humorvoll, ernst, abenteuerlich oder nachdenklich?\n\n[IDEE] Eine fesselnde Geschichte über [deine Stichworte], die Leser aller Altersgruppen anspricht. Die Hauptfigur steht vor einem zentralen Konflikt und muss dabei über sich hinauswachsen. Der Ton ist ausgewogen — mal spannend, mal nachdenklich. [/IDEE]',
+      ];
+      let mockStep = 0;
+
+      let wsHistory = [];
+      let wsRefinedIdea = '';
+      let wsLoading = false;
+
+      // ── Provider helpers ──────────────────────────────────────────
+      function getProvider(){
+        return document.querySelector('input[name="ws-provider"]:checked')?.value || 'openai';
+      }
+      function getApiKey(){
+        return (document.getElementById('ws-api-key')?.value || '').trim()
+          || localStorage.getItem('bm_ws_key') || '';
+      }
+      function saveKey(k){ if(k) localStorage.setItem('bm_ws_key', k); }
+
+      // Restore saved key
+      const savedKey = localStorage.getItem('bm_ws_key');
+      if(savedKey) document.getElementById('ws-api-key').value = savedKey;
+
+      // Show/hide key field based on provider
+      function syncKeyVisibility(){
+        const isMock = getProvider() === 'mock';
+        const grp = document.getElementById('ws-key-group');
+        if(grp) grp.style.display = isMock ? 'none' : '';
+      }
+      document.querySelectorAll('input[name="ws-provider"]').forEach(r =>
+        r.addEventListener('change', syncKeyVisibility)
+      );
+      syncKeyVisibility();
+
+      // Key show/hide toggle
+      const wsKeyInput = document.getElementById('ws-api-key');
+      const wsKeyToggle = document.getElementById('ws-key-toggle');
+      if(wsKeyToggle && wsKeyInput){
+        wsKeyToggle.addEventListener('click', () => {
+          const show = wsKeyInput.type === 'password';
+          wsKeyInput.type = show ? 'text' : 'password';
+          wsKeyToggle.textContent = show ? 'Verbergen' : 'Zeigen';
+        });
+      }
+
+      // Sync ws provider → book form provider (optional convenience)
+      document.querySelectorAll('input[name="ws-provider"]').forEach(r => {
+        r.addEventListener('change', () => {
+          const v = r.value;
+          const match = document.querySelector(`input[name="provider"][value="${v}"]`);
+          if(match) match.checked = true;
+        });
+      });
+
+      // Auto-resize textarea
+      const wsInput = document.getElementById('ws-input');
+      if(wsInput){
+        wsInput.addEventListener('input', function(){
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+      }
+
+      // ── UI helpers ────────────────────────────────────────────────
+      function escHtml(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                        .replace(/\n/g,'<br>');
+      }
+      function wsScroll(){
+        const el = document.getElementById('ws-messages');
+        if(el) el.scrollTop = el.scrollHeight;
+      }
+      function wsAppend(role, text){
+        const container = document.getElementById('ws-messages');
+        if(!container) return;
+        const div = document.createElement('div');
+        div.className = 'ws-msg ws-msg-' + (role === 'assistant' ? 'ai' : 'user');
+        div.innerHTML = '<span class="ws-msg-name">' + (role==='assistant' ? 'Assistent' : 'Du') + '</span>' +
+                        '<div class="ws-bubble">' + escHtml(text) + '</div>';
+        container.appendChild(div);
+        wsScroll();
+      }
+      function wsShowTyping(){
+        const container = document.getElementById('ws-messages');
+        if(!container) return;
+        const div = document.createElement('div');
+        div.id = 'ws-typing-indicator';
+        div.className = 'ws-msg ws-msg-ai';
+        div.innerHTML = '<span class="ws-msg-name">Assistent</span>' +
+          '<div class="ws-bubble ws-typing"><span></span><span></span><span></span></div>';
+        container.appendChild(div);
+        wsScroll();
+      }
+      function wsHideTyping(){ document.getElementById('ws-typing-indicator')?.remove(); }
+      function wsSetThinking(on){
+        wsLoading = on;
+        const dot = document.getElementById('ws-status-dot');
+        const btn = document.getElementById('ws-send-btn');
+        if(dot) dot.className = 'ws-chat-status-dot' + (on ? ' thinking' : '');
+        if(btn) btn.disabled = on;
+      }
+      function wsExtractIdea(text){
+        const m = text.match(/\[IDEE\]([\s\S]*?)\[\/IDEE\]/);
+        return m ? m[1].trim() : null;
+      }
+      function wsUpdateRefined(idea){
+        wsRefinedIdea = idea;
+        const box = document.getElementById('ws-refined-box');
+        const txt = document.getElementById('ws-refined-text');
+        const row = document.getElementById('ws-adopt-row');
+        if(txt) txt.textContent = idea;
+        if(box) box.classList.add('visible');
+        if(row) row.style.display = 'flex';
+      }
+
+      // ── API call (multi-turn, all providers) ──────────────────────
+      async function wsCall(history){
+        const provider = getProvider();
+        const apiKey   = getApiKey();
+
+        if(provider === 'mock'){
+          await new Promise(r => setTimeout(r, 900 + Math.random()*600));
+          return MOCK_REPLIES[Math.min(mockStep++, MOCK_REPLIES.length - 1)];
+        }
+        if(!apiKey) throw new Error('Bitte API Key eingeben.');
+        saveKey(apiKey);
+
+        if(provider === 'openai' || provider === 'mistral'){
+          const url = provider === 'openai'
+            ? 'https://api.openai.com/v1/chat/completions'
+            : 'https://api.mistral.ai/v1/chat/completions';
+          const model = provider === 'openai' ? 'gpt-4o-mini' : 'mistral-small-latest';
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
+            body: JSON.stringify({ model, temperature:0.75, max_tokens:400,
+              messages: [{ role:'system', content:SYSTEM_PROMPT }, ...history] }),
+          });
+          if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+resp.status); }
+          return (await resp.json()).choices?.[0]?.message?.content?.trim() || '';
+
+        } else if(provider === 'anthropic'){
+          // Anthropic: system separate, history must alternate user/assistant
+          const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json', 'x-api-key':apiKey,
+              'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+            body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:400,
+              system: SYSTEM_PROMPT, messages: history }),
+          });
+          if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+resp.status); }
+          return (await resp.json()).content?.[0]?.text?.trim() || '';
+
+        } else if(provider === 'gemini'){
+          // Gemini: map user/assistant → user/model
+          const contents = history.map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content }],
+          }));
+          const resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            { method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ contents,
+                systemInstruction: { parts:[{ text: SYSTEM_PROMPT }] },
+                generationConfig: { maxOutputTokens:400, temperature:0.75 } }) }
+          );
+          if(!resp.ok){ const e=await resp.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+resp.status); }
+          return (await resp.json()).candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        }
+        throw new Error('Unbekannter Provider: ' + provider);
+      }
+
+      // ── Send ──────────────────────────────────────────────────────
+      window.wsSend = async function(){
+        const inputEl = document.getElementById('ws-input');
+        const text = (inputEl?.value || '').trim();
+        if(!text || wsLoading) return;
+
+        const provider = getProvider();
+        if(provider !== 'mock' && !getApiKey()){
+          wsAppend('assistant', '⚠ Bitte zuerst den API Key links eingeben.');
+          document.getElementById('ws-api-key')?.focus();
+          return;
+        }
+
+        wsAppend('user', text);
+        wsHistory.push({ role:'user', content:text });
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+
+        wsSetThinking(true);
+        wsShowTyping();
+
+        try {
+          const reply = await wsCall(wsHistory);
+          wsHideTyping();
+          wsHistory.push({ role:'assistant', content:reply });
+
+          const displayText = reply.replace(/\[IDEE\][\s\S]*?\[\/IDEE\]/g, '').trim();
+          wsAppend('assistant', displayText || reply);
+
+          const idea = wsExtractIdea(reply);
+          if(idea) wsUpdateRefined(idea);
+
+        } catch(err){
+          wsHideTyping();
+          wsAppend('assistant', '⚠ Fehler: ' + (err.message || 'Unbekannter Fehler'));
+          console.error('[Workshop]', err);
+        } finally {
+          wsSetThinking(false);
+          document.getElementById('ws-input')?.focus();
+        }
+      };
+
+      // ── Adopt ─────────────────────────────────────────────────────
+      window.workshopAdopt = function(){
+        if(!wsRefinedIdea) return;
+        const ideaField = document.getElementById('idea');
+        if(ideaField){
+          ideaField.value = wsRefinedIdea;
+          ideaField.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+        // Also sync provider & key to book form
+        const provider = getProvider();
+        const key = getApiKey();
+        const bookProv = document.querySelector(`input[name="provider"][value="${provider}"]`);
+        if(bookProv) bookProv.checked = true;
+        const bookKey = document.getElementById('api-key');
+        if(bookKey && key) bookKey.value = key;
+
+        document.getElementById('create')?.scrollIntoView({ behavior:'smooth' });
+
+        const btn = document.getElementById('ws-adopt-btn');
+        if(btn){
+          const orig = btn.textContent;
+          btn.textContent = '✓ Übernommen';
+          btn.style.background = 'var(--accent)'; btn.style.color = '#000';
+          setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; btn.style.color=''; }, 2200);
+        }
+      };
+    })();
+
     // Load saved image API key
     const savedImgKey=localStorage.getItem('bm_img_api_key');
     if(savedImgKey) document.getElementById('img-api-key').value=savedImgKey;
@@ -2256,12 +3512,14 @@ Return JSON in this exact format (raw JSON only, no markdown):
     // Image API key show/hide toggle
     const imgKeyInput=document.getElementById('img-api-key');
     const imgKeyToggle=document.getElementById('img-api-key-toggle');
-    imgKeyToggle.addEventListener('click',()=>{
-      const isHidden=imgKeyInput.type==='password';
-      imgKeyInput.type=isHidden?'text':'password';
-      const d2=T[currentLang]||T.EN;
-      imgKeyToggle.textContent=isHidden?(d2['apikey.hide']||'Hide'):(d2['apikey.show']||'Show');
-    });
+    if(imgKeyToggle && imgKeyInput){
+      imgKeyToggle.addEventListener('click',()=>{
+        const isHidden=imgKeyInput.type==='password';
+        imgKeyInput.type=isHidden?'text':'password';
+        const d2=T[currentLang]||T.EN;
+        imgKeyToggle.textContent=isHidden?(d2['apikey.hide']||'Hide'):(d2['apikey.show']||'Show');
+      });
+    }
 
     // Default language
     setLang('DE');
