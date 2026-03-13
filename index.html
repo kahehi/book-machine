@@ -1961,12 +1961,15 @@
         const qaEl=document.getElementById(`qa-${i}`);
         const useChapters=!isChildrensMode(genre,density)&&parseInt(pages)>CHAPTER_PAGES;
         let pct=0, running=true;
-        const iv=setInterval(()=>{
-          if(!running)return;
-          pct+=(90-pct)*0.07;
-          bar.style.width=pct+'%';
-          if(!useChapters)stat.textContent=Math.round(pct)+'%';
-        },250);
+        let iv=null;
+        if(!useChapters){
+          iv=setInterval(()=>{
+            if(!running)return;
+            pct+=(90-pct)*0.07;
+            bar.style.width=pct+'%';
+            stat.textContent=Math.round(pct)+'%';
+          },250);
+        }
         try{
           const d2=T[currentLang]||T.EN;
           let book;
