@@ -1915,7 +1915,12 @@
         starters[(n+i)%starters.length]+
         ' The narrative unfolds with care, drawing readers into a world that feels both familiar and extraordinary, page after page.'
       );
-      return {id:n,title,synopsis,characters:[],pages,status:'pending'};
+      const mockCharacters=[
+        {name:'Alex',description:'The determined protagonist — sharp eyes, quick mind, always ready for the next challenge.',descriptionEn:'Alex, mid-twenties, short dark hair, green eyes, medium build, wearing a worn leather jacket.'},
+        {name:'Sam',description:'The loyal companion — warm-hearted and perceptive, often the voice of reason.',descriptionEn:'Sam, similar age, curly auburn hair, brown eyes, relaxed clothing style, friendly face.'},
+        {name:'Morgan',description:'The mysterious figure whose motives become clearer as the story unfolds.',descriptionEn:'Morgan, older, silver streaks in dark hair, piercing grey eyes, formal attire, commanding presence.'},
+      ];
+      return {id:n,title,synopsis,characters:mockCharacters,pages,status:'pending'};
     }
 
     function goToStep(n){
@@ -2477,6 +2482,38 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
       }
     }
 
+    function generateSvgCover(cov, book){
+      const title = escHtml(cov.bookTitle || book?.title || '');
+      const synopsis = escHtml((book?.synopsis || '').slice(0, 160));
+      const grad = cov.gradient || IMG_GRADIENTS[0];
+      // Extract two colours from the gradient string for a stop pair
+      const cols = [...grad.matchAll(/#[0-9a-fA-F]{3,6}/g)].map(m=>m[0]);
+      const c1 = cols[0] || '#1a1a2e', c2 = cols[cols.length-1] || '#0f3460';
+      const lines = title.match(/.{1,18}(\s|$)/g) || [title];
+      const titleY = 340 - (lines.length - 1) * 22;
+      const titleSvg = lines.map((l,i)=>
+        `<text x="180" y="${titleY + i*44}" font-size="36" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Georgia,serif">${l.trim()}</text>`
+      ).join('');
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="540" viewBox="0 0 360 540">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${c1}"/>
+      <stop offset="100%" stop-color="${c2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="540" fill="url(#bg)"/>
+  <rect x="30" y="30" width="300" height="480" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <rect x="60" y="60" width="240" height="1" fill="rgba(255,255,255,0.3)"/>
+  <rect x="60" y="480" width="240" height="1" fill="rgba(255,255,255,0.3)"/>
+  ${titleSvg}
+  <rect x="140" y="${titleY + lines.length*44 + 8}" width="80" height="1.5" fill="rgba(255,255,255,0.5)"/>
+  <foreignObject x="50" y="${titleY + lines.length*44 + 24}" width="260" height="120">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="color:rgba(255,255,255,0.65);font-size:12px;font-family:Georgia,serif;line-height:1.6;text-align:center">${synopsis}</div>
+  </foreignObject>
+</svg>`;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
     async function generateCovers(){
       const container=document.getElementById('wf-cover-progress');
       container.innerHTML='';
@@ -2516,12 +2553,15 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
             if(e.name==='AbortError') break;
             console.error('[Cover] Fehler für',cov.bookTitle,e.message||e);
           }
+        } else {
+          // No image AI — generate a styled typographic SVG cover
+          cov.dataUrl=generateSvgCover(cov,book);
         }
 
         clearInterval(iv);
         bar.style.width='100%';
-        stat.textContent=cov.imageUrl?'✓':'~';
-        stat.className='gen-book-status '+(cov.imageUrl?'done':'');
+        stat.textContent=(cov.imageUrl||cov.dataUrl)?'✓':'~';
+        stat.className='gen-book-status '+((cov.imageUrl||cov.dataUrl)?'done':'');
         await new Promise(r=>setTimeout(r,200));
       }
 
@@ -2541,8 +2581,9 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
         const card=document.createElement('div');
         card.className='img-card';card.id='covcard-'+i;
         const coverLabel=d['wf.nav.covers']||'Cover';
-        const coverVisual=cov.imageUrl
-          ?`<img class="cover-img" src="${escHtml(cov.imageUrl)}" alt="${escHtml(cov.bookTitle)}">`
+        const coverSrc=cov.imageUrl||cov.dataUrl||null;
+        const coverVisual=coverSrc
+          ?`<img class="cover-img" src="${escHtml(coverSrc)}" alt="${escHtml(cov.bookTitle)}">`
           :`<div class="img-placeholder cover-placeholder" style="background:${escHtml(cov.gradient)}">${escHtml(coverLabel)}</div>`;
         card.innerHTML=
           coverVisual+
@@ -2605,14 +2646,15 @@ Professional illustration, cinematic lighting, highly detailed, rich colors, vis
             console.error('[Cover] Regen Fehler:',e.message||e);
           }
         } else {
-          const cur=IMG_GRADIENTS.indexOf(cov.gradient);
-          cov.gradient=IMG_GRADIENTS[(cur+3)%IMG_GRADIENTS.length];
+          const book=wfBooks.find(b=>b.id===cov.bookId);
           cov.imageUrl=null;
+          cov.dataUrl=generateSvgCover(cov,book);
         }
-        const newVisual=cov.imageUrl
-          ?Object.assign(document.createElement('img'),{className:'cover-img',src:cov.imageUrl,alt:cov.bookTitle})
+        const coverSrc=cov.imageUrl||cov.dataUrl||null;
+        const newVisual=coverSrc
+          ?Object.assign(document.createElement('img'),{className:'cover-img',src:coverSrc,alt:cov.bookTitle})
           :Object.assign(document.createElement('div'),{className:'img-placeholder cover-placeholder',textContent:'COVER'});
-        if(!cov.imageUrl) newVisual.style.background=cov.gradient;
+        if(!coverSrc) newVisual.style.background=cov.gradient;
         card.querySelector('.cover-loading')?.replaceWith(newVisual);
         card.querySelectorAll('.bc-btn').forEach(b=>b.disabled=false);
         cov.status='pending';
