@@ -1960,21 +1960,25 @@
         const stat=document.getElementById(`stat-wf-gen-progress-${i}`);
         const qaEl=document.getElementById(`qa-${i}`);
         const useChapters=!isChildrensMode(genre,density)&&parseInt(pages)>CHAPTER_PAGES;
-        let pct=0, running=true;
-        let iv=null;
-        if(!useChapters){
-          iv=setInterval(()=>{
-            if(!running)return;
+        let pct=0, reportedPct=0, running=true;
+        const iv=setInterval(()=>{
+          if(!running)return;
+          if(!useChapters){
             pct+=(90-pct)*0.07;
             bar.style.width=pct+'%';
             stat.textContent=Math.round(pct)+'%';
-          },250);
-        }
+          } else {
+            // Slowly creep up to 2% ahead of last reported — never overtake real progress
+            const cap=Math.min(reportedPct+2,95);
+            if(pct<cap){ pct+=0.15; bar.style.width=pct.toFixed(1)+'%'; }
+          }
+        },250);
         try{
           const d2=T[currentLang]||T.EN;
           let book;
           if(useChapters){
             book=await callAIChaptered(provider,apiKey,idea,i,cnt,genre,age,pages,tone,currentLang,_genAbort.signal,(msg,p)=>{
+              reportedPct=p; pct=p;
               bar.style.width=p+'%';
               stat.textContent=p+'%';
               qaEl.textContent=msg;
