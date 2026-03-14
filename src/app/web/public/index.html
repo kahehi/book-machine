@@ -426,5 +426,34 @@ function esc(s) {
     .replace(/"/g,'&quot;');
 }
 </script>
+
+<!-- ─── Cookie Banner ────────────────────────────────────────────────────── -->
+<div id="cookieBanner"
+  style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+         background:rgba(3,7,18,.96);border-top:1px solid #1f2937;
+         padding:.75rem 1.25rem;display:flex;flex-wrap:wrap;align-items:center;
+         justify-content:space-between;gap:.75rem;">
+  <p style="margin:0;font-size:.75rem;color:#9ca3af;max-width:640px;line-height:1.5;">
+    Diese App speichert ausschliesslich technisch notwendige Einstellungen lokal in deinem Browser.
+    Es werden <strong style="color:#e5e7eb;font-weight:600;">keine Tracking-Cookies</strong>
+    gesetzt und keine personenbezogenen Daten an Dritte weitergegeben.
+  </p>
+  <button onclick="acceptCookies()"
+    style="flex-shrink:0;font-size:.75rem;font-weight:600;padding:.375rem 1rem;
+           border-radius:.5rem;background:#2563eb;color:#fff;border:none;cursor:pointer;">
+    Verstanden
+  </button>
+</div>
+<script>
+  (function() {
+    if (!localStorage.getItem('cookie-ok')) {
+      document.getElementById('cookieBanner').style.display = 'flex';
+    }
+  })();
+  function acceptCookies() {
+    localStorage.setItem('cookie-ok', '1');
+    document.getElementById('cookieBanner').style.display = 'none';
+  }
+</script>
 </body>
 </html>
